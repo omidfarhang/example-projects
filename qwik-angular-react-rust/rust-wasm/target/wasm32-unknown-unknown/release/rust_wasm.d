@@ -1,0 +1,1 @@
+/home/omid/Projects/omid/example-projects/qwik-angular-react-rust/rust-wasm/target/wasm32-unknown-unknown/release/rust_wasm.wasm: /home/omid/Projects/omid/example-projects/qwik-angular-react-rust/rust-wasm/src/lib.rs
