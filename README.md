@@ -1,12 +1,12 @@
 # Example Projects
 
-Companion source code for tutorials and technical posts on [omid.dev](https://omid.dev).
+Runnable companion projects for articles on [omid.dev](https://omid.dev).
 
-The goal of this repository is to keep blog posts readable while still giving readers a complete, runnable reference when a post grows beyond small snippets. Each top-level folder is an independent example project with its own README, dependencies, and run instructions.
+This repository exists for the examples that are too large for a blog post but still small enough to understand in one sitting. Each top-level folder is a focused project with its own dependencies, README, and run instructions.
 
-## Quick Start
+## Start Here
 
-Clone the repo and open the example you want to run:
+Pick the example that matches the article or topic you are reading, then install and run it from that folder:
 
 ```bash
 git clone https://github.com/omidfarhang/example-projects.git
@@ -15,59 +15,65 @@ npm install
 npm start
 ```
 
-Most examples are Angular-based and run on `http://localhost:4200`. Some projects include an API server, Firebase setup, Stencil build step, or multiple frontend apps; check the README inside each folder before running.
+Most frontend examples are Angular apps and open on `http://localhost:4200`. Some projects include an API server, Firebase setup, WebAssembly build step, or multiple apps. Check the README inside the project folder before running commands.
 
-## Projects
+## What You Can Explore
 
-### Tier A — Runnable tutorials
+| Area | Projects |
+| --- | --- |
+| Angular application patterns | [`angular-patterns-and-di`](./angular-patterns-and-di/), [`angular-dynamic-form-debugging`](./angular-dynamic-form-debugging/), [`angular-shared-library-workspace`](./angular-shared-library-workspace/) |
+| Browser performance | [`angular-web-workers-offscreencanvas`](./angular-web-workers-offscreencanvas/), [`angular-web-audio-visualizer`](./angular-web-audio-visualizer/), [`rust-wasm-performance-demo`](./rust-wasm-performance-demo/) |
+| APIs and data fetching | [`angular-graphql-apollo`](./angular-graphql-apollo/), [`graphql-express-angular-migration`](./graphql-express-angular-migration/) |
+| Real-time applications | [`angular-collaborative-editor-firebase-webrtc`](./angular-collaborative-editor-firebase-webrtc/), [`realtime-frontend-patterns`](./realtime-frontend-patterns/) |
+| Micro frontends and web components | [`qwik-angular-react-rust`](./qwik-angular-react-rust/), [`angular-stencil-web-components`](./angular-stencil-web-components/) |
+| TypeScript and state management | [`typescript-advanced-types`](./typescript-advanced-types/), [`react-recoil-advanced-state`](./react-recoil-advanced-state/) |
+| Tooling and migration | [`angular-custom-schematics`](./angular-custom-schematics/), [`bootstrap-to-tailwind-migration`](./bootstrap-to-tailwind-migration/), [`jupyter-blog-starter`](./jupyter-blog-starter/) |
 
-| Project | Stack | Blog post |
+## Project Index
+
+| Project | Focus | Related article |
 | --- | --- | --- |
-| [`angular-web-audio-visualizer`](./angular-web-audio-visualizer/) | Angular, Web Audio API, Canvas | [Creating Dynamic Music Visualizations with Angular and the Web Audio API](https://omid.dev/2024/07/13/creating-dynamic-music-visualizations-with-angular-and-the-web-audio-api/) |
-| [`qwik-angular-react-rust`](./qwik-angular-react-rust/) | Qwik, Angular, React, Rust WASM | [Micro Frontends: Working Example](https://omid.dev/2024/05/11/micro-frontends-working-example/) |
-| [`angular-collaborative-editor-firebase-webrtc`](./angular-collaborative-editor-firebase-webrtc/) | Angular, Firebase, Firestore, WebRTC | [Building a Real-Time Collaborative Editor with Angular, Firebase, and WebRTC](https://omid.dev/2024/06/24/realtime-collaborative-editor-with-angular-firebase-webrtc/) |
-| [`angular-web-workers-offscreencanvas`](./angular-web-workers-offscreencanvas/) | Angular, Web Workers, OffscreenCanvas | [Optimizing Angular Applications with Web Workers and OffscreenCanvas](https://omid.dev/2024/06/23/optimizing-angular-applications-with-web-workers-and-offscreencanvas/) |
-| [`angular-graphql-apollo`](./angular-graphql-apollo/) | Angular, Apollo Client, GraphQL, Express | [Integrating GraphQL with Angular: A Practical Guide](https://omid.dev/2024/06/01/integrating-graphql-with-angular-a-practical-guide/) |
-| [`angular-stencil-web-components`](./angular-stencil-web-components/) | Angular, Stencil, Web Components | [Implementing Custom Web Components in Angular with Stencil.js](https://omid.dev/2024/06/26/implementing-custom-web-components-in-angular-with-stenciljs/) |
+| [`angular-web-audio-visualizer`](./angular-web-audio-visualizer/) | Angular music visualization with the Web Audio API and Canvas | [Creating Dynamic Music Visualizations with Angular and the Web Audio API](https://omid.dev/2024/07/13/creating-dynamic-music-visualizations-with-angular-and-the-web-audio-api/) |
+| [`qwik-angular-react-rust`](./qwik-angular-react-rust/) | Qwik shell app that hosts Angular and React micro frontends, with optional Rust WASM | [Micro Frontends: Working Example](https://omid.dev/2024/05/11/micro-frontends-working-example/) |
+| [`angular-collaborative-editor-firebase-webrtc`](./angular-collaborative-editor-firebase-webrtc/) | Real-time Angular editor using Firebase, Firestore, and WebRTC signaling ideas | [Building a Real-Time Collaborative Editor with Angular, Firebase, and WebRTC](https://omid.dev/2024/06/24/realtime-collaborative-editor-with-angular-firebase-webrtc/) |
+| [`angular-web-workers-offscreencanvas`](./angular-web-workers-offscreencanvas/) | Moving canvas work off the main thread with Web Workers and OffscreenCanvas | [Optimizing Angular Applications with Web Workers and OffscreenCanvas](https://omid.dev/2024/06/23/optimizing-angular-applications-with-web-workers-and-offscreencanvas/) |
+| [`angular-graphql-apollo`](./angular-graphql-apollo/) | Angular app connected to a local GraphQL API with Apollo Client | [Integrating GraphQL with Angular: A Practical Guide](https://omid.dev/2024/06/01/integrating-graphql-with-angular-a-practical-guide/) |
+| [`angular-stencil-web-components`](./angular-stencil-web-components/) | Stencil web component consumed by an Angular app | [Implementing Custom Web Components in Angular with Stencil.js](https://omid.dev/2024/06/26/implementing-custom-web-components-in-angular-with-stenciljs/) |
+| [`typescript-advanced-types`](./typescript-advanced-types/) | Small TypeScript examples for mapped, conditional, recursive, and utility types | [Advanced TypeScript types](https://omid.dev/2024/06/14/advanced-typeScript-types/) |
+| [`react-recoil-advanced-state`](./react-recoil-advanced-state/) | React task dashboard demonstrating atoms, selectors, and derived state with Recoil | [Advanced state management in React with Recoil](https://omid.dev/2024/06/14/advanced-state-management-in-react-with-recoil/) |
+| [`realtime-frontend-patterns`](./realtime-frontend-patterns/) | Node examples for WebSocket and Server-Sent Events patterns | [Real-time data in frontend applications](https://omid.dev/2024/06/08/real-time-data-in-frontend-applications/) |
+| [`angular-patterns-and-di`](./angular-patterns-and-di/) | Angular design patterns, dependency injection, providers, and injection tokens | [Design patterns in Angular](https://omid.dev/2024/05/31/design-patterns-in-angular-enhancing-code-quality-and-maintainability/), [Advanced DI techniques](https://omid.dev/2024/06/17/advanced-dependency-injection-techniques-in-angular-tree-shakable-providers-and-injection-tokens/) |
+| [`angular-dynamic-form-debugging`](./angular-dynamic-form-debugging/) | Reactive form debugging scenario for Angular applications | [Debugging Angular](https://omid.dev/2024/05/22/debugging-angular-a-tale-of-two-developers/) |
+| [`angular-shared-library-workspace`](./angular-shared-library-workspace/) | Angular workspace containing a reusable UI library and demo app | [Reusable shared module in Angular](https://omid.dev/2024/05/12/reusable-shared-module-in-angular/) |
+| [`angular-custom-schematics`](./angular-custom-schematics/) | Angular schematics for repeatable code generation | [Building custom Angular schematics](https://omid.dev/2024/06/03/building-custom-angular-schematics-automating-code-generation/) |
+| [`bootstrap-to-tailwind-migration`](./bootstrap-to-tailwind-migration/) | Side-by-side migration from Bootstrap-style markup to Tailwind CSS | [Migrate CSS Bootstrap to Tailwind](https://omid.dev/2024/05/22/migrate-css-bootstrap-to-tailwind/) |
+| [`rust-wasm-performance-demo`](./rust-wasm-performance-demo/) | Rust and WebAssembly benchmark served from a simple web page | [WebAssembly and Rust](https://omid.dev/2024/06/13/building-high-performance-web-applications-leveraging-webassembly-and-rust/) |
+| [`jupyter-blog-starter`](./jupyter-blog-starter/) | Python and Jupyter starter for notebook-driven technical analysis | [Jupyter setup guide](https://omid.dev/2025/12/23/jupyter-technical-setup-guide/), [Jupyter real-world examples](https://omid.dev/2025/12/23/jupyter-real-world-examples/) |
+| [`graphql-express-angular-migration`](./graphql-express-angular-migration/) | Express API showing REST and GraphQL side by side with an Angular client | [Migrating from REST to GraphQL](https://omid.dev/2024/08/07/migrating-from-rest-to-graphql-a-step-by-step-guide-for-expressjs-and-angular/) |
 
-### Tier B — Optional companion examples
+## Common Requirements
 
-| Project | Stack | Blog post |
-| --- | --- | --- |
-| [`typescript-advanced-types`](./typescript-advanced-types/) | TypeScript | [Advanced TypeScript types](https://omid.dev/2024/06/14/advanced-typeScript-types/) |
-| [`react-recoil-advanced-state`](./react-recoil-advanced-state/) | React, Recoil | [Advanced state management in React with Recoil](https://omid.dev/2024/06/14/advanced-state-management-in-react-with-recoil/) |
-| [`realtime-frontend-patterns`](./realtime-frontend-patterns/) | Node, WebSocket, SSE | [Real-time data in frontend applications](https://omid.dev/2024/06/08/real-time-data-in-frontend-applications/) |
-| [`angular-patterns-and-di`](./angular-patterns-and-di/) | Angular, DI tokens | [Design patterns in Angular](https://omid.dev/2024/05/31/design-patterns-in-angular-enhancing-code-quality-and-maintainability/), [Advanced DI techniques](https://omid.dev/2024/06/17/advanced-dependency-injection-techniques-in-angular-tree-shakable-providers-and-injection-tokens/) |
-| [`angular-dynamic-form-debugging`](./angular-dynamic-form-debugging/) | Angular, Reactive Forms | [Debugging Angular](https://omid.dev/2024/05/22/debugging-angular-a-tale-of-two-developers/) |
-| [`angular-shared-library-workspace`](./angular-shared-library-workspace/) | Angular library workspace | [Reusable shared module in Angular](https://omid.dev/2024/05/12/reusable-shared-module-in-angular/) |
-| [`angular-custom-schematics`](./angular-custom-schematics/) | Angular schematics | [Building custom Angular schematics](https://omid.dev/2024/06/03/building-custom-angular-schematics-automating-code-generation/) |
-| [`bootstrap-to-tailwind-migration`](./bootstrap-to-tailwind-migration/) | Bootstrap, Tailwind | [Migrate CSS Bootstrap to Tailwind](https://omid.dev/2024/05/22/migrate-css-bootstrap-to-tailwind/) |
-| [`rust-wasm-performance-demo`](./rust-wasm-performance-demo/) | Rust, WebAssembly | [WebAssembly and Rust](https://omid.dev/2024/06/13/building-high-performance-web-applications-leveraging-webassembly-and-rust/) |
-| [`jupyter-blog-starter`](./jupyter-blog-starter/) | Python, Jupyter, uv | [Jupyter setup guide](https://omid.dev/2025/12/23/jupyter-technical-setup-guide/), [Jupyter real-world examples](https://omid.dev/2025/12/23/jupyter-real-world-examples/) |
-| [`graphql-express-angular-migration`](./graphql-express-angular-migration/) | Express REST + GraphQL, Angular | [Migrating from REST to GraphQL](https://omid.dev/2024/08/07/migrating-from-rest-to-graphql-a-step-by-step-guide-for-expressjs-and-angular/) |
-
-## Requirements
-
-- Node.js 20+ and npm
-- Angular CLI 18+ for Angular examples:
+- Node.js 20+ and npm for most JavaScript and Angular examples. If you use `nvm`, run `nvm use` from the repository root.
+- Angular CLI 18+ for Angular projects:
 
 ```bash
 npm install -g @angular/cli@18
 ```
 
-Some examples need additional setup:
+- Rust, `wasm-pack`, Python, `uv`, or Firebase access only for projects that explicitly mention them in their README.
 
-- `angular-collaborative-editor-firebase-webrtc` needs a Firebase project. Copy `.env.example` values into `src/environments/environment.ts`, then enable Anonymous Auth and Firestore.
-- `angular-graphql-apollo` includes a local GraphQL server. Start `server/` before running the Angular app.
-- `angular-stencil-web-components` has two parts: build the Stencil component first, then run the Angular app.
-- `qwik-angular-react-rust` has multiple apps. Start the Qwik shell, Angular app, and React app in separate terminals.
-- `graphql-express-angular-migration` includes REST and GraphQL endpoints. Start `server/` before the Angular app.
-- `jupyter-blog-starter` supports `uv sync` or `pip install -r requirements.txt`.
-- `rust-wasm-performance-demo` requires `wasm-pack build --target web --out-dir web/pkg` before opening the browser demo.
+## Project-Specific Setup
 
-## Repository Layout
+- `angular-collaborative-editor-firebase-webrtc` needs a Firebase project with Anonymous Authentication and Cloud Firestore enabled.
+- `angular-graphql-apollo` and `graphql-express-angular-migration` include local API servers. Start the `server/` app before the Angular app.
+- `angular-stencil-web-components` has two parts. Build the Stencil component first, then run the Angular app.
+- `qwik-angular-react-rust` is a multi-app demo. Run the Qwik shell, Angular app, and React app in separate terminals.
+- `jupyter-blog-starter` supports either `uv sync` or a standard Python virtual environment.
+- `rust-wasm-performance-demo` requires `wasm-pack build --target web --out-dir web/pkg` before serving the browser demo.
 
-Each example should stay self-contained:
+## Repository Shape
+
+Each example is intentionally self-contained:
 
 ```text
 example-projects/
@@ -77,7 +83,7 @@ example-projects/
     src/
 ```
 
-For multi-part examples, keep the parts under one folder:
+Multi-part examples keep related apps together:
 
 ```text
 example-projects/
@@ -86,18 +92,18 @@ example-projects/
     src/
 ```
 
-## Maintenance Notes
+## Maintenance Guidelines
 
-- Keep generated dependencies (`node_modules/`, `dist/`, Angular cache, Rust `target/`) out of git.
-- Prefer stable, tutorial-friendly code over clever abstractions.
-- Keep each example aligned with the blog post it supports.
-- If a sample needs secrets or local configuration, provide `.env.example` or documented placeholder values.
+- Keep examples aligned with the article they support.
+- Prefer clear tutorial code over clever abstractions.
+- Keep generated output out of git, including `node_modules/`, `dist/`, Angular cache folders, Rust `target/`, and local notebook artifacts.
+- Document required secrets or local configuration with placeholder values or `.env.example`.
 - Add new examples as top-level kebab-case folders named after the post or the main demo idea.
-
-## Backlog
-
-Tier B examples are now included. See [`TIER_B_BACKLOG.md`](./TIER_B_BACKLOG.md) for the completed mapping.
 
 ## Contributing
 
-These projects mirror blog tutorials. If you find a bug, dependency issue, or mismatch with a post, open an issue or pull request.
+Issues and pull requests are welcome when an example is broken, outdated, or no longer matches the related article. See [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
+
+## License
+
+This repository is licensed under the [MIT License](./LICENSE).
