@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "FeatureSchema",
+  "title": "Feature Schematic",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Feature name",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "default": "src/app",
+      "description": "Path where the feature will be created"
+    }
+  },
+  "required": ["name"]
+}

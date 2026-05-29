@@ -1,0 +1,11 @@
+.settings {
+  margin: 20px;
+}
+
+label {
+  margin-right: 10px;
+}
+
+select {
+  padding: 4px 8px;
+}

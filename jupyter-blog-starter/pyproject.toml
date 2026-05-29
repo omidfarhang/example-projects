@@ -1,0 +1,15 @@
+[project]
+name = "jupyter-blog-starter"
+version = "0.1.0"
+description = "Companion starter for omid.dev Jupyter blog posts"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "jupyterlab>=4.2.0",
+  "pandas>=2.2.0",
+  "matplotlib>=3.9.0",
+  "requests>=2.32.0",
+]
+
+[tool.uv]
+dev-dependencies = []

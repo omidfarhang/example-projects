@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Realtime Frontend Patterns</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Realtime Frontend Patterns</h1>
+      <p>Companion demo for WebSockets and Server-Sent Events.</p>
+
+      <section>
+        <h2>WebSocket</h2>
+        <p id="ws-status">Disconnected</p>
+        <input id="ws-input" placeholder="Send a message" />
+        <button id="ws-send" type="button">Send</button>
+        <ul id="ws-log"></ul>
+      </section>
+
+      <section>
+        <h2>Server-Sent Events</h2>
+        <p id="sse-status">Disconnected</p>
+        <ul id="sse-log"></ul>
+      </section>
+    </main>
+    <script type="module" src="/client.js"></script>
+  </body>
+</html>

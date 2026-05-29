@@ -1,0 +1,12 @@
+{
+  "name": "typescript-advanced-types",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Companion examples for advanced TypeScript types blog post",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.tests.json"
+  },
+  "devDependencies": {
+    "typescript": "~5.5.2"
+  }
+}

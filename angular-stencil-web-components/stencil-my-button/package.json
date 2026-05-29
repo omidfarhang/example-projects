@@ -1,0 +1,14 @@
+{
+  "name": "stencil-my-button",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Stencil web component library for the omid.dev Stencil + Angular tutorial",
+  "scripts": {
+    "build": "stencil build",
+    "start": "stencil build --dev --watch --serve"
+  },
+  "devDependencies": {
+    "@stencil/core": "^4.22.0",
+    "typescript": "~5.5.2"
+  }
+}

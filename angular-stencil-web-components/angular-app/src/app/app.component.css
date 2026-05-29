@@ -1,0 +1,11 @@
+.container {
+  font-family: Arial, sans-serif;
+  max-width: 640px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+}
+
+my-button {
+  display: inline-block;
+  margin-top: 1rem;
+}

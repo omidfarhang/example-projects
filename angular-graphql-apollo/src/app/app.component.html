@@ -1,0 +1,25 @@
+<main class="container">
+  <h1>GraphQL + Angular (Apollo)</h1>
+  <p>Companion demo for the omid.dev GraphQL integration guide.</p>
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  <section>
+    <h2>Items</h2>
+    <ul>
+      @for (item of items; track item.id) {
+        <li>{{ item.name }}</li>
+      }
+    </ul>
+  </section>
+
+  <section>
+    <h2>Add item</h2>
+    <form (submit)="addItem(); $event.preventDefault()">
+      <input [(ngModel)]="newItemName" name="newItemName" placeholder="Item name" />
+      <button type="submit">Add</button>
+    </form>
+  </section>
+</main>

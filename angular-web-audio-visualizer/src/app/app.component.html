@@ -1,0 +1,6 @@
+<div class="app-container">
+  <h1>Music Visualizer</h1>
+  <app-settings (styleChange)="onStyleChange($event)"></app-settings>
+  <app-audio-player></app-audio-player>
+  <app-visualizer [style]="selectedStyle"></app-visualizer>
+</div>

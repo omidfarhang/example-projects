@@ -1,0 +1,10 @@
+{
+  "name": "angular-custom-schematics",
+  "version": "0.0.1",
+  "private": true,
+  "schematics": "./collection.json",
+  "dependencies": {
+    "@angular-devkit/core": "^18.2.21",
+    "@angular-devkit/schematics": "^18.2.21"
+  }
+}

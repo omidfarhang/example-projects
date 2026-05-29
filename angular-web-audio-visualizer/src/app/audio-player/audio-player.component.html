@@ -1,0 +1,15 @@
+<div class="audio-player">
+  <input type="file" accept="audio/*" (change)="onFileSelected($event)" />
+  <audio #audio src="assets/sample.mp3"></audio>
+  <button type="button" (click)="play()" aria-label="Play">
+    <fa-icon [icon]="faPlay"></fa-icon>
+  </button>
+  @if (isPlaying) {
+    <button type="button" (click)="pause()" aria-label="Pause">
+      <fa-icon [icon]="faPause"></fa-icon>
+    </button>
+  }
+  <button type="button" (click)="stop()" aria-label="Stop">
+    <fa-icon [icon]="faStop"></fa-icon>
+  </button>
+</div>

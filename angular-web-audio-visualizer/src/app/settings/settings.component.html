@@ -1,0 +1,12 @@
+<div class="settings">
+  <label for="styleSelect">Visualization Style:</label>
+  <select
+    id="styleSelect"
+    [(ngModel)]="selectedStyle"
+    (ngModelChange)="onStyleChange($event)"
+  >
+    @for (style of styles; track style) {
+      <option [ngValue]="style">{{ style }}</option>
+    }
+  </select>
+</div>

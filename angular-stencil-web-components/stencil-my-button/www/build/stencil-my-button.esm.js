@@ -1,0 +1,1 @@
+import{p as t,b as a}from"./p-_YcaRUs3.js";export{s as setNonce}from"./p-_YcaRUs3.js";import{g as o}from"./p-DQuL1Twl.js";(()=>{const s=import.meta.url,a={};return""!==s&&(a.resourcesUrl=new URL(".",s).href),t(a)})().then((async s=>(await o(),a([["p-f3c5944e",[[513,"my-button",{text:[1]}]]]],s))));

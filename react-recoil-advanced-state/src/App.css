@@ -1,0 +1,54 @@
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.dashboard-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.task-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.task-item label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.task-item input[type='text'] {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+}
+
+.summary {
+  margin: 0.5rem 0 0;
+  color: #444;
+}
+
+.suggestion {
+  margin: 0.25rem 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}

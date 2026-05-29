@@ -1,0 +1,25 @@
+<main class="layout">
+  <h1>REST to GraphQL Migration</h1>
+  <p>Compare the same user list through REST and GraphQL endpoints.</p>
+
+  <div class="mode-switch">
+    <button type="button" [class.active]="mode === 'rest'" (click)="switchMode('rest')">REST</button>
+    <button type="button" [class.active]="mode === 'graphql'" (click)="switchMode('graphql')">GraphQL</button>
+  </div>
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  <ul>
+    @for (user of users; track user.id) {
+      <li>{{ user.name }} — {{ user.email }}</li>
+    }
+  </ul>
+
+  <form (submit)="addUser(); $event.preventDefault()">
+    <input [(ngModel)]="name" name="name" placeholder="Name" />
+    <input [(ngModel)]="email" name="email" placeholder="Email" />
+    <button type="submit">Add user via {{ mode | uppercase }}</button>
+  </form>
+</main>
