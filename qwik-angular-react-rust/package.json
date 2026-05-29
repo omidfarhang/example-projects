@@ -1,0 +1,13 @@
+{
+  "name": "qwik-angular-react-rust",
+  "private": true,
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('qwik-micro-frontend/public/mfes', { recursive: true, force: true })\"",
+    "build:angular": "npm run build --prefix angular-app",
+    "build:react": "npm run build --prefix react-app",
+    "build:rust": "node scripts/build-rust.mjs",
+    "build:shell": "npm run build --prefix qwik-micro-frontend",
+    "build": "npm run clean && npm run build:angular && npm run build:react && npm run build:rust && npm run build:shell",
+    "dev": "npm run build:angular && npm run build:react && npm run build:rust && npm run dev --prefix qwik-micro-frontend"
+  }
+}

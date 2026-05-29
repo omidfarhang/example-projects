@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub fn your_function() -> String {
-    "Hello from Rust!".to_string()
+pub fn format_message(input: &str) -> String {
+    format!("{} -> formatted by Rust", input)
 }

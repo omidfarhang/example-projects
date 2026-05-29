@@ -1,1 +1,9 @@
-Hello Angular!
+<section class="micro-card angular-card">
+  <p class="eyebrow">Angular micro frontend</p>
+  <h2>Hello from Angular</h2>
+  <p>
+    The Qwik shell passed this message through a custom element attribute:
+  </p>
+  <strong>{{ message || 'No message yet' }}</strong>
+  <button type="button" (click)="sendMessage()">Send message to shell</button>
+</section>

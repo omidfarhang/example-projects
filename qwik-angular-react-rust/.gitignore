@@ -1,0 +1,4 @@
+qwik-micro-frontend/public/mfes/
+qwik-micro-frontend/dist/
+angular-app/.angular/
+**/node_modules/

@@ -2,50 +2,51 @@
 
 Companion project for [Micro Frontends: Working Example](https://omid.dev/2024/05/11/micro-frontends-working-example/).
 
-A micro frontend demo with a Qwik shell app integrating Angular and React micro frontends, plus a Rust WASM module.
+A micro frontend demo with a Qwik shell app that composes Angular and React micro frontends as custom elements, plus an optional Rust WebAssembly module.
 
 ## Structure
 
 ```
 qwik-angular-react-rust/
-├── qwik-micro-frontend/   # Shell application
+├── qwik-micro-frontend/   # Qwik shell application
 ├── angular-app/           # Angular micro frontend
 ├── react-app/             # React micro frontend
-└── rust-wasm/             # Rust WebAssembly module
+├── rust-wasm/             # Rust WebAssembly module
+└── scripts/               # Shared build helpers
 ```
+
+Each micro frontend builds into `qwik-micro-frontend/public/mfes/`. The shell loads those bundles at runtime and renders them as `<angular-microfrontend>` and `<react-microfrontend>` custom elements.
 
 ## Prerequisites
 
 - Node.js 20+
-- Rust toolchain (for `rust-wasm` only)
+- Rust toolchain and `wasm-pack` (optional, for `rust-wasm`)
 
-## Run
+## Run locally
 
-Start each app in a separate terminal:
-
-```bash
-# Qwik shell (default port 5173)
-cd qwik-micro-frontend
-npm install
-npm start
-
-# Angular micro frontend (port 4200)
-cd angular-app
-npm install
-npm start
-
-# React micro frontend (port 3000)
-cd react-app
-npm install
-npm start
-```
-
-Build Rust WASM (optional):
+From the project root:
 
 ```bash
-cd rust-wasm
-wasm-pack build --target web
+npm install --prefix qwik-micro-frontend
+npm install --prefix angular-app
+npm install --prefix react-app
+npm run dev
 ```
+
+This builds the Angular and React bundles, optionally builds Rust WASM when `wasm-pack` is available, and starts the Qwik shell on `http://localhost:5173`.
+
+## Build everything
+
+```bash
+npm run build
+```
+
+That command:
+
+1. Builds Angular into `qwik-micro-frontend/public/mfes/angular`
+2. Builds React into `qwik-micro-frontend/public/mfes/react`
+3. Builds Rust WASM into `qwik-micro-frontend/public/mfes/rust-wasm` when `wasm-pack` is installed
+4. Builds the Qwik shell
 
 ## Blog post
 
