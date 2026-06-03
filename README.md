@@ -23,6 +23,7 @@ Most frontend examples are Angular apps and open on `http://localhost:4200`. Som
 | --- | --- |
 | Angular application patterns | [`angular-patterns-and-di`](./angular-patterns-and-di/), [`angular-dynamic-form-debugging`](./angular-dynamic-form-debugging/), [`angular-shared-library-workspace`](./angular-shared-library-workspace/) |
 | Browser performance | [`angular-web-workers-offscreencanvas`](./angular-web-workers-offscreencanvas/), [`angular-web-audio-visualizer`](./angular-web-audio-visualizer/), [`rust-wasm-performance-demo`](./rust-wasm-performance-demo/) |
+| Linux desktop and kernel-adjacent tooling | [`latency-lens`](./latency-lens/) |
 | APIs and data fetching | [`angular-graphql-apollo`](./angular-graphql-apollo/), [`graphql-express-angular-migration`](./graphql-express-angular-migration/) |
 | Real-time applications | [`angular-collaborative-editor-firebase-webrtc`](./angular-collaborative-editor-firebase-webrtc/), [`realtime-frontend-patterns`](./realtime-frontend-patterns/) |
 | Micro frontends and web components | [`qwik-angular-react-rust`](./qwik-angular-react-rust/), [`angular-stencil-web-components`](./angular-stencil-web-components/) |
@@ -48,6 +49,7 @@ Most frontend examples are Angular apps and open on `http://localhost:4200`. Som
 | [`angular-custom-schematics`](./angular-custom-schematics/) | Angular schematics for repeatable code generation | [Building custom Angular schematics](https://omid.dev/2024/06/03/building-custom-angular-schematics-automating-code-generation/) |
 | [`bootstrap-to-tailwind-migration`](./bootstrap-to-tailwind-migration/) | Side-by-side migration from Bootstrap-style markup to Tailwind CSS | [Migrate CSS Bootstrap to Tailwind](https://omid.dev/2024/05/22/migrate-css-bootstrap-to-tailwind/) |
 | [`rust-wasm-performance-demo`](./rust-wasm-performance-demo/) | Rust and WebAssembly benchmark served from a simple web page | [WebAssembly and Rust](https://omid.dev/2024/06/13/building-high-performance-web-applications-leveraging-webassembly-and-rust/) |
+| [`latency-lens`](./latency-lens/) | Rust TUI that reads Linux PSI and explains desktop stutter from kernel pressure signals | [Building a Tiny Linux App to Explain Desktop Stutter](https://omid.dev/2026/06/04/building-a-tiny-linux-app-to-explain-desktop-stutter/) |
 | [`jupyter-blog-starter`](./jupyter-blog-starter/) | Python and Jupyter starter for notebook-driven technical analysis | [Jupyter setup guide](https://omid.dev/2025/12/23/jupyter-technical-setup-guide/), [Jupyter real-world examples](https://omid.dev/2025/12/23/jupyter-real-world-examples/) |
 | [`graphql-express-angular-migration`](./graphql-express-angular-migration/) | Express API showing REST and GraphQL side by side with an Angular client | [Migrating from REST to GraphQL](https://omid.dev/2024/08/07/migrating-from-rest-to-graphql-a-step-by-step-guide-for-expressjs-and-angular/) |
 
@@ -61,6 +63,7 @@ npm install -g @angular/cli@18
 ```
 
 - Rust, `wasm-pack`, Python, `uv`, or Firebase access only for projects that explicitly mention them in their README.
+- Rust toolchain for [`latency-lens`](./latency-lens/) (no root or eBPF required).
 
 ## Project-Specific Setup
 
@@ -70,6 +73,7 @@ npm install -g @angular/cli@18
 - `qwik-angular-react-rust` is a multi-app demo. Run the Qwik shell, Angular app, and React app in separate terminals.
 - `jupyter-blog-starter` supports either `uv sync` or a standard Python virtual environment.
 - `rust-wasm-performance-demo` requires `wasm-pack build --target web --out-dir web/pkg` before serving the browser demo.
+- `latency-lens` is a native Linux binary. Run `cargo run -- --once` from the project folder for a one-shot snapshot.
 
 ## Repository Shape
 

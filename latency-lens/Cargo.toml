@@ -1,0 +1,20 @@
+[package]
+name = "latency-lens"
+version = "0.1.0"
+edition = "2021"
+description = "A tiny Linux app that reads kernel pressure signals and explains desktop stutter"
+license = "MIT"
+readme = "README.md"
+
+[[bin]]
+name = "latency-lens"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+crossterm = "0.28"
+ratatui = "0.29"
+thiserror = "2"
+
+[dev-dependencies]
+tempfile = "3"
