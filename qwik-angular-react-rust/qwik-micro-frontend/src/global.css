@@ -44,8 +44,23 @@ button {
 .hero h1,
 .hero p,
 .status p,
+.wasm-card h2,
 .wasm-card p {
   margin: 0;
+}
+
+.wasm-card h2 {
+  font-size: 1.5rem;
+}
+
+.wasm-card button {
+  background: #ce422b;
+  justify-self: start;
+}
+
+.wasm-card button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .hero h1 {

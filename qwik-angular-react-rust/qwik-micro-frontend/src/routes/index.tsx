@@ -45,10 +45,26 @@ const loadScript = (src: string) => {
   return promise;
 };
 
+type RustWasm = {
+  default: () => Promise<unknown>;
+  analyze_message: (input: string) => string;
+  count_primes: (limit: number) => number;
+};
+
+type RustWasmApi = Pick<RustWasm, 'analyze_message' | 'count_primes'>;
+
+declare global {
+  interface Window {
+    rustWasmApi?: RustWasmApi;
+  }
+}
+
 export default component$(() => {
   const assetsReady = useSignal(false);
   const message = useSignal('Hello from the Qwik shell');
-  const rustMessage = useSignal('Rust WASM has not been built yet.');
+  const rustReady = useSignal(false);
+  const rustStats = useSignal('Loading Rust WASM...');
+  const rustBenchmark = useSignal('');
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(({ cleanup }) => {
@@ -71,18 +87,15 @@ export default component$(() => {
       assetsReady.value = true;
     });
 
-    importBrowserModule<{
-      default: () => Promise<unknown>;
-      format_message: (input: string) => string;
-    }>(
-      assetUrl('mfes/rust-wasm/rust_wasm.js'),
-    )
+    importBrowserModule<RustWasm>(assetUrl('mfes/rust-wasm/rust_wasm.js'))
       .then(async (rust) => {
         await rust.default();
-        rustMessage.value = rust.format_message('Qwik loaded Rust WASM');
+        window.rustWasmApi = rust;
+        rustReady.value = true;
+        rustStats.value = rust.analyze_message(message.value);
       })
       .catch(() => {
-        rustMessage.value =
+        rustStats.value =
           'Run `npm run build:rust` from the project root to enable Rust WASM.';
       });
 
@@ -94,8 +107,34 @@ export default component$(() => {
     });
   });
 
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(({ track }) => {
+    track(() => message.value);
+
+    if (!window.rustWasmApi) {
+      return;
+    }
+
+    rustStats.value = window.rustWasmApi.analyze_message(message.value);
+  });
+
   const updateFromShell = $(() => {
     message.value = 'Qwik updated the contract for every micro frontend';
+  });
+
+  const runPrimeBenchmark = $(() => {
+    if (!window.rustWasmApi) {
+      return;
+    }
+
+    const limit = 500_000;
+    rustBenchmark.value = 'Running prime sieve in Rust WASM...';
+
+    const started = performance.now();
+    const count = window.rustWasmApi.count_primes(limit);
+    const elapsedMs = (performance.now() - started).toFixed(1);
+
+    rustBenchmark.value = `Found ${count.toLocaleString()} primes up to ${limit.toLocaleString()} in ${elapsedMs} ms`;
   });
 
   return (
@@ -105,7 +144,8 @@ export default component$(() => {
         <h1>Qwik composing Angular, React, and Rust</h1>
         <p>
           The shell owns routing and shared state. Angular and React are loaded
-          as custom elements, and Rust provides a small WebAssembly function.
+          as custom elements, and Rust WebAssembly handles CPU work inside the
+          shell.
         </p>
         <button type="button" onClick$={updateFromShell}>
           Update shared message from Qwik
@@ -132,7 +172,23 @@ export default component$(() => {
 
       <section class="wasm-card">
         <p class="eyebrow">Rust WebAssembly</p>
-        <p>{rustMessage.value}</p>
+        <h2>Compute from WebAssembly</h2>
+        <p>
+          Unlike Angular and React, Rust is not rendered as a custom element.
+          The Qwik shell imports a WASM module when it needs fast native code.
+        </p>
+        <p>
+          <strong>Shared message analysis:</strong>{' '}
+          <span>{rustStats.value}</span>
+        </p>
+        <button
+          type="button"
+          disabled={!rustReady.value}
+          onClick$={runPrimeBenchmark}
+        >
+          Run prime sieve in Rust WASM
+        </button>
+        {rustBenchmark.value ? <p>{rustBenchmark.value}</p> : null}
       </section>
     </main>
   );

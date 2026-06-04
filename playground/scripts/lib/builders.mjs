@@ -180,7 +180,8 @@ export function buildQwikMfe(demo, category) {
   copyDir(deploySource, distDemoDir(demo.slug, category));
 
   const mfesSrc = path.join(built, 'mfes');
-  if (dirExists(mfesSrc)) {
+  const deployMfes = path.join(deploySource, 'mfes');
+  if (!dirExists(deployMfes) && dirExists(mfesSrc)) {
     copyDir(mfesSrc, path.join(distDemoDir(demo.slug, category), 'mfes'));
   }
 }
