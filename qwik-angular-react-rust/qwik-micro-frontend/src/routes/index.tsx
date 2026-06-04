@@ -5,7 +5,7 @@ type MicroFrontendEvent = CustomEvent<{
   message: string;
 }>;
 
-const assetBase = import.meta.env.BASE_URL ?? '/';
+const assetBase = import.meta.env.BASE_URL;
 
 const assetUrl = (path: string) => {
   const base = assetBase.endsWith('/') ? assetBase : `${assetBase}/`;
@@ -71,10 +71,14 @@ export default component$(() => {
       assetsReady.value = true;
     });
 
-    importBrowserModule<{ format_message: (input: string) => string }>(
+    importBrowserModule<{
+      default: () => Promise<unknown>;
+      format_message: (input: string) => string;
+    }>(
       assetUrl('mfes/rust-wasm/rust_wasm.js'),
     )
-      .then((rust) => {
+      .then(async (rust) => {
+        await rust.default();
         rustMessage.value = rust.format_message('Qwik loaded Rust WASM');
       })
       .catch(() => {

@@ -142,12 +142,11 @@ export function buildQwikMfe(demo, category) {
   run('npm', ['run', 'build:angular'], { cwd: root, env: angularCliEnv });
   run('npm', ['run', 'build:react'], { cwd: root });
 
-  try {
-    ensureRustToolchain();
-    run('npm', ['run', 'build:rust'], { cwd: root });
-  } catch (err) {
-    console.warn(`  ⚠ Rust WASM skipped for ${demo.slug}: ${err.message}`);
-  }
+  ensureRustToolchain();
+  run('npm', ['run', 'build:rust'], {
+    cwd: root,
+    env: { PLAYGROUND_REQUIRE_RUST_WASM: '1' },
+  });
 
   const qwikBuildEnv = {
     PLAYGROUND_BASE: baseHref,
