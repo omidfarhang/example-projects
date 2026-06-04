@@ -37,6 +37,13 @@ export function buildAngular(demo, category) {
   const cwd = projectDir(demo);
   const baseHref = demoPublicPath(demo.slug, category);
   npmInstall(cwd, { legacyPeerDeps: demo.legacyPeerDeps });
+  for (const lib of demo.angularLibraries ?? []) {
+    run(
+      'npx',
+      ['ng', 'build', '--project', lib, '--configuration', 'production'],
+      { cwd, env: angularCliEnv, label: `ng build lib ${lib}` },
+    );
+  }
   const projectFlag = demo.angularProject ? ['--project', demo.angularProject] : [];
   run(
     'npx',

@@ -65,6 +65,7 @@
       "projectDir": "angular-shared-library-workspace",
       "type": "angular-workspace",
       "angularProject": "demo-app",
+      "angularLibraries": ["my-shared-ui"],
       "articleUrl": "https://omid.dev/2024/05/12/reusable-shared-module-in-angular/"
     },
     {
