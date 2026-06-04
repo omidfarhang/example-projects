@@ -34,6 +34,11 @@ export function writeLandingPage(manifest) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Omid Playground — Live Examples</title>
+  <link rel="icon" href="https://omid.dev/logo/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="16x16" href="https://omid.dev/logo/favicon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="https://omid.dev/logo/favicon-32x32.png" />
+  <link rel="apple-touch-icon" href="https://omid.dev/logo/apple-touch-icon.png" />
+  <link rel="mask-icon" href="https://omid.dev/logo/safari-pinned-tab.svg" />
   <style>
     :root {
       color-scheme: light dark;
@@ -73,7 +78,6 @@ export function writeLandingPage(manifest) {
     .demo-card__links { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; font-size: 0.88rem; }
     .demo-card__links a { color: var(--accent); }
     .demo-card__primary { font-weight: 600; }
-    .reserved { color: var(--muted); font-size: 0.9rem; }
     footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.85rem; }
     footer a { color: var(--accent); }
   </style>
@@ -90,10 +94,6 @@ export function writeLandingPage(manifest) {
         <div class="demo-grid">
           ${demoCards}
         </div>
-      </section>
-      <section>
-        <h2>Coming later</h2>
-        <p class="reserved"><code>/tools</code>, <code>/benchmarks</code>, and <code>/labs</code> are reserved for future interactive content.</p>
       </section>
     </div>
     <footer>
