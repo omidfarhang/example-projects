@@ -11,6 +11,12 @@ const playgroundOrigin = (
 
 export default extendConfig(baseConfig, () => ({
   base: playgroundBase,
+  build: {
+    ssr: true,
+    rollupOptions: {
+      input: ['@qwik-city-plan'],
+    },
+  },
   plugins: [
     staticAdapter({
       origin: playgroundOrigin,

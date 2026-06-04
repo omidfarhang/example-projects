@@ -149,13 +149,20 @@ export function buildQwikMfe(demo, category) {
     console.warn(`  ⚠ Rust WASM skipped for ${demo.slug}: ${err.message}`);
   }
 
+  const qwikBuildEnv = {
+    PLAYGROUND_BASE: baseHref,
+    PLAYGROUND_ORIGIN: origin,
+  };
+
   run('npm', ['run', 'build.client'], {
     cwd: shellDir,
-    env: {
-      PLAYGROUND_BASE: baseHref,
-      PLAYGROUND_ORIGIN: origin,
-    },
+    env: qwikBuildEnv,
     label: 'qwik client build',
+  });
+  run('npm', ['run', 'build.server'], {
+    cwd: shellDir,
+    env: qwikBuildEnv,
+    label: 'qwik static SSG',
   });
 
   const built = firstExistingDir(shellDir, ['dist']);
@@ -166,7 +173,10 @@ export function buildQwikMfe(demo, category) {
   const nested = path.join(built, 'examples', demo.slug);
   const deploySource = dirExists(nested) ? nested : built;
 
-  writeQwikShellIndex(deploySource, baseHref);
+  const indexHtml = path.join(deploySource, 'index.html');
+  if (!fileExists(indexHtml)) {
+    writeQwikShellIndex(deploySource, baseHref);
+  }
 
   copyDir(deploySource, distDemoDir(demo.slug, category));
 
