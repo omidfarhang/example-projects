@@ -1,1 +1,1 @@
-export function defineCustomElements(win?: Window): void;
+export declare function defineCustomElements(win?: Window): void;

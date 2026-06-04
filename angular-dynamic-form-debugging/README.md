@@ -2,6 +2,8 @@
 
 Companion project for [Debugging Angular: A Tale of Two Developers](https://omid.dev/2024/05/22/debugging-angular-a-tale-of-two-developers/).
 
+**Live demo:** https://playground.omid.dev/examples/angular-dynamic-form-debugging/ (prebuilt on [playground.omid.dev](https://playground.omid.dev))
+
 ## Run
 
 ```bash

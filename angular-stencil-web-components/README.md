@@ -2,6 +2,8 @@
 
 Companion project for [Implementing Custom Web Components in Angular with Stencil.js](https://omid.dev/2024/06/26/implementing-custom-web-components-in-angular-with-stenciljs/).
 
+**Live demo:** https://playground.omid.dev/examples/angular-stencil-web-components/ (prebuilt on [playground.omid.dev](https://playground.omid.dev))
+
 ## Structure
 
 ```

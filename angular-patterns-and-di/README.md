@@ -2,6 +2,8 @@
 
 Companion project for:
 
+**Live demo:** https://playground.omid.dev/examples/angular-patterns-and-di/ (prebuilt on [playground.omid.dev](https://playground.omid.dev))
+
 - [Design Patterns in Angular](https://omid.dev/2024/05/31/design-patterns-in-angular-enhancing-code-quality-and-maintainability/)
 - [Advanced Dependency Injection Techniques in Angular](https://omid.dev/2024/06/17/advanced-dependency-injection-techniques-in-angular-tree-shakable-providers-and-injection-tokens/)
 

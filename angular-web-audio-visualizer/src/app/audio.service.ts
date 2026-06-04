@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 export class AudioService {
   private audioContext: AudioContext;
   private source?: MediaElementAudioSourceNode;
+  private sourceElement?: HTMLAudioElement;
   private analyser?: AnalyserNode;
   private dataArray?: Uint8Array;
 
@@ -15,11 +16,12 @@ export class AudioService {
   }
 
   init(audioElement: HTMLAudioElement): void {
-    if (this.source) {
-      this.source.disconnect();
+    if (this.sourceElement === audioElement && this.source && this.analyser && this.dataArray) {
+      return;
     }
 
     this.source = this.audioContext.createMediaElementSource(audioElement);
+    this.sourceElement = audioElement;
     this.analyser = this.audioContext.createAnalyser();
     this.source.connect(this.analyser);
     this.analyser.connect(this.audioContext.destination);
@@ -34,5 +36,13 @@ export class AudioService {
     }
     this.analyser.getByteFrequencyData(this.dataArray);
     return this.dataArray;
+  }
+
+  resume(): Promise<void> {
+    if (this.audioContext.state === 'running') {
+      return Promise.resolve();
+    }
+
+    return this.audioContext.resume();
   }
 }

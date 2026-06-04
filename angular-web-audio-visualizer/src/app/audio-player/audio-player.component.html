@@ -1,7 +1,7 @@
 <div class="audio-player">
   <input type="file" accept="audio/*" (change)="onFileSelected($event)" />
-  <audio #audio src="assets/sample.mp3"></audio>
-  <button type="button" (click)="play()" aria-label="Play">
+  <audio #audio></audio>
+  <button type="button" (click)="play()" aria-label="Play" [disabled]="!hasAudioSource">
     <fa-icon [icon]="faPlay"></fa-icon>
   </button>
   @if (isPlaying) {
@@ -9,7 +9,7 @@
       <fa-icon [icon]="faPause"></fa-icon>
     </button>
   }
-  <button type="button" (click)="stop()" aria-label="Stop">
+  <button type="button" (click)="stop()" aria-label="Stop" [disabled]="!hasAudioSource">
     <fa-icon [icon]="faStop"></fa-icon>
   </button>
 </div>

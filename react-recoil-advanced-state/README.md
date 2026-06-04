@@ -2,6 +2,8 @@
 
 Companion project for [Advanced State Management in React with Recoil](https://omid.dev/2024/06/14/advanced-state-management-in-react-with-recoil/).
 
+**Live demo:** https://playground.omid.dev/examples/react-recoil-advanced-state/ (prebuilt on [playground.omid.dev](https://playground.omid.dev))
+
 ## Run
 
 ```bash

@@ -2,6 +2,8 @@
 
 Companion project for [Micro Frontends: Working Example](https://omid.dev/2024/05/11/micro-frontends-working-example/).
 
+**Live demo:** https://playground.omid.dev/examples/qwik-angular-react-rust/ (prebuilt on [playground.omid.dev](https://playground.omid.dev))
+
 A micro frontend demo with a Qwik shell app that composes Angular and React micro frontends as custom elements, plus an optional Rust WebAssembly module.
 
 ## Structure

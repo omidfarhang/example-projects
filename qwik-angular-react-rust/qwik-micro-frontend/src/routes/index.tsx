@@ -5,6 +5,13 @@ type MicroFrontendEvent = CustomEvent<{
   message: string;
 }>;
 
+const assetBase = import.meta.env.BASE_URL ?? '/';
+
+const assetUrl = (path: string) => {
+  const base = assetBase.endsWith('/') ? assetBase : `${assetBase}/`;
+  return `${base}${path.replace(/^\//, '')}`;
+};
+
 const scripts = new Map<string, Promise<void>>();
 const importBrowserModule = new Function(
   'src',
@@ -57,15 +64,15 @@ export default component$(() => {
     );
 
     Promise.all([
-      loadScript('/mfes/angular/polyfills.js'),
-      loadScript('/mfes/angular/main.js'),
-      loadScript('/mfes/react/react-microfrontend.js'),
+      loadScript(assetUrl('mfes/angular/polyfills.js')),
+      loadScript(assetUrl('mfes/angular/main.js')),
+      loadScript(assetUrl('mfes/react/react-microfrontend.js')),
     ]).then(() => {
       assetsReady.value = true;
     });
 
     importBrowserModule<{ format_message: (input: string) => string }>(
-      '/mfes/rust-wasm/rust_wasm.js',
+      assetUrl('mfes/rust-wasm/rust_wasm.js'),
     )
       .then((rust) => {
         rustMessage.value = rust.format_message('Qwik loaded Rust WASM');

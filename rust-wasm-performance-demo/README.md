@@ -2,6 +2,8 @@
 
 Companion project for [Building High-Performance Web Applications: Leveraging WebAssembly and Rust](https://omid.dev/2024/06/13/building-high-performance-web-applications-leveraging-webassembly-and-rust/).
 
+**Live demo:** https://playground.omid.dev/examples/rust-wasm-performance-demo/ (prebuilt on [playground.omid.dev](https://playground.omid.dev))
+
 ## Build WASM
 
 ```bash

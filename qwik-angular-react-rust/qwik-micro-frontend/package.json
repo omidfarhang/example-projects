@@ -13,7 +13,9 @@
   "type": "module",
   "scripts": {
     "build": "qwik build",
+    "build:playground": "npm run build:client",
     "build.client": "vite build",
+    "build.server": "vite build --ssr src/entry.ssr.tsx",
     "build.preview": "vite build --ssr src/entry.preview.tsx",
     "build.types": "tsc --incremental --noEmit",
     "deploy": "echo 'Run \"npm run qwik add\" to install a server adapter'",

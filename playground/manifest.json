@@ -1,0 +1,87 @@
+{
+  "baseUrl": "https://playground.omid.dev",
+  "category": "examples",
+  "demos": [
+    {
+      "slug": "angular-web-audio-visualizer",
+      "title": "Angular Web Audio Visualizer",
+      "description": "Dynamic music visualizations with Angular and the Web Audio API.",
+      "projectDir": "angular-web-audio-visualizer",
+      "type": "angular",
+      "articleUrl": "https://omid.dev/2024/07/13/creating-dynamic-music-visualizations-with-angular-and-the-web-audio-api/"
+    },
+    {
+      "slug": "angular-web-workers-offscreencanvas",
+      "title": "Web Workers & OffscreenCanvas",
+      "description": "Offload canvas rendering from the Angular main thread.",
+      "projectDir": "angular-web-workers-offscreencanvas",
+      "type": "angular",
+      "articleUrl": "https://omid.dev/2024/06/23/optimizing-angular-applications-with-web-workers-and-offscreencanvas/"
+    },
+    {
+      "slug": "rust-wasm-performance-demo",
+      "title": "Rust WASM Performance Demo",
+      "description": "Compare JavaScript vs WebAssembly for CPU-heavy loops.",
+      "projectDir": "rust-wasm-performance-demo",
+      "type": "rust-wasm",
+      "articleUrl": "https://omid.dev/2024/06/13/building-high-performance-web-applications-leveraging-webassembly-and-rust/"
+    },
+    {
+      "slug": "qwik-angular-react-rust",
+      "title": "Micro Frontends (Qwik + Angular + React)",
+      "description": "Qwik shell hosting Angular and React micro frontends.",
+      "projectDir": "qwik-angular-react-rust",
+      "type": "qwik-mfe",
+      "articleUrl": "https://omid.dev/2024/05/11/micro-frontends-working-example/"
+    },
+    {
+      "slug": "angular-stencil-web-components",
+      "title": "Stencil Web Components in Angular",
+      "description": "Custom element built with Stencil, consumed in Angular.",
+      "projectDir": "angular-stencil-web-components",
+      "type": "stencil-angular",
+      "articleUrl": "https://omid.dev/2024/06/26/implementing-custom-web-components-in-angular-with-stenciljs/"
+    },
+    {
+      "slug": "angular-dynamic-form-debugging",
+      "title": "Angular Dynamic Form Debugging",
+      "description": "Reactive form debugging patterns in Angular.",
+      "projectDir": "angular-dynamic-form-debugging",
+      "type": "angular",
+      "articleUrl": "https://omid.dev/2024/05/22/debugging-angular-a-tale-of-two-developers/"
+    },
+    {
+      "slug": "angular-patterns-and-di",
+      "title": "Angular Patterns & DI",
+      "description": "Design patterns, providers, and injection tokens.",
+      "projectDir": "angular-patterns-and-di",
+      "type": "angular",
+      "articleUrl": "https://omid.dev/2024/05/31/design-patterns-in-angular-enhancing-code-quality-and-maintainability/"
+    },
+    {
+      "slug": "angular-shared-library-workspace",
+      "title": "Angular Shared Library Workspace",
+      "description": "Reusable UI library consumed by a demo app.",
+      "projectDir": "angular-shared-library-workspace",
+      "type": "angular-workspace",
+      "angularProject": "demo-app",
+      "articleUrl": "https://omid.dev/2024/05/12/reusable-shared-module-in-angular/"
+    },
+    {
+      "slug": "react-recoil-advanced-state",
+      "title": "React Recoil Advanced State",
+      "description": "Atoms, selectors, and async queries with Recoil.",
+      "projectDir": "react-recoil-advanced-state",
+      "type": "vite",
+      "articleUrl": "https://omid.dev/2024/06/14/advanced-state-management-in-react-with-recoil/"
+    },
+    {
+      "slug": "bootstrap-to-tailwind-migration",
+      "title": "Bootstrap to Tailwind Migration",
+      "description": "Side-by-side before/after styling comparison.",
+      "projectDir": "bootstrap-to-tailwind-migration",
+      "type": "static-html",
+      "articleUrl": "https://omid.dev/2024/05/22/migrate-css-bootstrap-to-tailwind/"
+    }
+  ]
+}

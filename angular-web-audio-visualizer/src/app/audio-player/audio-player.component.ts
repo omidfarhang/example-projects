@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faPause, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 
@@ -11,13 +11,15 @@ import { AudioService } from '../audio.service';
   templateUrl: './audio-player.component.html',
   styleUrl: './audio-player.component.css',
 })
-export class AudioPlayerComponent implements OnInit {
+export class AudioPlayerComponent implements OnDestroy, OnInit {
   @ViewChild('audio', { static: true }) audioRef!: ElementRef<HTMLAudioElement>;
 
   faPlay = faPlay;
   faPause = faPause;
   faStop = faStop;
   isPlaying = false;
+  hasAudioSource = false;
+  private objectUrl?: string;
 
   constructor(private audioService: AudioService) {}
 
@@ -25,8 +27,17 @@ export class AudioPlayerComponent implements OnInit {
     this.audioService.init(this.audioRef.nativeElement);
   }
 
-  play(): void {
-    void this.audioRef.nativeElement.play();
+  ngOnDestroy(): void {
+    this.revokeObjectUrl();
+  }
+
+  async play(): Promise<void> {
+    if (!this.hasAudioSource) {
+      return;
+    }
+
+    await this.audioService.resume();
+    await this.audioRef.nativeElement.play();
     this.isPlaying = true;
   }
 
@@ -47,8 +58,18 @@ export class AudioPlayerComponent implements OnInit {
     if (input.files?.length) {
       const file = input.files[0];
       const audioElement = this.audioRef.nativeElement;
-      audioElement.src = URL.createObjectURL(file);
-      this.audioService.init(audioElement);
+      this.revokeObjectUrl();
+      this.objectUrl = URL.createObjectURL(file);
+      audioElement.src = this.objectUrl;
+      this.hasAudioSource = true;
+      this.isPlaying = false;
+    }
+  }
+
+  private revokeObjectUrl(): void {
+    if (this.objectUrl) {
+      URL.revokeObjectURL(this.objectUrl);
+      this.objectUrl = undefined;
     }
   }
 }

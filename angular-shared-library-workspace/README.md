@@ -2,6 +2,8 @@
 
 Companion project for [Creating a Reusable Shared Module in Angular](https://omid.dev/2024/05/12/reusable-shared-module-in-angular/).
 
+**Live demo:** https://playground.omid.dev/examples/angular-shared-library-workspace/ (prebuilt on [playground.omid.dev](https://playground.omid.dev))
+
 ## Structure
 
 ```text

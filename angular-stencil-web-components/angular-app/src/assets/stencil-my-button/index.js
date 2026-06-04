@@ -8,7 +8,7 @@ const MyButton = class {
     }
     text = 'Click Me';
     render() {
-        return h("button", { key: 'acc9df5d34ec4770c476142cfa0fcd7ac524fcf1', type: "button" }, this.text);
+        return h("button", { key: '6f08b81b18e149ac43deff63c6b5af4abc8bc2d5', type: "button" }, this.text);
     }
 };
 MyButton.style = myButtonCss();

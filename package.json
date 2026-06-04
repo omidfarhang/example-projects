@@ -1,0 +1,11 @@
+{
+  "name": "example-projects",
+  "private": true,
+  "description": "Companion projects for omid.dev — includes playground build for live demos",
+  "scripts": {
+    "build:playground": "node playground/scripts/cloudflare-build.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

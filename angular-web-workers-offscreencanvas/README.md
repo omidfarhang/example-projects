@@ -2,6 +2,8 @@
 
 Companion project for [Optimizing Angular Applications with Web Workers and OffscreenCanvas](https://omid.dev/2024/06/23/optimizing-angular-applications-with-web-workers-and-offscreencanvas/).
 
+**Live demo:** https://playground.omid.dev/examples/angular-web-workers-offscreencanvas/ (prebuilt on [playground.omid.dev](https://playground.omid.dev))
+
 ## Run
 
 ```bash
