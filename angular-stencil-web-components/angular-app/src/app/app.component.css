@@ -9,3 +9,8 @@ my-button {
   display: inline-block;
   margin-top: 1rem;
 }
+
+.feedback {
+  margin-top: 1rem;
+  color: #0f5132;
+}

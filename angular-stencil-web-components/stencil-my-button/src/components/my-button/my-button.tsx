@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'my-button',
@@ -8,7 +8,17 @@ import { Component, Prop, h } from '@stencil/core';
 export class MyButton {
   @Prop() text = 'Click Me';
 
+  @Event() buttonClick: EventEmitter<void>;
+
+  private handleClick = () => {
+    this.buttonClick.emit();
+  };
+
   render() {
-    return <button type="button">{this.text}</button>;
+    return (
+      <button type="button" onClick={this.handleClick}>
+        {this.text}
+      </button>
+    );
   }
 }

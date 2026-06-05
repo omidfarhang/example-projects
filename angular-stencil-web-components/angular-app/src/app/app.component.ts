@@ -7,4 +7,10 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent {}
+export class AppComponent {
+  clickCount = 0;
+
+  onButtonClick(): void {
+    this.clickCount += 1;
+  }
+}

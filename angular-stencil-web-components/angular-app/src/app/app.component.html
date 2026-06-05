@@ -1,5 +1,10 @@
 <main class="container">
   <h1>Stencil Web Component in Angular</h1>
   <p>Companion demo for the omid.dev Stencil + Angular tutorial.</p>
-  <my-button text="Click Me"></my-button>
+  <my-button text="Click Me" (buttonClick)="onButtonClick()"></my-button>
+  @if (clickCount > 0) {
+    <p class="feedback" role="status">
+      Button clicked {{ clickCount }} time{{ clickCount === 1 ? '' : 's' }}.
+    </p>
+  }
 </main>
