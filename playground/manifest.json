@@ -84,5 +84,63 @@
       "type": "static-html",
       "articleUrl": "https://omid.dev/2024/05/22/migrate-css-bootstrap-to-tailwind/"
     }
+  ],
+  "sourceOnly": [
+    {
+      "slug": "angular-collaborative-editor-firebase-webrtc",
+      "title": "Real-Time Collaborative Editor",
+      "description": "Angular editor using Firebase, Firestore, and WebRTC signaling ideas.",
+      "reason": "Firebase",
+      "articleUrl": "https://omid.dev/2024/06/24/realtime-collaborative-editor-with-angular-firebase-webrtc/"
+    },
+    {
+      "slug": "angular-graphql-apollo",
+      "title": "GraphQL with Angular & Apollo",
+      "description": "Angular app connected to a local GraphQL API with Apollo Client.",
+      "reason": "API server",
+      "articleUrl": "https://omid.dev/2024/06/01/integrating-graphql-with-angular-a-practical-guide/"
+    },
+    {
+      "slug": "graphql-express-angular-migration",
+      "title": "REST to GraphQL Migration",
+      "description": "Express API showing REST and GraphQL side by side with an Angular client.",
+      "reason": "API server",
+      "articleUrl": "https://omid.dev/2024/08/07/migrating-from-rest-to-graphql-a-step-by-step-guide-for-expressjs-and-angular/"
+    },
+    {
+      "slug": "realtime-frontend-patterns",
+      "title": "Real-Time Frontend Patterns",
+      "description": "Node examples for WebSocket and Server-Sent Events patterns.",
+      "reason": "Node server",
+      "articleUrl": "https://omid.dev/2024/06/08/real-time-data-in-frontend-applications/"
+    },
+    {
+      "slug": "angular-custom-schematics",
+      "title": "Custom Angular Schematics",
+      "description": "Angular schematics for repeatable code generation.",
+      "reason": "CLI tooling",
+      "articleUrl": "https://omid.dev/2024/06/03/building-custom-angular-schematics-automating-code-generation/"
+    },
+    {
+      "slug": "typescript-advanced-types",
+      "title": "Advanced TypeScript Types",
+      "description": "Mapped, conditional, recursive, and utility type examples.",
+      "reason": "Source snippets",
+      "articleUrl": "https://omid.dev/2024/06/14/advanced-typeScript-types/"
+    },
+    {
+      "slug": "jupyter-blog-starter",
+      "title": "Jupyter Blog Starter",
+      "description": "Python and Jupyter starter for notebook-driven technical analysis.",
+      "reason": "Notebook",
+      "articleUrl": "https://omid.dev/2025/12/23/jupyter-technical-setup-guide/"
+    },
+    {
+      "slug": "latency-lens",
+      "title": "Latency Lens",
+      "description": "Rust TUI that reads Linux PSI and explains desktop stutter from kernel pressure signals.",
+      "reason": "Native Linux",
+      "articleUrl": "https://omid.dev/2026/06/04/building-a-tiny-linux-app-to-explain-desktop-stutter/"
+    }
   ]
 }
