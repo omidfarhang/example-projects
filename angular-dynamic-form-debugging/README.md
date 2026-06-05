@@ -12,7 +12,7 @@ npm start
 npm test
 ```
 
-Toggle **Use buggy flow** to see a form built before metadata arrives versus the fixed rebuild path.
+Toggle **Use buggy flow** to replay a form built before metadata arrives. The debug panel shows the concrete failure: metadata fields are present, but the Angular form has no matching controls. Turn it off to see the fixed path build controls and validators after metadata loads.
 
 ## Blog post
 
