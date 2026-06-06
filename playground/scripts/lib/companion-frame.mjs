@@ -17,7 +17,7 @@ import {
   getOgImageUrl,
   renderSeoHead,
 } from './seo.mjs';
-import { escapeHtml } from './theme.mjs';
+import { escapeHtml, faviconHead } from './theme.mjs';
 
 const COMPANION_ASSET = '/assets/companion-frame.css';
 
@@ -92,6 +92,14 @@ function injectStylesheetLink(html) {
   return injectIntoHead(html, link);
 }
 
+function injectFaviconHead(html) {
+  if (html.includes('https://omid.dev/logo/favicon.ico')) {
+    return html;
+  }
+
+  return injectIntoHead(stripExistingFavicons(html), faviconHead());
+}
+
 function injectMetaTags(html, demo, manifest) {
   if (html.includes('<!-- Playground SEO -->')) {
     return html;
@@ -113,6 +121,12 @@ function stripExistingSeo(html) {
     .replace(/\s*<meta\s+property=["']og:[^"']+["'][^>]*>/gi, '')
     .replace(/\s*<link\s+rel=["']canonical["'][^>]*>/gi, '')
     .replace(/\s*<script\s+type=["']application\/ld\+json["'][\s\S]*?<\/script>/gi, '');
+}
+
+function stripExistingFavicons(html) {
+  return html
+    .replace(/\s*<link\s+[^>]*rel=["'](?:shortcut\s+icon|icon|apple-touch-icon|mask-icon)["'][^>]*>/gi, '')
+    .replace(/\s*<link\s+[^>]*rel=["'][^"']*\bicon\b[^"']*["'][^>]*>/gi, '');
 }
 
 function injectCompanionBar(html, demo, manifest) {
@@ -190,6 +204,7 @@ export function injectCompanionFrame(demo, category, manifest) {
   let html = fs.readFileSync(indexPath, 'utf8');
   html = injectHtmlClass(html);
   html = injectStylesheetLink(html);
+  html = injectFaviconHead(html);
   html = injectMetaTags(html, demo, manifest);
   html = updateDocumentTitle(html, demo);
   html = injectCompanionBar(html, demo, manifest);
