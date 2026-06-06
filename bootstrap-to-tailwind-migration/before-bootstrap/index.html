@@ -2,18 +2,324 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Bootstrap version</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bootstrap CRM Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      :root {
+        --brand: #4f46e5;
+        --brand-dark: #3730a3;
+        --ink: #111827;
+        --muted: #64748b;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at top left, rgba(79, 70, 229, 0.16), transparent 36rem),
+          #f8fafc;
+        color: var(--ink);
+      }
+
+      .app-shell {
+        max-width: 1180px;
+      }
+
+      .navbar-brand-badge {
+        width: 2.5rem;
+        height: 2.5rem;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 0.9rem;
+        background: var(--brand);
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .hero-card,
+      .metric-card,
+      .plan-card,
+      .migration-card {
+        border: 0;
+        border-radius: 1.5rem;
+        box-shadow: 0 1.25rem 3rem rgba(15, 23, 42, 0.08);
+      }
+
+      .btn-brand {
+        --bs-btn-bg: var(--brand);
+        --bs-btn-border-color: var(--brand);
+        --bs-btn-hover-bg: var(--brand-dark);
+        --bs-btn-hover-border-color: var(--brand-dark);
+        border-radius: 999px;
+        padding-inline: 1.2rem;
+      }
+
+      .btn-soft {
+        border-radius: 999px;
+        color: var(--brand);
+        background: rgba(79, 70, 229, 0.1);
+      }
+
+      .metric-value {
+        font-size: clamp(2rem, 5vw, 3.25rem);
+        letter-spacing: -0.04em;
+      }
+
+      .status-dot {
+        width: 0.7rem;
+        height: 0.7rem;
+        border-radius: 999px;
+        background: #22c55e;
+      }
+
+      .pipeline-row {
+        border-radius: 1rem;
+        background: #f8fafc;
+      }
+
+      .plan-card.featured {
+        border: 2px solid rgba(79, 70, 229, 0.35);
+      }
+    </style>
   </head>
-  <body class="bg-light">
-    <div class="container py-5">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h1 class="card-title">Pricing card</h1>
-          <p class="card-text">Before migration: Bootstrap component classes.</p>
-          <button class="btn btn-primary">Get started</button>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+      <div class="container app-shell py-2">
+        <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
+          <span class="navbar-brand-badge">O</span>
+          Orbit CRM
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mainNav"
+          aria-controls="mainNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+            <li class="nav-item"><a class="nav-link" href="#pipeline">Pipeline</a></li>
+            <li class="nav-item"><a class="nav-link" href="#pricing">Pricing</a></li>
+            <li class="nav-item"><a class="nav-link" href="#migration">Migration notes</a></li>
+            <li class="nav-item"><a class="btn btn-brand text-white" href="#pricing">Start trial</a></li>
+          </ul>
         </div>
       </div>
-    </div>
+    </nav>
+
+    <main class="container app-shell py-5">
+      <section class="row align-items-center g-4 g-lg-5 mb-5">
+        <div class="col-lg-6">
+          <span class="badge rounded-pill text-bg-light border mb-3">Bootstrap + custom CSS baseline</span>
+          <h1 class="display-4 fw-bold lh-1 mb-3">A customer pipeline page before migration.</h1>
+          <p class="lead text-secondary mb-4">
+            This page uses Bootstrap grid, cards, badges, buttons, and tables with several product-specific CSS
+            overrides. It is a closer match to the messy middle of real migrations than a single button example.
+          </p>
+          <div class="d-flex flex-column flex-sm-row gap-3">
+            <a class="btn btn-brand btn-lg text-white" href="#pipeline">Review dashboard</a>
+            <a class="btn btn-soft btn-lg" href="../after-tailwind/">Compare Tailwind version</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card hero-card">
+            <div class="card-body p-4 p-lg-5">
+              <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                  <p class="text-secondary small text-uppercase fw-semibold mb-1">Quarter forecast</p>
+                  <h2 class="h4 mb-0">$284k in active deals</h2>
+                </div>
+                <span class="badge rounded-pill text-bg-success">+18%</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="metric-card bg-light p-3">
+                    <p class="text-secondary small mb-1">Win rate</p>
+                    <p class="h3 fw-bold mb-0">42%</p>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="metric-card bg-light p-3">
+                    <p class="text-secondary small mb-1">Response time</p>
+                    <p class="h3 fw-bold mb-0">1.8h</p>
+                  </div>
+                </div>
+              </div>
+              <div class="progress mt-4" role="progressbar" aria-label="Revenue target" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar" style="width: 72%">72% of target</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="row g-4 mb-5" aria-label="Key metrics">
+        <div class="col-md-4">
+          <div class="card metric-card h-100">
+            <div class="card-body p-4">
+              <p class="text-secondary mb-1">New opportunities</p>
+              <p class="metric-value fw-bold mb-1">128</p>
+              <p class="text-success fw-semibold mb-0">24 added this week</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card metric-card h-100">
+            <div class="card-body p-4">
+              <p class="text-secondary mb-1">Expansion revenue</p>
+              <p class="metric-value fw-bold mb-1">$96k</p>
+              <p class="text-success fw-semibold mb-0">31% above plan</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card metric-card h-100">
+            <div class="card-body p-4">
+              <p class="text-secondary mb-1">At-risk accounts</p>
+              <p class="metric-value fw-bold mb-1">7</p>
+              <p class="text-danger fw-semibold mb-0">Needs owner follow-up</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pipeline" class="card migration-card mb-5">
+        <div class="card-body p-4 p-lg-5">
+          <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
+            <div>
+              <p class="text-secondary small text-uppercase fw-semibold mb-1">Pipeline health</p>
+              <h2 class="h1 fw-bold mb-0">Deals that need attention</h2>
+            </div>
+            <button class="btn btn-outline-primary align-self-start rounded-pill">Export report</button>
+          </div>
+          <div class="vstack gap-3">
+            <div class="pipeline-row d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 p-3">
+              <div class="d-flex align-items-center gap-3">
+                <span class="status-dot"></span>
+                <div>
+                  <p class="fw-semibold mb-0">Northstar Labs</p>
+                  <p class="text-secondary small mb-0">Enterprise onboarding, $42k</p>
+                </div>
+              </div>
+              <span class="badge text-bg-warning">Legal review</span>
+            </div>
+            <div class="pipeline-row d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 p-3">
+              <div class="d-flex align-items-center gap-3">
+                <span class="status-dot"></span>
+                <div>
+                  <p class="fw-semibold mb-0">Bluebird Finance</p>
+                  <p class="text-secondary small mb-0">Security questionnaire, $28k</p>
+                </div>
+              </div>
+              <span class="badge text-bg-info">Technical validation</span>
+            </div>
+            <div class="pipeline-row d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 p-3">
+              <div class="d-flex align-items-center gap-3">
+                <span class="status-dot"></span>
+                <div>
+                  <p class="fw-semibold mb-0">Helio Studio</p>
+                  <p class="text-secondary small mb-0">Renewal expansion, $17k</p>
+                </div>
+              </div>
+              <span class="badge text-bg-success">Ready to sign</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" class="row g-4 mb-5">
+        <div class="col-lg-4">
+          <div class="card plan-card h-100">
+            <div class="card-body p-4">
+              <h3 class="h4 fw-bold">Starter</h3>
+              <p class="text-secondary">For small teams validating a pipeline process.</p>
+              <p class="display-6 fw-bold">$29<span class="fs-6 text-secondary">/seat</span></p>
+              <ul class="list-unstyled vstack gap-2 text-secondary">
+                <li>Basic pipeline boards</li>
+                <li>Email sync</li>
+                <li>Weekly reports</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card plan-card featured h-100">
+            <div class="card-body p-4">
+              <span class="badge rounded-pill text-bg-primary mb-3">Most popular</span>
+              <h3 class="h4 fw-bold">Growth</h3>
+              <p class="text-secondary">For revenue teams that need forecasting and automation.</p>
+              <p class="display-6 fw-bold">$59<span class="fs-6 text-secondary">/seat</span></p>
+              <ul class="list-unstyled vstack gap-2 text-secondary">
+                <li>Forecasting dashboard</li>
+                <li>Automation rules</li>
+                <li>Priority support</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card plan-card h-100">
+            <div class="card-body p-4">
+              <h3 class="h4 fw-bold">Scale</h3>
+              <p class="text-secondary">For distributed teams with compliance requirements.</p>
+              <p class="display-6 fw-bold">Custom</p>
+              <ul class="list-unstyled vstack gap-2 text-secondary">
+                <li>Advanced permissions</li>
+                <li>Audit exports</li>
+                <li>Dedicated success manager</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="migration" class="card migration-card">
+        <div class="card-body p-4 p-lg-5">
+          <div class="row g-4 align-items-center">
+            <div class="col-lg-5">
+              <p class="text-secondary small text-uppercase fw-semibold mb-1">What this version demonstrates</p>
+              <h2 class="h1 fw-bold mb-3">Bootstrap is fast, but local overrides become the migration surface.</h2>
+              <p class="text-secondary mb-0">
+                The custom CSS above represents the design decisions that must be preserved: brand color,
+                rounded cards, soft shadows, responsive spacing, and status treatments.
+              </p>
+            </div>
+            <div class="col-lg-7">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="bg-light rounded-4 p-3 h-100">
+                    <p class="fw-semibold mb-1">Keep the markup map</p>
+                    <p class="text-secondary small mb-0">List Bootstrap components before rewriting classes.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="bg-light rounded-4 p-3 h-100">
+                    <p class="fw-semibold mb-1">Extract design tokens</p>
+                    <p class="text-secondary small mb-0">Move repeated colors, radii, and shadows into Tailwind config.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="bg-light rounded-4 p-3 h-100">
+                    <p class="fw-semibold mb-1">Migrate by section</p>
+                    <p class="text-secondary small mb-0">Convert navigation, hero, cards, and tables separately.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="bg-light rounded-4 p-3 h-100">
+                    <p class="fw-semibold mb-1">Verify responsive behavior</p>
+                    <p class="text-secondary small mb-0">Compare breakpoints and interaction states before removing Bootstrap.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

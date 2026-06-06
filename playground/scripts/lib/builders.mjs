@@ -199,29 +199,10 @@ export function buildStaticHtml(demo, category) {
     copyDir(src, path.join(dest, folder));
   }
 
-  const indexHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bootstrap to Tailwind Migration</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
-    h1 { font-size: 1.4rem; }
-    ul { padding-left: 1.2rem; }
-    a { color: #2563eb; }
-  </style>
-</head>
-<body>
-  <h1>Bootstrap to Tailwind Migration</h1>
-  <p>Compare the same layout with two styling approaches:</p>
-  <ul>
-    <li><a href="before-bootstrap/index.html">Before — Bootstrap-style markup</a></li>
-    <li><a href="after-tailwind/index.html">After — Tailwind CSS</a></li>
-  </ul>
-</body>
-</html>`;
-  fs.writeFileSync(path.join(dest, 'index.html'), indexHtml, 'utf8');
+  const indexPath = path.join(cwd, 'index.html');
+  if (fileExists(indexPath)) {
+    copyFile(indexPath, path.join(dest, 'index.html'));
+  }
 }
 
 export function buildDemo(demo, category) {
