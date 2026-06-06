@@ -10,6 +10,13 @@ import {
   SITE_URL,
 } from './manifest-utils.mjs';
 import { distDemoDir } from './paths.mjs';
+import {
+  demoDescription,
+  demoSchema,
+  demoTitle,
+  getOgImageUrl,
+  renderSeoHead,
+} from './seo.mjs';
 import { escapeHtml } from './theme.mjs';
 
 const COMPANION_ASSET = '/assets/companion-frame.css';
@@ -44,27 +51,31 @@ function renderCompanionBar(demo, manifest) {
 
 function renderMetaTags(demo, manifest) {
   const demoUrl = getDemoPublicUrl(manifest, demo, manifest.category ?? 'examples');
-  const articleTitle = getArticleTitle(demo);
-  const description = `${demo.description} Companion demo for the omid.dev article “${articleTitle}”.`;
+  const title = demoTitle(demo);
+  const description = demoDescription(demo);
 
-  return `
-  <meta name="description" content="${escapeHtml(description)}" />
-  <link rel="canonical" href="${escapeHtml(demoUrl)}" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="omid.dev" />
-  <meta property="og:title" content="${escapeHtml(`${demo.title} — omid.dev companion demo`)}" />
-  <meta property="og:description" content="${escapeHtml(description)}" />
-  <meta property="og:url" content="${escapeHtml(demoUrl)}" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="${escapeHtml(`${demo.title} — omid.dev companion demo`)}" />
-  <meta name="twitter:description" content="${escapeHtml(description)}" />`;
+  return `<!-- Playground SEO -->
+${renderSeoHead({
+  title,
+  description,
+  canonicalUrl: demoUrl,
+  imageUrl: getOgImageUrl(manifest),
+  imageAlt: `${demo.title} - live companion demo on Omid Playground`,
+  keywords: [
+    demo.title,
+    getArticleTitle(demo),
+    demo.type,
+    'omid.dev',
+    'Omid Playground',
+    'Frontend',
+    'Live demo',
+  ],
+  schema: demoSchema(manifest, demo),
+})}
+<!-- End Playground SEO -->`;
 }
 
 function injectIntoHead(html, injection) {
-  if (html.includes('data-playground-companion-meta')) {
-    return html;
-  }
-
   if (html.includes('</head>')) {
     return html.replace('</head>', `${injection}\n</head>`);
   }
@@ -82,11 +93,26 @@ function injectStylesheetLink(html) {
 }
 
 function injectMetaTags(html, demo, manifest) {
-  const meta = renderMetaTags(demo, manifest).replace(
-    '<meta name="description"',
-    '<meta data-playground-companion-meta name="description"',
-  );
-  return injectIntoHead(html, meta);
+  if (html.includes('<!-- Playground SEO -->')) {
+    return html;
+  }
+
+  return injectIntoHead(stripExistingSeo(html), renderMetaTags(demo, manifest));
+}
+
+function stripExistingSeo(html) {
+  return html
+    .replace(/\s*<meta\s+name=["']description["'][^>]*>/gi, '')
+    .replace(/\s*<meta\s+name=["']robots["'][^>]*>/gi, '')
+    .replace(/\s*<meta\s+name=["']author["'][^>]*>/gi, '')
+    .replace(/\s*<meta\s+name=["']keywords["'][^>]*>/gi, '')
+    .replace(/\s*<meta\s+name=["']application-name["'][^>]*>/gi, '')
+    .replace(/\s*<meta\s+name=["']theme-color["'][^>]*>/gi, '')
+    .replace(/\s*<meta\s+name=["']msapplication-TileColor["'][^>]*>/gi, '')
+    .replace(/\s*<meta\s+name=["']twitter:[^"']+["'][^>]*>/gi, '')
+    .replace(/\s*<meta\s+property=["']og:[^"']+["'][^>]*>/gi, '')
+    .replace(/\s*<link\s+rel=["']canonical["'][^>]*>/gi, '')
+    .replace(/\s*<script\s+type=["']application\/ld\+json["'][\s\S]*?<\/script>/gi, '');
 }
 
 function injectCompanionBar(html, demo, manifest) {
@@ -147,7 +173,7 @@ function injectHtmlClass(html) {
 }
 
 function updateDocumentTitle(html, demo) {
-  const title = `${demo.title} — omid.dev companion demo`;
+  const title = demoTitle(demo);
   if (html.includes('<title>')) {
     return html.replace(/<title>.*?<\/title>/is, `<title>${escapeHtml(title)}</title>`);
   }

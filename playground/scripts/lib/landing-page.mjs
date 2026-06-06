@@ -8,6 +8,14 @@ import {
   getSourcePath,
   getSourceUrl,
 } from './manifest-utils.mjs';
+import {
+  getOgImageUrl,
+  landingSchema,
+  PLAYGROUND_DESCRIPTION,
+  PLAYGROUND_KEYWORDS,
+  PLAYGROUND_TITLE,
+  renderSeoHead,
+} from './seo.mjs';
 import { escapeHtml, faviconHead, landingPageCss } from './theme.mjs';
 
 const TYPE_LABELS = {
@@ -96,6 +104,9 @@ export function writeLandingPage(manifest) {
   const { baseUrl, demos, category, sourceOnly = [] } = manifest;
   const repoUrl = getRepoUrl(manifest);
   const canonicalUrl = `${baseUrl.replace(/\/$/, '')}/`;
+  const title = `${PLAYGROUND_TITLE} | Live companion demos for omid.dev`;
+  const description = PLAYGROUND_DESCRIPTION;
+  const imageUrl = getOgImageUrl(manifest);
   const demoCards = demos.map((demo) => renderDemoCard(demo, category, manifest)).join('\n');
   const sourceCards = sourceOnly.map((project) => renderSourceCard(project, manifest)).join('\n');
   const stats = renderStats(demos, sourceOnly);
@@ -119,17 +130,16 @@ export function writeLandingPage(manifest) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>omid.dev companion demos</title>
-  <meta name="description" content="Live browser companions for technical articles on omid.dev. Open a working demo, then return to the article for the full walkthrough." />
-  <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="omid.dev companion demos" />
-  <meta property="og:description" content="Live browser companions for technical articles on omid.dev." />
-  <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />
-  <meta property="og:site_name" content="omid.dev" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="omid.dev companion demos" />
-  <meta name="twitter:description" content="Live browser companions for technical articles on omid.dev." />
+  <title>${escapeHtml(title)}</title>
+  ${renderSeoHead({
+    title,
+    description,
+    canonicalUrl,
+    imageUrl,
+    imageAlt: 'Omid Playground - live companion demos for omid.dev articles',
+    keywords: PLAYGROUND_KEYWORDS,
+    schema: landingSchema(manifest),
+  })}
   ${faviconHead()}
   <style>${landingPageCss()}</style>
 </head>

@@ -55,6 +55,8 @@ Demos are listed in [`manifest.json`](manifest.json). The build script reads slu
 
 After each demo build, the script injects a slim **companion bar** into `index.html` with links back to the article, source folder, and playground home. Shared styling lives in `scripts/lib/theme.mjs` and is emitted to `dist/assets/companion-frame.css`.
 
+SEO, social cards, structured data, Matomo tracking, `robots.txt`, `sitemap.xml`, and the playground OpenGraph image are generated from `scripts/lib/seo.mjs`.
+
 ## Adding a demo
 
 1. Add an entry to `manifest.json` with a unique `slug` and `type`.
