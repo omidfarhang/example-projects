@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { DIST_ROOT } from './paths.mjs';
+import { DIST_ROOT, PLAYGROUND_ROOT } from './paths.mjs';
 import { ensureDir } from './fs-utils.mjs';
 import {
   getArticleTitle,
@@ -18,6 +17,7 @@ export const PLAYGROUND_SITE_NAME = 'omid.dev';
 export const PLAYGROUND_AUTHOR = 'Omid Farhang';
 export const PLAYGROUND_DESCRIPTION =
   'Live companion demos for omid.dev technical articles. Try Angular, React, WebAssembly, Web Workers, micro frontends, Web Components, and CSS migration examples in the browser.';
+const PLAYGROUND_OG_IMAGE_PATH = '/assets/og-image.png';
 export const PLAYGROUND_KEYWORDS = [
   'Omid Farhang',
   'omid.dev',
@@ -36,7 +36,7 @@ export const PLAYGROUND_KEYWORDS = [
 ];
 
 export function getOgImageUrl(manifest) {
-  const imagePath = manifest.generatedOgImagePath ?? '/assets/og-image.svg';
+  const imagePath = manifest.generatedOgImagePath ?? PLAYGROUND_OG_IMAGE_PATH;
   return `${getLandingUrl(manifest).replace(/\/$/, '')}${imagePath}`;
 }
 
@@ -208,31 +208,13 @@ export function writeSeoAssets(manifest) {
   const assetsDir = path.join(DIST_ROOT, 'assets');
   ensureDir(assetsDir);
 
-  const svgPath = path.join(assetsDir, 'og-image.svg');
-  const pngPath = path.join(assetsDir, 'og-image.png');
+  const ogImageSourcePath = path.join(PLAYGROUND_ROOT, 'assets', 'og-image.png');
+  const ogImageDistPath = path.join(assetsDir, 'og-image.png');
 
-  fs.writeFileSync(svgPath, renderOgImage(), 'utf8');
-  if (tryRenderPng(svgPath, pngPath)) {
-    manifest.generatedOgImagePath = '/assets/og-image.png';
-  } else {
-    manifest.generatedOgImagePath = '/assets/og-image.svg';
-  }
+  fs.copyFileSync(ogImageSourcePath, ogImageDistPath);
+  manifest.generatedOgImagePath = PLAYGROUND_OG_IMAGE_PATH;
   fs.writeFileSync(path.join(DIST_ROOT, 'robots.txt'), renderRobotsTxt(baseUrl), 'utf8');
   fs.writeFileSync(path.join(DIST_ROOT, 'sitemap.xml'), renderSitemapXml(manifest), 'utf8');
-}
-
-function tryRenderPng(svgPath, pngPath) {
-  for (const command of ['magick', 'convert']) {
-    const check = spawnSync(command, ['-version'], { stdio: 'ignore' });
-    if (check.status !== 0) {
-      continue;
-    }
-
-    const result = spawnSync(command, [svgPath, pngPath], { stdio: 'ignore' });
-    return result.status === 0 && fs.existsSync(pngPath);
-  }
-
-  return false;
 }
 
 function renderRobotsTxt(baseUrl) {
@@ -272,41 +254,3 @@ ${urls
 `;
 }
 
-function renderOgImage() {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
-  <title id="title">Omid Playground - Live companion demos</title>
-  <desc id="desc">OpenGraph image for playground.omid.dev, live browser demos for omid.dev articles.</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="48%" stop-color="#dbeafe"/>
-      <stop offset="100%" stop-color="#eef2ff"/>
-    </linearGradient>
-    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#4f46e5"/>
-    </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#0f172a" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <circle cx="1040" cy="80" r="220" fill="#2563eb" opacity="0.12"/>
-  <circle cx="120" cy="580" r="220" fill="#0891b2" opacity="0.1"/>
-  <rect x="76" y="70" width="1048" height="490" rx="38" fill="#ffffff" opacity="0.84" filter="url(#shadow)"/>
-  <rect x="76" y="70" width="1048" height="490" rx="38" fill="none" stroke="#bfdbfe" stroke-width="2"/>
-  <circle cx="146" cy="142" r="28" fill="url(#brand)"/>
-  <text x="190" y="153" fill="#0f172a" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="34" font-weight="800">omid.dev</text>
-  <text x="112" y="252" fill="#2563eb" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="800" letter-spacing="5">ARTICLE COMPANIONS</text>
-  <text x="112" y="336" fill="#0f172a" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="66" font-weight="850">Omid Playground</text>
-  <text x="112" y="400" fill="#334155" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="32" font-weight="500">Live demos for Angular, React, WebAssembly,</text>
-  <text x="112" y="444" fill="#334155" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="32" font-weight="500">Web Workers, micro frontends, and more.</text>
-  <g transform="translate(112 492)">
-    <rect width="192" height="46" rx="23" fill="#0f172a"/>
-    <text x="28" y="31" fill="#ffffff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="800">Try live demos</text>
-    <rect x="216" width="238" height="46" rx="23" fill="#eff6ff" stroke="#bfdbfe"/>
-    <text x="244" y="31" fill="#2563eb" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="800">Read the articles</text>
-  </g>
-</svg>
-`;
-}
