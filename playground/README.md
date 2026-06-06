@@ -51,7 +51,9 @@ Attach `playground.omid.dev` to the Pages project in the Cloudflare dashboard.
 
 ## Manifest
 
-Demos are listed in [`manifest.json`](manifest.json). The build script reads slug, project path, build type, and metadata from there.
+Demos are listed in [`manifest.json`](manifest.json). The build script reads slug, project path, build type, article metadata (`articleUrl`, `articleTitle`, `sourcePath`), and repo settings from there.
+
+After each demo build, the script injects a slim **companion bar** into `index.html` with links back to the article, source folder, and playground home. Shared styling lives in `scripts/lib/theme.mjs` and is emitted to `dist/assets/companion-frame.css`.
 
 ## Adding a demo
 
