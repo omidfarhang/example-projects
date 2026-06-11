@@ -119,7 +119,8 @@ jobs:
           done
 
       - name: Write landing & SEO
-        run: node -e "
+        run: |
+          node --input-type=module <<'EOF'
           import { loadManifest } from './playground/scripts/lib/manifest-load.mjs';
           import { setActiveDistRoot } from './playground/scripts/lib/paths.mjs';
           import { writeSharedAssets } from './playground/scripts/lib/theme.mjs';
@@ -130,24 +131,24 @@ jobs:
           writeSharedAssets();
           writeSeoAssets(manifest);
           writeLandingPage(manifest);
-        "
+          EOF
 
       - name: Inject companion frames
         run: |
-          node -e "
-            import fs from 'node:fs';
-            import { loadManifest } from './playground/scripts/lib/manifest-load.mjs';
-            import { injectCompanionFrame } from './playground/scripts/lib/companion-frame.mjs';
-            import { setActiveDistRoot } from './playground/scripts/lib/paths.mjs';
-            const { manifest, targets } = loadManifest();
-            setActiveDistRoot('playground/dist');
-            for (const t of targets) {
-              const index = 'playground/dist/' + t.category + '/' + t.slug + '/index.html';
-              if (fs.existsSync(index)) {
-                injectCompanionFrame(t, t.category, manifest);
-              }
+          node --input-type=module <<'EOF'
+          import fs from 'node:fs';
+          import { loadManifest } from './playground/scripts/lib/manifest-load.mjs';
+          import { injectCompanionFrame } from './playground/scripts/lib/companion-frame.mjs';
+          import { setActiveDistRoot } from './playground/scripts/lib/paths.mjs';
+          const { manifest, targets } = loadManifest();
+          setActiveDistRoot('playground/dist');
+          for (const t of targets) {
+            const index = 'playground/dist/' + t.category + '/' + t.slug + '/index.html';
+            if (fs.existsSync(index)) {
+              injectCompanionFrame(t, t.category, manifest);
             }
-          "
+          }
+          EOF
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
