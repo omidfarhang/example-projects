@@ -6,7 +6,11 @@ This repository exists for the examples that are too large for a blog post but s
 
 ## Live Demos
 
-Browser-only companion projects are published at **[playground.omid.dev](https://playground.omid.dev)** under `/examples/<project-slug>/`.
+Browser-only companion projects and interactive labs are published at **[playground.omid.dev](https://playground.omid.dev)** under `/examples/<slug>/` and `/labs/<slug>/`.
+
+| Lab | Description |
+| --- | --- |
+| [Bio-Dynamics: Microbiome Sandbox](https://playground.omid.dev/labs/microbiome-sandbox/) | Full-body 3D microbiome simulator with blog-backed probiotic scenarios |
 
 | Live demo | Project |
 | --- | --- |

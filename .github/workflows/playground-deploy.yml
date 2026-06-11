@@ -1,0 +1,165 @@
+name: Playground Deploy
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'playground/**'
+      - 'angular-*/**'
+      - 'react-*/**'
+      - 'rust-*/**'
+      - 'qwik-*/**'
+      - 'bootstrap-*/**'
+      - 'package.json'
+      - '.github/workflows/playground-deploy.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'playground/**'
+      - 'angular-*/**'
+      - 'react-*/**'
+      - 'rust-*/**'
+      - 'qwik-*/**'
+      - 'bootstrap-*/**'
+      - 'package.json'
+  workflow_dispatch:
+
+concurrency:
+  group: playground-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  build-matrix:
+    name: Build ${{ matrix.slug }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - slug: angular-web-audio-visualizer
+            category: examples
+          - slug: angular-web-workers-offscreencanvas
+            category: examples
+          - slug: rust-wasm-performance-demo
+            category: examples
+          - slug: qwik-angular-react-rust
+            category: examples
+          - slug: angular-stencil-web-components
+            category: examples
+          - slug: angular-dynamic-form-debugging
+            category: examples
+          - slug: angular-patterns-and-di
+            category: examples
+          - slug: angular-shared-library-workspace
+            category: examples
+          - slug: react-recoil-advanced-state
+            category: examples
+          - slug: bootstrap-to-tailwind-migration
+            category: examples
+          - slug: microbiome-sandbox
+            category: labs
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: Restore build cache
+        uses: actions/cache@v4
+        with:
+          path: playground/.build-cache
+          key: playground-cache-${{ matrix.category }}-${{ matrix.slug }}-${{ hashFiles(format('{0}/package-lock.json', matrix.category == 'labs' && 'playground/labs/microbiome-sandbox' || matrix.slug), 'playground/scripts/**') }}
+          restore-keys: |
+            playground-cache-${{ matrix.category }}-${{ matrix.slug }}-
+
+      - name: Build target
+        run: node playground/scripts/cloudflare-build.mjs --only ${{ matrix.slug }} --skip-landing
+
+      - name: Upload dist slice
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.category }}-${{ matrix.slug }}
+          path: playground/dist/${{ matrix.category }}/${{ matrix.slug }}/
+          retention-days: 1
+
+  assemble-deploy:
+    name: Assemble & Deploy
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Download all dist slices
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: false
+
+      - name: Assemble dist
+        run: |
+          mkdir -p playground/dist
+          for dir in artifacts/dist-*; do
+            # artifacts/dist-examples-slug/ contains the slug folder contents
+            category=$(echo "$dir" | sed 's|artifacts/dist-||' | cut -d- -f1)
+            slug=$(echo "$dir" | sed 's|artifacts/dist-||' | cut -d- -f2-)
+            mkdir -p "playground/dist/$category/$slug"
+            cp -r "$dir"/* "playground/dist/$category/$slug/"
+          done
+
+      - name: Write landing & SEO
+        run: node -e "
+          import { loadManifest } from './playground/scripts/lib/manifest-load.mjs';
+          import { setActiveDistRoot } from './playground/scripts/lib/paths.mjs';
+          import { writeSharedAssets } from './playground/scripts/lib/theme.mjs';
+          import { writeSeoAssets } from './playground/scripts/lib/seo.mjs';
+          import { writeLandingPage } from './playground/scripts/lib/landing-page.mjs';
+          const { manifest } = loadManifest();
+          setActiveDistRoot('playground/dist');
+          writeSharedAssets();
+          writeSeoAssets(manifest);
+          writeLandingPage(manifest);
+        "
+
+      - name: Inject companion frames
+        run: |
+          node -e "
+            import fs from 'node:fs';
+            import { loadManifest } from './playground/scripts/lib/manifest-load.mjs';
+            import { injectCompanionFrame } from './playground/scripts/lib/companion-frame.mjs';
+            import { setActiveDistRoot } from './playground/scripts/lib/paths.mjs';
+            const { manifest, targets } = loadManifest();
+            setActiveDistRoot('playground/dist');
+            for (const t of targets) {
+              const index = 'playground/dist/' + t.category + '/' + t.slug + '/index.html';
+              if (fs.existsSync(index)) {
+                injectCompanionFrame(t, t.category, manifest);
+              }
+            }
+          "
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy playground/dist --project-name=omid-dev-playground
+
+  pr-build-check:
+    name: PR Build Check
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - run: echo "All matrix builds succeeded"

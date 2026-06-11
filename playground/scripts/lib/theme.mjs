@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { DIST_ROOT } from './paths.mjs';
+import { getActiveDistRoot } from './paths.mjs';
 import { ensureDir } from './fs-utils.mjs';
 
 /** CSS custom properties aligned with omid.dev themes/omid-dev/assets/css/core/theme-vars.css */
@@ -589,7 +589,7 @@ export function faviconHead() {
 }
 
 export function writeSharedAssets() {
-  const assetsDir = path.join(DIST_ROOT, 'assets');
+  const assetsDir = path.join(getActiveDistRoot(), 'assets');
   ensureDir(assetsDir);
   fs.writeFileSync(path.join(assetsDir, 'companion-frame.css'), companionFrameCss(), 'utf8');
 }

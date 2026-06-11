@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { DIST_ROOT, PLAYGROUND_ROOT } from './paths.mjs';
+import { getActiveDistRoot, PLAYGROUND_ROOT } from './paths.mjs';
 import { ensureDir } from './fs-utils.mjs';
 import {
   getArticleTitle,
@@ -153,11 +153,11 @@ export function landingSchema(manifest) {
         '@type': 'ItemList',
         '@id': `${url}#live-demos`,
         name: 'Live companion demos',
-        itemListElement: manifest.demos.map((demo, index) => ({
+        itemListElement: getAllBuildTargets(manifest).map((target, index) => ({
           '@type': 'ListItem',
           position: index + 1,
-          url: getDemoPublicUrl(manifest, demo, manifest.category ?? 'examples'),
-          name: demo.title,
+          url: getDemoPublicUrl(manifest, target, target.category),
+          name: target.title,
         })),
       },
     ],
@@ -203,9 +203,10 @@ export function demoTitle(demo) {
   return `${demo.title} | Omid Playground`;
 }
 
-export function writeSeoAssets(manifest) {
+export function writeSeoAssets(manifest, selectedTargets = null) {
   const baseUrl = getLandingUrl(manifest);
-  const assetsDir = path.join(DIST_ROOT, 'assets');
+  const distRoot = getActiveDistRoot();
+  const assetsDir = path.join(distRoot, 'assets');
   ensureDir(assetsDir);
 
   const ogImageSourcePath = path.join(PLAYGROUND_ROOT, 'assets', 'og-image.png');
@@ -213,8 +214,8 @@ export function writeSeoAssets(manifest) {
 
   fs.copyFileSync(ogImageSourcePath, ogImageDistPath);
   manifest.generatedOgImagePath = PLAYGROUND_OG_IMAGE_PATH;
-  fs.writeFileSync(path.join(DIST_ROOT, 'robots.txt'), renderRobotsTxt(baseUrl), 'utf8');
-  fs.writeFileSync(path.join(DIST_ROOT, 'sitemap.xml'), renderSitemapXml(manifest), 'utf8');
+  fs.writeFileSync(path.join(distRoot, 'robots.txt'), renderRobotsTxt(baseUrl), 'utf8');
+  fs.writeFileSync(path.join(distRoot, 'sitemap.xml'), renderSitemapXml(manifest, selectedTargets), 'utf8');
 }
 
 function renderRobotsTxt(baseUrl) {
@@ -225,16 +226,29 @@ Sitemap: ${baseUrl.replace(/\/$/, '')}/sitemap.xml
 `;
 }
 
-function renderSitemapXml(manifest) {
+function getAllBuildTargets(manifest) {
+  const categories = manifest.categories ?? {};
+  const examples = (categories.examples ?? manifest.demos ?? []).map((d) => ({ ...d, category: 'examples' }));
+  const labs = (categories.labs ?? []).map((d) => ({ ...d, category: 'labs' }));
+  return [...examples, ...labs];
+}
+
+function renderSitemapXml(manifest, selectedTargets = null) {
+  let targets = getAllBuildTargets(manifest);
+  if (selectedTargets) {
+    const slugs = new Set(selectedTargets.map((t) => t.slug));
+    targets = targets.filter((t) => slugs.has(t.slug));
+  }
+
   const urls = [
     {
       loc: getLandingUrl(manifest),
       priority: '1.0',
       changefreq: 'weekly',
     },
-    ...manifest.demos.map((demo) => ({
-      loc: getDemoPublicUrl(manifest, demo, manifest.category ?? 'examples'),
-      priority: '0.8',
+    ...targets.map((target) => ({
+      loc: getDemoPublicUrl(manifest, target, target.category),
+      priority: target.category === 'labs' ? '0.85' : '0.8',
       changefreq: 'monthly',
     })),
   ];

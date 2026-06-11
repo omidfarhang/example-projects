@@ -21,12 +21,42 @@ import { escapeHtml, faviconHead } from './theme.mjs';
 
 const COMPANION_ASSET = '/assets/companion-frame.css';
 
-function renderCompanionBar(demo, manifest) {
-  const articleTitle = getArticleTitle(demo);
-  const articleContext = getArticleContext(demo);
-  const articleUrl = demo.articleUrl;
+function isLabTarget(demo, category) {
+  return demo.kind === 'lab' || category === 'labs';
+}
+
+function renderCompanionBar(demo, category, manifest) {
   const sourceUrl = getSourceUrl(demo, manifest);
   const landingUrl = getLandingUrl(manifest);
+  const isLab = isLabTarget(demo, category);
+
+  if (isLab) {
+    const techBlogUrl = demo.techBlogUrl ?? 'https://omid.dev/posts/';
+    const allLabsUrl = `${landingUrl.replace(/\/$/, '')}/#labs`;
+
+    return `
+  <header class="pg-companion" data-playground-companion-bar aria-label="Playground lab">
+    <div class="pg-companion__inner">
+      <div class="pg-companion__brand">
+        <a href="${escapeHtml(SITE_URL)}/">omid.dev</a>
+        <span class="pg-companion__sep" aria-hidden="true">·</span>
+        <span class="pg-companion__eyebrow">Playground lab</span>
+      </div>
+      <div class="pg-companion__content">
+        <div class="pg-companion__title">${escapeHtml(demo.title)}</div>
+        <div class="pg-companion__context">${escapeHtml(demo.description)}</div>
+      </div>
+      <nav class="pg-companion__actions" aria-label="Lab links">
+        <a class="pg-companion__btn pg-companion__btn--secondary" href="${escapeHtml(sourceUrl)}">Source code</a>
+        <a class="pg-companion__btn" href="${escapeHtml(techBlogUrl)}">Tech blog</a>
+        <a class="pg-companion__btn" href="${escapeHtml(allLabsUrl)}">All labs</a>
+      </nav>
+    </div>
+  </header>`;
+  }
+
+  const articleTitle = getArticleTitle(demo);
+  const articleUrl = demo.articleUrl;
 
   return `
   <header class="pg-companion" data-playground-companion-bar aria-label="Article companion demo">
@@ -49,8 +79,8 @@ function renderCompanionBar(demo, manifest) {
   </header>`;
 }
 
-function renderMetaTags(demo, manifest) {
-  const demoUrl = getDemoPublicUrl(manifest, demo, manifest.category ?? 'examples');
+function renderMetaTags(demo, category, manifest) {
+  const demoUrl = getDemoPublicUrl(manifest, demo, category);
   const title = demoTitle(demo);
   const description = demoDescription(demo);
 
@@ -100,12 +130,12 @@ function injectFaviconHead(html) {
   return injectIntoHead(stripExistingFavicons(html), faviconHead());
 }
 
-function injectMetaTags(html, demo, manifest) {
+function injectMetaTags(html, demo, category, manifest) {
   if (html.includes('<!-- Playground SEO -->')) {
     return html;
   }
 
-  return injectIntoHead(stripExistingSeo(html), renderMetaTags(demo, manifest));
+  return injectIntoHead(stripExistingSeo(html), renderMetaTags(demo, category, manifest));
 }
 
 function stripExistingSeo(html) {
@@ -129,12 +159,12 @@ function stripExistingFavicons(html) {
     .replace(/\s*<link\s+[^>]*rel=["'][^"']*\bicon\b[^"']*["'][^>]*>/gi, '');
 }
 
-function injectCompanionBar(html, demo, manifest) {
+function injectCompanionBar(html, demo, category, manifest) {
   if (html.includes('data-playground-companion-bar')) {
     return html;
   }
 
-  const bar = renderCompanionBar(demo, manifest);
+  const bar = renderCompanionBar(demo, category, manifest);
 
   const bodyMatch = html.match(/<body([^>]*)>/i);
   if (bodyMatch) {
@@ -205,9 +235,9 @@ export function injectCompanionFrame(demo, category, manifest) {
   html = injectHtmlClass(html);
   html = injectStylesheetLink(html);
   html = injectFaviconHead(html);
-  html = injectMetaTags(html, demo, manifest);
+  html = injectMetaTags(html, demo, category, manifest);
   html = updateDocumentTitle(html, demo);
-  html = injectCompanionBar(html, demo, manifest);
+  html = injectCompanionBar(html, demo, category, manifest);
 
   fs.writeFileSync(indexPath, html, 'utf8');
   console.log(`  ✓ Companion frame injected for ${demo.slug}`);

@@ -1,21 +1,41 @@
-# Playground (live demos)
+# Playground (live demos & labs)
 
-Static live demos for browser-only companion projects, published at **[playground.omid.dev](https://playground.omid.dev)**.
+Static live demos and interactive labs for omid.dev, published at **[playground.omid.dev](https://playground.omid.dev)**.
 
 ## URL layout
 
 | Path | Purpose |
 | --- | --- |
-| `/` | Playground home |
-| `/examples/<slug>/` | Companion demo (first pass) |
-| `/tools/`, `/benchmarks/`, `/labs/` | Reserved for future content |
+| `/` | Playground home (examples + labs) |
+| `/examples/<slug>/` | Article companion demos |
+| `/labs/<slug>/` | Standalone interactive labs |
 
 ## Local build
 
 ```bash
-# From repository root
+# Full site (all examples + labs)
 npm run build:playground
+
+# Labs only
+npm run build:playground:labs
+
+# Single target (fast iteration)
+npm run build:playground -- --only microbiome-sandbox
+npm run build:playground:one microbiome-sandbox
 ```
+
+### CLI flags
+
+| Flag / env | Use |
+| --- | --- |
+| `--only <slug>` | Build one target (+ landing/sitemap) |
+| `--category labs` | Build all labs only |
+| `--exclude <slug>` | Skip a known-heavy demo |
+| `--no-cache` | Skip lockfile-hash output cache |
+| `PLAYGROUND_AFFECTED=1` | Git-diff since merge-base — rebuild only changed projects |
+| `PLAYGROUND_ALLOW_SKIP=1` | Local debugging — continue on failure (never in production) |
+
+Output cache: `playground/.build-cache/` restores unchanged targets between builds.
 
 Output: `playground/dist/`
 
@@ -25,41 +45,54 @@ Preview locally:
 npx serve playground/dist
 ```
 
-## Cloudflare Pages
+## Deploy
 
-Connect this repository to a Cloudflare Pages project:
+**Production path:** GitHub Actions matrix build → assemble `playground/dist/` → Wrangler `pages deploy`.
+
+See [`.github/workflows/playground-deploy.yml`](../.github/workflows/playground-deploy.yml) and [`wrangler.toml`](../wrangler.toml).
+
+Required GitHub secrets:
+
+| Secret | Purpose |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Pages deploy token |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account |
+
+**Legacy fallback:** Cloudflare Pages native git build still works with:
 
 | Setting | Value |
 | --- | --- |
-| Root directory | `/` (repository root) |
+| Root directory | `/` |
 | Build command | `node playground/scripts/cloudflare-build.mjs` |
 | Build output directory | `playground/dist` |
-| Production branch | `master` (or your default) |
+| Production branch | `master` |
 
-### Environment variables
-
-| Variable | Value | Notes |
-| --- | --- | --- |
-| `NODE_VERSION` | `20` | Recommended |
-| `SKIP_DEPENDENCY_INSTALL` | `1` | Optional — root has no app dependencies; the build script installs per demo |
-
-No Firebase or API secrets are required for the current demo set.
-
-### Custom domain
-
-Attach `playground.omid.dev` to the Pages project in the Cloudflare dashboard.
+Disable the native git hook once the GitHub Actions workflow is verified.
 
 ## Manifest
 
-Demos are listed in [`manifest.json`](manifest.json). The build script reads slug, project path, build type, article metadata (`articleUrl`, `articleTitle`, `sourcePath`), and repo settings from there.
+Targets are listed in [`manifest.json`](manifest.json):
 
-After each demo build, the script injects a slim **companion bar** into `index.html` with links back to the article, source folder, and playground home. Shared styling lives in `scripts/lib/theme.mjs` and is emitted to `dist/assets/companion-frame.css`.
+- `categories.examples` — article companions (backward-compatible with top-level `demos`)
+- `categories.labs` — standalone labs
+- `build.concurrency` / `build.cacheDir` — orchestrator settings
 
-SEO, social cards, structured data, Matomo tracking, `robots.txt`, `sitemap.xml`, and the playground OpenGraph image are generated from `scripts/lib/seo.mjs`.
+Each entry: `slug`, `projectDir`, `type`, optional `tier: "heavy"`, `kind: "lab"` for labs.
 
-## Adding a demo
+Companion frame variants:
+
+- **Examples:** “Companion demo” bar with article CTA
+- **Labs:** “Playground lab” bar with Source code + Tech blog + All labs
+
+## Adding a lab
+
+1. Create project under `playground/labs/<slug>/` (Vite recommended).
+2. Add entry to `manifest.json` → `categories.labs`.
+3. Run `npm run build:playground -- --only <slug>`.
+4. Link from blog posts with deep-link query params.
+
+## Adding an example
 
 1. Add an entry to `manifest.json` with a unique `slug` and `type`.
-2. Implement or extend a builder in `scripts/lib/builders.mjs` if the project needs a custom build path.
+2. Implement or extend a builder in `scripts/lib/builders.mjs` if needed.
 3. Run `npm run build:playground` locally and verify `/examples/<slug>/`.
-4. Update the project README and the matching omid.dev blog post with live-demo links.
