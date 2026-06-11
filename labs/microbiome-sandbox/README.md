@@ -16,7 +16,7 @@ Rotate a low-poly body map, fly into tissue cross-sections, and run deterministi
 ## Local dev
 
 ```bash
-cd playground/labs/microbiome-sandbox
+cd labs/microbiome-sandbox
 npm install
 npm run dev
 ```

@@ -53,10 +53,6 @@ export function getAffectedSlugs(targets) {
     if (changed.some((f) => f === dir || f.startsWith(`${dir}/`))) {
       affected.add(target.slug);
     }
-    // Labs under playground/labs/
-    if (dir.startsWith('playground/') && changed.some((f) => f.startsWith(dir))) {
-      affected.add(target.slug);
-    }
   }
 
   // Playground assets affect landing/seo

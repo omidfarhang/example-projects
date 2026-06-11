@@ -2,6 +2,14 @@
 
 Static live demos and interactive labs for omid.dev, published at **[playground.omid.dev](https://playground.omid.dev)**.
 
+## Repository layout
+
+| Path | Purpose |
+| --- | --- |
+| `examples/<slug>/` | Article companion projects |
+| `labs/<slug>/` | Standalone interactive labs |
+| `playground/` | Build scripts, manifest, and deploy output (`dist/`) |
+
 ## URL layout
 
 | Path | Purpose |
@@ -86,13 +94,14 @@ Companion frame variants:
 
 ## Adding a lab
 
-1. Create project under `playground/labs/<slug>/` (Vite recommended).
+1. Create project under `labs/<slug>/` (Vite recommended).
 2. Add entry to `manifest.json` → `categories.labs`.
 3. Run `npm run build:playground -- --only <slug>`.
 4. Link from blog posts with deep-link query params.
 
 ## Adding an example
 
-1. Add an entry to `manifest.json` with a unique `slug` and `type`.
-2. Implement or extend a builder in `scripts/lib/builders.mjs` if needed.
-3. Run `npm run build:playground` locally and verify `/examples/<slug>/`.
+1. Create project under `examples/<slug>/`.
+2. Add an entry to `manifest.json` → `categories.examples` with a unique `slug` and `type`.
+3. Implement or extend a builder in `scripts/lib/builders.mjs` if needed.
+4. Run `npm run build:playground` locally and verify `/examples/<slug>/`.
