@@ -1,3 +1,4 @@
+import { buildRegionEnv, type RegionEnv } from './envVars';
 import type { RegionId } from './regions';
 import { ARTICLES } from './articles';
 
@@ -10,7 +11,7 @@ export interface PresetDef {
   scenarioLifestage?: string;
   articleKey: keyof typeof ARTICLES;
   defaultRegion: RegionId;
-  env: { ph: number; moisture: number };
+  env: RegionEnv;
 }
 
 export const PRESETS: Record<PresetId, PresetDef> = {
@@ -23,7 +24,7 @@ export const PRESETS: Record<PresetId, PresetDef> = {
       'Life-stage context: early-life microbiome training shapes how the nasal barrier responds to allergens. Select nose/sinus and use region-specific inoculations to restore barrier integrity across ages.',
     articleKey: 'allergies',
     defaultRegion: 'nose',
-    env: { ph: 6.8, moisture: 0.72 },
+    env: buildRegionEnv({ ph: 6.8, moisture: 0.72, temperature: 0.54, oxygenation: 0.82 }),
   },
   candida: {
     id: 'candida',
@@ -32,7 +33,7 @@ export const PRESETS: Record<PresetId, PresetDef> = {
       'Select skin or gut tissue and adjust pH and moisture to see how the biome shifts. Alkaline pH and sugar load favor C. albicans — acidifying inoculations and pH balancing restore equilibrium.',
     articleKey: 'candidiasis',
     defaultRegion: 'skin',
-    env: { ph: 7.4, moisture: 0.55 },
+    env: buildRegionEnv({ ph: 7.4, moisture: 0.55, temperature: 0.52, sebum: 0.28 }),
   },
   lifecycle: {
     id: 'lifecycle',
@@ -41,7 +42,7 @@ export const PRESETS: Record<PresetId, PresetDef> = {
       'Free-play across unlocked regions. Select gut tissue to add prebiotic fiber, watch probiotics consume it, and observe postbiotic SCFA particles healing epithelial integrity.',
     articleKey: 'lifecycle',
     defaultRegion: 'gut',
-    env: { ph: 6.2, moisture: 0.65 },
+    env: buildRegionEnv({ ph: 6.2, moisture: 0.65, temperature: 0.6, oxygenTension: 0.12 }),
   },
 };
 

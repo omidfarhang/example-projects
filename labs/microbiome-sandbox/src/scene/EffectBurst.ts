@@ -56,6 +56,10 @@ export class EffectBurst {
       scfa: 0x2dd4bf,
       saline_mist: 0x7dd3fc,
       ph_serum: 0x34d399,
+      cerumen_impaction: 0xd4a040,
+      swim_exposure: 0x38bdf8,
+      sebum_surge: 0xf0d878,
+      harsh_shampoo: 0xc084fc,
     };
     this.color = colors[kind] ?? 0x38bdf8;
     const mat = this.ring.material as THREE.MeshBasicMaterial;

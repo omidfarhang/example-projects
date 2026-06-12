@@ -8,6 +8,8 @@ const MICRO_FRAMES: Record<EpitheliumKind, { pos: THREE.Vector3; target: THREE.V
   gut: { pos: new THREE.Vector3(0, 0.52, 2.05), target: new THREE.Vector3(0, 0.48, 0) },
   skin: { pos: new THREE.Vector3(0, 0.34, 1.95), target: new THREE.Vector3(0, 0.3, 0) },
   sinus: { pos: new THREE.Vector3(0, 0.58, 2.3), target: new THREE.Vector3(0, 0.48, 0) },
+  ear: { pos: new THREE.Vector3(0, 0.52, 2.15), target: new THREE.Vector3(0, 0.46, 0) },
+  scalp: { pos: new THREE.Vector3(0, 0.36, 2.0), target: new THREE.Vector3(0, 0.34, 0) },
 };
 
 export class CameraRig {

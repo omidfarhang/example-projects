@@ -429,6 +429,232 @@ export function buildNasalTissue(): TissueBuildResult {
   return { group, inflamedMeshes, overlays, kind: 'sinus' };
 }
 
+/**
+ * EAR CANAL — narrow tubular squamous canal (not ciliated sinus):
+ * cartilage ring → stratified squamous layers → cerumen film → tympanic membrane.
+ */
+export function buildEarCanalTissue(): TissueBuildResult {
+  const group = new THREE.Group();
+  const overlays: THREE.Mesh[] = [];
+  const inflamedMeshes: THREE.Mesh[] = [];
+  const W = 4.6;
+  const canalH = 1.05;
+
+  const cartilage = new THREE.Mesh(
+    new THREE.TorusGeometry(0.42, 0.07, 10, 24, Math.PI),
+    mat(0x8a98a8, { roughness: 0.82 }),
+  );
+  cartilage.rotation.z = Math.PI;
+  cartilage.position.set(0, 0.1, 0.02);
+  group.add(cartilage, outline(cartilage, 0x6890b0, 0.4));
+
+  const layers: { name: string; h: number; color: number; cells: number }[] = [
+    { name: 'basale', h: 0.07, color: P.basale, cells: 10 },
+    { name: 'spinous', h: 0.09, color: P.spinous, cells: 10 },
+    { name: 'granulosum', h: 0.06, color: P.granulosum, cells: 10 },
+    { name: 'corneum', h: 0.05, color: P.corneum, cells: 12 },
+  ];
+
+  let y = 0.14;
+  for (const layer of layers) {
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(W, layer.h, DEPTH * 0.9), mat(layer.color));
+    slab.position.set(0, y + layer.h / 2, 0);
+    group.add(slab, outline(slab, 0xb89080, 0.32));
+
+    const pitch = W / layer.cells;
+    for (let i = 0; i < layer.cells; i++) {
+      const cx = -W / 2 + pitch * 0.5 + i * pitch;
+      const bump = new THREE.Mesh(
+        new THREE.BoxGeometry(pitch * 0.72, layer.h * 0.58, DEPTH * 0.38),
+        mat(layer.name === 'corneum' ? P.lipid : layer.color, {
+          roughness: layer.name === 'corneum' ? 0.28 : 0.55,
+        }),
+      );
+      bump.position.set(cx, y + layer.h / 2 + (layer.name === 'corneum' ? 0.008 : 0), DEPTH * 0.22);
+      group.add(bump);
+      if (layer.name === 'spinous' && i >= 3 && i <= 6) {
+        bump.userData.baseColor = P.spinous;
+        inflamedMeshes.push(bump);
+      }
+    }
+    y += layer.h;
+  }
+
+  const canalTop = y;
+  for (let i = 0; i < 4; i++) {
+    const gx = -0.55 + i * 0.38;
+    const gland = new THREE.Mesh(
+      new THREE.SphereGeometry(0.045, 10, 8),
+      mat(0xe8c878, { roughness: 0.35 }),
+    );
+    gland.position.set(gx, canalTop - 0.02, DEPTH * 0.32);
+    gland.scale.set(1.2, 0.7, 0.9);
+    group.add(gland);
+  }
+
+  for (let i = 0; i < 7; i++) {
+    const hx = -1.4 + i * 0.42;
+    const hair = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.003, 0.0015, 0.14, 3),
+      mat(0x3a2818, { roughness: 0.92 }),
+    );
+    hair.position.set(hx, canalTop + 0.1, DEPTH * 0.42);
+    hair.rotation.z = (i % 2 ? 0.12 : -0.08);
+    group.add(hair);
+  }
+
+  const cerumen = new THREE.Mesh(
+    new THREE.PlaneGeometry(W * 0.88, 0.12),
+    mat(0xd4a040, { transparent: true, opacity: 0.22, roughness: 0.4 }),
+  );
+  cerumen.position.set(0, canalTop + 0.06, DEPTH * 0.44);
+  cerumen.userData.isCerumen = true;
+  group.add(cerumen);
+  overlays.push(cerumen);
+
+  const mucus = mucusSheet(W * 0.82, 0.1, canalTop + 0.14, 0.1);
+  group.add(mucus);
+  overlays.push(mucus);
+
+  const lumen = new THREE.Mesh(
+    new THREE.BoxGeometry(W * 0.72, canalH, DEPTH * 0.85),
+    mat(0x2a1810, { transparent: true, opacity: 0.45 }),
+  );
+  lumen.position.set(0, canalTop + canalH / 2 + 0.08, -0.01);
+  group.add(lumen);
+
+  const tympanum = new THREE.Mesh(
+    new THREE.CircleGeometry(0.28, 20),
+    mat(0xf0e8d8, { roughness: 0.35, side: THREE.DoubleSide }),
+  );
+  tympanum.position.set(W / 2 - 0.18, canalTop + canalH * 0.42, 0.02);
+  tympanum.rotation.y = Math.PI / 2;
+  group.add(tympanum, outline(tympanum, 0xd8c8b0, 0.45));
+
+  const biofilm = new THREE.Mesh(
+    new THREE.PlaneGeometry(W * 0.7, 0.035),
+    mat(0x9333ea, { transparent: true, opacity: 0 }),
+  );
+  biofilm.position.set(0, canalTop + 0.08, DEPTH * 0.48);
+  biofilm.userData.isBiofilm = true;
+  group.add(biofilm);
+  overlays.push(biofilm);
+
+  return { group, inflamedMeshes, overlays, kind: 'ear' };
+}
+
+/**
+ * SCALP — dense follicular field with sebaceous units (distinct from single-follicle skin).
+ */
+export function buildScalpTissue(): TissueBuildResult {
+  const group = new THREE.Group();
+  const overlays: THREE.Mesh[] = [];
+  const inflamedMeshes: THREE.Mesh[] = [];
+  const W = 5.2;
+
+  const layers: { name: string; h: number; color: number }[] = [
+    { name: 'corneum', h: 0.06, color: P.corneum },
+    { name: 'granulosum', h: 0.06, color: P.granulosum },
+    { name: 'spinous', h: 0.11, color: P.spinous },
+    { name: 'basale', h: 0.08, color: P.basale },
+    { name: 'dermis', h: 0.2, color: P.dermis },
+    { name: 'subcutis', h: 0.12, color: 0xc8a878 },
+  ];
+
+  let y = 0;
+  for (const layer of layers) {
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(W, layer.h, DEPTH), mat(layer.color));
+    slab.position.set(0, y + layer.h / 2, 0);
+    group.add(slab, outline(slab, 0x9a6868, 0.32));
+
+    if (layer.name === 'dermis') {
+      for (let i = 0; i < 14; i++) {
+        const fib = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.005, 0.005, 0.45 + (i % 4) * 0.2, 4),
+          mat(P.collagen),
+        );
+        fib.rotation.z = Math.PI / 2;
+        fib.rotation.y = (i % 6) * 0.15 - 0.45;
+        fib.position.set(-W / 2 + (i + 0.5) * (W / 14), y + layer.h / 2, (i % 2) * 0.04 - 0.02);
+        group.add(fib);
+      }
+    }
+    y += layer.h;
+  }
+
+  const surfaceY = layers[0].h + layers[1].h + layers[2].h + layers[3].h + layers[4].h + layers[5].h;
+  const follicleXs = [-1.35, 0, 1.35];
+
+  for (let fi = 0; fi < follicleXs.length; fi++) {
+    const fx = follicleXs[fi];
+    const inflamed = fi === 1;
+    const follicleH = 0.38 + fi * 0.04;
+    const follicle = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.055, 0.085, follicleH, 12),
+      mat(inflamed ? P.cytoplasmDeep : P.basale),
+    );
+    follicle.position.set(fx, follicleH / 2 - 0.02, 0.02);
+    group.add(follicle, outline(follicle, 0xc08070, 0.38));
+    if (inflamed) {
+      follicle.userData.baseColor = P.basale;
+      inflamedMeshes.push(follicle);
+    }
+
+    const hair = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.022, 0.028, 0.72, 8),
+      mat(0x1a1008, { roughness: 0.92 }),
+    );
+    hair.position.set(fx, surfaceY + 0.34, DEPTH * 0.38);
+    group.add(hair);
+
+    const sebaceous = new THREE.Mesh(
+      new THREE.SphereGeometry(0.13, 12, 10),
+      mat(0xf0e0a8, { roughness: 0.28 }),
+    );
+    sebaceous.position.set(fx + 0.16, follicleH * 0.48, 0.06);
+    sebaceous.scale.set(1.15, 0.8, 0.9);
+    group.add(sebaceous, outline(sebaceous, 0xd8c878, 0.35));
+
+    const bulb = new THREE.Mesh(
+      new THREE.SphereGeometry(0.06, 10, 8),
+      mat(0x9a5850),
+    );
+    bulb.position.set(fx, 0.04, 0.04);
+    group.add(bulb);
+  }
+
+  const sweatCurve = new THREE.QuadraticBezierCurve3(
+    new THREE.Vector3(-2.1, surfaceY - 0.08, 0.06),
+    new THREE.Vector3(-1.2, surfaceY + 0.12, 0.08),
+    new THREE.Vector3(-0.4, surfaceY - 0.02, 0.06),
+  );
+  const sweatDuct = new THREE.Mesh(
+    new THREE.TubeGeometry(sweatCurve, 12, 0.018, 6, false),
+    mat(0xd8c8b8, { roughness: 0.45 }),
+  );
+  group.add(sweatDuct);
+
+  const sebumSheen = new THREE.Mesh(
+    new THREE.PlaneGeometry(W, 0.03),
+    mat(0xf0d878, { transparent: true, opacity: 0.18, metalness: 0.28 }),
+  );
+  sebumSheen.position.set(0, surfaceY + 0.02, DEPTH * 0.48);
+  sebumSheen.userData.isSebum = true;
+  group.add(sebumSheen);
+  overlays.push(sebumSheen);
+
+  const biofilm = new THREE.Mesh(
+    new THREE.PlaneGeometry(W * 0.92, 0.05),
+    mat(0x9333ea, { transparent: true, opacity: 0 }),
+  );
+  biofilm.position.set(0, surfaceY + 0.05, DEPTH * 0.5);
+  biofilm.userData.isBiofilm = true;
+  group.add(biofilm);
+  overlays.push(biofilm);
+
+  return { group, inflamedMeshes, overlays, kind: 'scalp' };
+}
+
 /** 3D volume where microbes swim, aligned to each tissue cross-section. */
 export interface LumenBounds {
   xMin: number;
@@ -482,6 +708,30 @@ export const LUMEN_BOUNDS: Record<EpitheliumKind, LumenBounds> = {
     allergenBase: 0.92,
     allergenHeight: 0.18,
   },
+  ear: {
+    xMin: -2.1,
+    xMax: 2.1,
+    yMin: 0.48,
+    yMax: 1.18,
+    zMin: 0.06,
+    zMax: 0.3,
+    epithelialY: 0.5,
+    mucusY: 0.62,
+    allergenBase: 0.88,
+    allergenHeight: 0.35,
+  },
+  scalp: {
+    xMin: -2.45,
+    xMax: 2.45,
+    yMin: 0.48,
+    yMax: 1.05,
+    zMin: 0.1,
+    zMax: 0.48,
+    epithelialY: 0.5,
+    mucusY: 0.66,
+    allergenBase: 0.88,
+    allergenHeight: 0.2,
+  },
 };
 
 /** Epithelial receptor columns — attachment sites along the tissue surface. */
@@ -489,4 +739,6 @@ export const RECEPTOR_SITES: Record<EpitheliumKind, number[]> = {
   sinus: Array.from({ length: 12 }, (_, i) => -2.5 + i * (5 / 11)),
   skin: Array.from({ length: 13 }, (_, i) => -2.5 + i * (5.2 / 12)),
   gut: Array.from({ length: 11 }, (_, i) => -2.6 + 0.32 + i * ((5.2 - 0.64) / 10)),
+  ear: Array.from({ length: 10 }, (_, i) => -2.1 + i * (4.2 / 9)),
+  scalp: [-1.35, 0, 1.35, -0.68, 0.68, -2.0, 2.0],
 };

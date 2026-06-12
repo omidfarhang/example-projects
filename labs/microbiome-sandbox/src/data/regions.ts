@@ -1,3 +1,6 @@
+import { buildRegionEnv, type RegionEnv } from './envVars';
+import type { EpitheliumKind } from '../scene/epithelium/types';
+
 export type RegionId = 'ear' | 'scalp' | 'nose' | 'skin' | 'gut';
 
 export interface RegionBaseline {
@@ -24,11 +27,11 @@ export interface RegionDef {
   label: string;
   active: boolean;
   hotspot: [number, number, number];
-  microGeometry: 'sinus' | 'skin' | 'gut';
+  microGeometry: EpitheliumKind;
   zoomTitle: string;
   scaleLabel: string;
   defaultStrains: { probiotics: string[]; pathogens: string[]; allergens: string[] };
-  env: { ph: number; moisture: number };
+  env: RegionEnv;
   baseline: RegionBaseline;
   triggers: RegionAction[];
   inoculations: RegionInoculation[];
@@ -38,30 +41,77 @@ export const REGIONS: RegionDef[] = [
   {
     id: 'ear',
     label: 'Ear Canal',
-    active: false,
+    active: true,
     hotspot: [-0.52, 1.62, 0.08],
-    microGeometry: 'sinus',
+    microGeometry: 'ear',
     zoomTitle: 'EAR CANAL EPITHELIUM',
     scaleLabel: '80× magnification',
-    defaultStrains: { probiotics: ['L. rhamnosus'], pathogens: ['S. aureus'], allergens: ['Dust'] },
-    env: { ph: 6.8, moisture: 0.72 },
-    baseline: { commensals: 40, probiotics: [{ strain: 'L. rhamnosus', count: 8 }] },
-    triggers: [],
-    inoculations: [],
+    defaultStrains: { probiotics: ['L. rhamnosus'], pathogens: ['S. aureus', 'P. aeruginosa'], allergens: ['Dust'] },
+    env: buildRegionEnv({
+      ph: 6.5,
+      moisture: 0.68,
+      temperature: 0.58,
+      cerumen: 0.42,
+      salinity: 0.55,
+      oxygenation: 0.62,
+    }),
+    baseline: {
+      commensals: 40,
+      probiotics: [{ strain: 'L. rhamnosus', count: 8 }],
+      pathogens: [{ strain: 'S. aureus', count: 5, kind: 'pathogen' }],
+      inflammation: 0.06,
+      biofilm: 0.08,
+    },
+    triggers: [
+      { id: 'allergen', label: 'TRIGGER ALLERGEN SPIKE' },
+      { id: 'dry_air', label: 'DRY AIR EXPOSURE' },
+      { id: 'cerumen_impaction', label: 'CERUMEN IMPACTION' },
+      { id: 'swim_exposure', label: 'SWIM / WATER EXPOSURE' },
+    ],
+    inoculations: [
+      { id: 'lrham', label: 'SPRAY L. RHAMNOSUS', strain: 'L. rhamnosus' },
+      { id: 'saline_mist', label: 'SALINE MIST', strain: 'saline_mist' },
+    ],
   },
   {
     id: 'scalp',
     label: 'Scalp',
-    active: false,
+    active: true,
     hotspot: [0, 1.92, 0.12],
-    microGeometry: 'skin',
+    microGeometry: 'scalp',
     zoomTitle: 'SCALP BARRIER CROSS-SECTION',
     scaleLabel: '200× magnification',
-    defaultStrains: { probiotics: ['L. rhamnosus'], pathogens: ['S. aureus'], allergens: ['Dust'] },
-    env: { ph: 7.0, moisture: 0.5 },
-    baseline: { commensals: 30, probiotics: [{ strain: 'L. rhamnosus', count: 6 }] },
-    triggers: [],
-    inoculations: [],
+    defaultStrains: {
+      probiotics: ['L. rhamnosus'],
+      pathogens: ['C. albicans', 'S. aureus', 'Malassezia'],
+      allergens: ['Dust'],
+    },
+    env: buildRegionEnv({
+      ph: 5.8,
+      moisture: 0.48,
+      temperature: 0.56,
+      sebum: 0.58,
+      sweatRate: 0.32,
+    }),
+    baseline: {
+      commensals: 30,
+      probiotics: [{ strain: 'L. rhamnosus', count: 6 }],
+      pathogens: [
+        { strain: 'C. albicans', count: 8, kind: 'yeast' },
+        { strain: 'S. aureus', count: 4, kind: 'pathogen' },
+      ],
+      biofilm: 0.12,
+    },
+    triggers: [
+      { id: 'sebum_surge', label: 'SEBUM SURGE' },
+      { id: 'harsh_shampoo', label: 'HARSH SHAMPOO (ALKALINE)' },
+      { id: 'friction_irritant', label: 'FRICTION / IRRITANT' },
+    ],
+    inoculations: [
+      { id: 'lrham', label: 'APPLY L. RHAMNOSUS', strain: 'L. rhamnosus' },
+      { id: 's_epidermidis', label: 'APPLY S. EPIDERMIDIS', strain: 'S. epidermidis' },
+      { id: 'ph_serum', label: 'pH BALANCING SERUM', strain: 'ph_serum' },
+    ],
   },
   {
     id: 'nose',
@@ -76,7 +126,7 @@ export const REGIONS: RegionDef[] = [
       pathogens: ['S. aureus', 'H. influenzae'],
       allergens: ['Pollen/Dust'],
     },
-    env: { ph: 6.8, moisture: 0.72 },
+    env: buildRegionEnv({ ph: 6.8, moisture: 0.72, temperature: 0.54, oxygenation: 0.82 }),
     baseline: {
       commensals: 50,
       probiotics: [{ strain: 'L. rhamnosus', count: 8 }],
@@ -110,7 +160,7 @@ export const REGIONS: RegionDef[] = [
       pathogens: ['C. albicans', 'S. aureus'],
       allergens: ['Irritant'],
     },
-    env: { ph: 7.4, moisture: 0.55 },
+    env: buildRegionEnv({ ph: 7.4, moisture: 0.55, temperature: 0.52, sebum: 0.28 }),
     baseline: {
       commensals: 30,
       probiotics: [{ strain: 'L. acidophilus', count: 6 }],
@@ -144,7 +194,7 @@ export const REGIONS: RegionDef[] = [
       pathogens: ['Enteropathogen'],
       allergens: ['Food antigen'],
     },
-    env: { ph: 6.2, moisture: 0.65 },
+    env: buildRegionEnv({ ph: 6.2, moisture: 0.65, temperature: 0.6, oxygenTension: 0.12 }),
     baseline: {
       commensals: 35,
       probiotics: [{ strain: 'L. plantarum', count: 10 }],

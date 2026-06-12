@@ -15,6 +15,13 @@ export interface MicrobeNode {
 export interface BiomeState {
   ph: number;
   moisture: number;
+  temperature: number;
+  sebum: number;
+  cerumen: number;
+  salinity: number;
+  oxygenation: number;
+  sweatRate: number;
+  oxygenTension: number;
   integrity: number;
   inflammation: number;
   biofilm: number;

@@ -30,14 +30,14 @@ export class App {
         onBackToBody: () => this.backToBody(),
         onTrigger: (id) => this.handleTrigger(id),
         onInoculate: (id) => this.handleInoculate(id),
-        onEnvChange: (ph, moisture) => this.engine.setEnv(ph, moisture),
+        onEnvChange: (env) => this.engine.setEnv(env),
       },
       url.context,
     );
 
     this.dashboard.setPreset(this.preset, this.region);
     this.dashboard.setRegionActions(this.region);
-    this.dashboard.syncEnvSliders(this.engine.biome.ph, this.engine.biome.moisture);
+    this.dashboard.syncEnvSliders(this.engine.biome, this.region);
 
     this.scene = new SceneManager(
       this.dashboard.getCanvas(),
@@ -80,7 +80,7 @@ export class App {
     this.engine.setRegion(id);
     this.dashboard.highlightRegion(id);
     this.dashboard.setRegionActions(id);
-    this.dashboard.syncEnvSliders(this.engine.biome.ph, this.engine.biome.moisture);
+    this.dashboard.syncEnvSliders(this.engine.biome, this.region);
     this.scene.selectRegion(id);
     this.dashboard.setMicroView(true, region);
   }
@@ -96,10 +96,10 @@ export class App {
     this.engine.setPreset(id, def.env);
     this.region = def.defaultRegion;
     this.engine.setRegion(this.region, true);
-    this.engine.setEnv(def.env.ph, def.env.moisture);
+    this.engine.setEnv(def.env);
     this.dashboard.setPreset(id, this.region);
     this.dashboard.setRegionActions(this.region);
-    this.dashboard.syncEnvSliders(this.engine.biome.ph, this.engine.biome.moisture);
+    this.dashboard.syncEnvSliders(this.engine.biome, this.region);
     this.backToBody();
     if (getRegion(this.region).active) {
       requestAnimationFrame(() => this.selectRegion(this.region));

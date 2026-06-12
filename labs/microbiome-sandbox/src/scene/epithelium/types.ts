@@ -1,4 +1,4 @@
-export type EpitheliumKind = 'sinus' | 'skin' | 'gut';
+export type EpitheliumKind = 'sinus' | 'skin' | 'gut' | 'ear' | 'scalp';
 
 export interface EpitheliumState {
   inflammation: number;
@@ -7,4 +7,7 @@ export interface EpitheliumState {
   postbioticLevel: number;
   ph: number;
   moisture: number;
+  sebum: number;
+  cerumen: number;
+  sweatRate: number;
 }

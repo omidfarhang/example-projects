@@ -1,5 +1,11 @@
 import * as THREE from 'three';
-import { buildGutTissue, buildNasalTissue, buildSkinTissue } from './tissueModels';
+import {
+  buildEarCanalTissue,
+  buildGutTissue,
+  buildNasalTissue,
+  buildScalpTissue,
+  buildSkinTissue,
+} from './tissueModels';
 import type { EpitheliumKind, EpitheliumState } from './types';
 
 export class Epithelium3D {
@@ -13,8 +19,14 @@ export class Epithelium3D {
     this.clear();
     this.kind = kind;
 
-    const result =
-      kind === 'sinus' ? buildNasalTissue() : kind === 'skin' ? buildSkinTissue() : buildGutTissue();
+    const builders = {
+      sinus: buildNasalTissue,
+      skin: buildSkinTissue,
+      gut: buildGutTissue,
+      ear: buildEarCanalTissue,
+      scalp: buildScalpTissue,
+    } as const;
+    const result = builders[kind]();
 
     this.group.add(result.group);
     this.overlays = result.overlays;
@@ -79,6 +91,15 @@ export class Epithelium3D {
         const phSheen = state.ph >= 5.5 && state.ph <= 7 ? 0.04 : 0;
         (overlay.material as THREE.MeshStandardMaterial).opacity =
           0.04 + state.integrity * 0.12 + phSheen - dryPenalty;
+      }
+      if (overlay.userData.isCerumen) {
+        (overlay.material as THREE.MeshStandardMaterial).opacity =
+          0.06 + state.cerumen * 0.38 + state.moisture * 0.06;
+      }
+      if (overlay.userData.isSebum) {
+        const m = overlay.material as THREE.MeshStandardMaterial;
+        m.opacity = 0.05 + state.sebum * 0.32 + state.sweatRate * 0.08;
+        m.emissiveIntensity = state.sebum * 0.15;
       }
     }
   }

@@ -117,6 +117,9 @@ export class TissueLayer {
       postbioticLevel: biome.postbioticLevel,
       ph: biome.ph,
       moisture: biome.moisture,
+      sebum: biome.sebum,
+      cerumen: biome.cerumen,
+      sweatRate: biome.sweatRate,
     });
 
     const bounds = LUMEN_BOUNDS[this.geometry];

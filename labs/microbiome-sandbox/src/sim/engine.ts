@@ -1,3 +1,4 @@
+import type { EnvVarId } from '../data/envVars';
 import { getRegion, type RegionId } from '../data/regions';
 import type { PresetId } from '../data/presets';
 import type { BiomeState, MicrobeNode, MicrobeType, SimSnapshot } from './types';
@@ -33,6 +34,13 @@ export class SimEngine {
   biome: BiomeState = {
     ph: 6.8,
     moisture: 0.7,
+    temperature: 0.55,
+    sebum: 0.35,
+    cerumen: 0.3,
+    salinity: 0.4,
+    oxygenation: 0.75,
+    sweatRate: 0.25,
+    oxygenTension: 0.15,
     integrity: 0.85,
     inflammation: 0.1,
     biofilm: 0.05,
@@ -71,21 +79,17 @@ export class SimEngine {
     this.biome.integrity = b.integrity ?? 0.85;
     this.biome.inflammation = b.inflammation ?? 0.1;
     this.biome.biofilm = b.biofilm ?? 0.05;
-    this.biome.ph = def.env.ph;
-    this.biome.moisture = def.env.moisture;
+    this.applyEnv(def.env);
     this.biome.sugarLoad = 0;
     this.biome.postbioticLevel = 0;
     this.allergenAdhesion = 0;
     this.updateCounts();
   }
 
-  setPreset(preset: PresetId, env?: { ph: number; moisture: number }) {
+  setPreset(preset: PresetId, env?: Partial<Record<EnvVarId, number>>) {
     this.preset = preset;
     this.reset();
-    if (env) {
-      this.biome.ph = env.ph;
-      this.biome.moisture = env.moisture;
-    }
+    if (env) this.applyEnv(env);
   }
 
   setRegion(id: RegionId, force = false) {
@@ -189,6 +193,26 @@ export class SimEngine {
       b.integrity = Math.max(0.2, b.integrity - 0.1);
       b.postbioticLevel = Math.max(0, b.postbioticLevel - 0.2);
       this.events.push('Antibiotic disruption — commensals depleted, SCFA falling');
+    } else if (id === 'cerumen_impaction') {
+      b.cerumen = clamp(b.cerumen + 0.35, 0, 1);
+      b.oxygenation = Math.max(0.15, b.oxygenation - 0.3);
+      b.integrity = Math.max(0.2, b.integrity - 0.15);
+      this.events.push('Cerumen impaction — canal narrowed, oxygenation falling');
+    } else if (id === 'swim_exposure') {
+      b.moisture = clamp(b.moisture + 0.22, 0, 1);
+      b.salinity = clamp(b.salinity + 0.18, 0, 1);
+      this.spawnBatch('pathogen', 'P. aeruginosa', 6);
+      this.events.push('Swim exposure — moisture and salinity spike');
+    } else if (id === 'sebum_surge') {
+      b.sebum = clamp(b.sebum + 0.35, 0, 1);
+      b.biofilm = clamp(b.biofilm + 0.2, 0, 1);
+      this.spawnBatch('yeast', 'Malassezia', 14);
+      this.events.push('Sebum surge — lipid film thickens, Malassezia bloom');
+    } else if (id === 'harsh_shampoo') {
+      b.ph = Math.min(8, b.ph + 0.8);
+      b.sebum = Math.max(0.05, b.sebum - 0.25);
+      this.adjustVitality(['commensal'], -0.2);
+      this.events.push('Harsh shampoo — alkaline wash strips sebum film');
     }
 
     this.updateCounts();
@@ -248,9 +272,16 @@ export class SimEngine {
     this.updateCounts();
   }
 
-  setEnv(ph: number, moisture: number) {
-    this.biome.ph = ph;
-    this.biome.moisture = moisture;
+  applyEnv(env: Partial<Record<EnvVarId, number>>) {
+    for (const [key, value] of Object.entries(env)) {
+      if (value !== undefined) {
+        (this.biome as Record<string, number>)[key] = value;
+      }
+    }
+  }
+
+  setEnv(env: Partial<Record<EnvVarId, number>>) {
+    this.applyEnv(env);
   }
 
   step(dt: number) {
@@ -269,6 +300,11 @@ export class SimEngine {
     return 0.0005;
   }
 
+  private tempMultiplier(temp: number): number {
+    const dist = Math.abs(temp - 0.55);
+    return Math.max(0.35, 1 - dist * 1.4);
+  }
+
   private pathogenGrowthRate(ph: number, moisture: number, sugarLoad: number): number {
     let rate = ph > 7.2 ? 0.004 : ph > 7 ? 0.003 : 0.001;
     if (moisture > 0.75 && ph > 7) rate += 0.002;
@@ -281,6 +317,14 @@ export class SimEngine {
     const region = this.region;
 
     b.sugarLoad = Math.max(0, b.sugarLoad - 0.001);
+    const tempMul = this.tempMultiplier(b.temperature);
+
+    if (region === 'scalp') {
+      b.moisture = clamp(b.moisture + b.sweatRate * 0.0004 - 0.0001, 0, 1);
+    }
+    if (region === 'ear' && b.cerumen > 0.55) {
+      b.oxygenation = Math.max(0.1, b.oxygenation - 0.0005);
+    }
 
     for (const node of this.nodes) {
       if (node.type === 'commensal' || node.type === 'pathogen' || node.type === 'yeast') {
@@ -301,7 +345,7 @@ export class SimEngine {
         node.vy = Math.min(node.vy, -0.004 - this.allergenAdhesion * 0.002);
         node.vx += Math.sin(this.tick * 0.05 + node.id) * 0.0005;
         if (node.y < -0.15) node.vy = Math.abs(node.vy) * 0.3;
-        if (region === 'nose' && b.moisture < 0.45) {
+        if ((region === 'nose' || region === 'ear') && b.moisture < 0.45) {
           node.vitality = Math.min(1, node.vitality + 0.0015);
         }
       }
@@ -310,15 +354,27 @@ export class SimEngine {
       if (Math.abs(node.y) > 0.9) node.vy *= -1;
 
       if (node.type === 'probiotic') {
-        let rate = this.probioticGrowthRate(b.ph);
+        let rate = this.probioticGrowthRate(b.ph) * tempMul;
         if (region === 'gut' && b.moisture >= 0.55 && b.moisture <= 0.75) {
           rate += 0.001;
         }
+        if (region === 'gut' && b.oxygenTension > 0.35) rate *= 0.5;
+        if ((region === 'nose' || region === 'ear') && b.oxygenation < 0.4) rate *= 0.7;
         node.vitality = Math.min(1, node.vitality + rate);
       } else if (node.type === 'pathogen' || node.type === 'yeast') {
-        let rate = this.pathogenGrowthRate(b.ph, b.moisture, b.sugarLoad);
-        if (region === 'skin' && b.moisture > 0.8 && b.ph > 7) {
+        let rate = this.pathogenGrowthRate(b.ph, b.moisture, b.sugarLoad) * tempMul;
+        if ((region === 'skin' || region === 'scalp') && b.moisture > 0.8 && b.ph > 7) {
           rate += 0.002;
+        }
+        if (region === 'scalp' && b.sebum > 0.55 && node.type === 'yeast') {
+          rate += 0.0025;
+        }
+        if (region === 'ear' && b.cerumen > 0.6 && b.oxygenation < 0.45) {
+          rate += 0.0015;
+        }
+        if (region === 'ear' && b.salinity > 0.7) rate *= 0.75;
+        if ((region === 'nose' || region === 'ear') && b.oxygenation < 0.35) {
+          rate += 0.001;
         }
         node.vitality = Math.min(1, node.vitality + rate);
       } else if (node.type === 'commensal') {
@@ -367,15 +423,21 @@ export class SimEngine {
     if (b.ph > 7 && b.moisture > 0.5) {
       b.biofilm = clamp(b.biofilm + 0.0008, 0, 1);
     }
+    if (region === 'scalp' && b.sebum > 0.5) {
+      b.biofilm = clamp(b.biofilm + 0.0012, 0, 1);
+    }
+    if (region === 'ear' && b.cerumen > 0.45) {
+      b.biofilm = clamp(b.biofilm + 0.0006, 0, 1);
+    }
     if (b.ph < 6 && b.biofilm > 0) {
       b.biofilm = Math.max(0, b.biofilm - 0.002);
     }
 
-    if (region === 'skin') {
+    if (region === 'skin' || region === 'scalp') {
       if (b.moisture < 0.35) {
         b.integrity = Math.max(0.15, b.integrity - 0.001 * 1.5);
       }
-    } else if (region === 'nose') {
+    } else if (region === 'nose' || region === 'ear') {
       if (b.moisture < 0.4) {
         b.integrity = Math.max(0.15, b.integrity - 0.0006);
       }

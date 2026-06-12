@@ -1,9 +1,15 @@
 import { ARTICLES } from '../data/articles';
+import {
+  ENV_VAR_DEFS,
+  REGION_ENV_CONTROLS,
+  type EnvVarId,
+} from '../data/envVars';
 import { PRESETS, type PresetId } from '../data/presets';
 import { getRegion, REGIONS, type RegionDef, type RegionId } from '../data/regions';
 import type { HotspotProjection, TissueCalloutProjection } from '../scene/SceneManager';
 import { TISSUE_PICTOGRAMS } from '../scene/tissueCallouts';
 import { POPULATION_SCALE, type SimEngine } from '../sim/engine';
+import type { BiomeState } from '../sim/types';
 
 function trendLabel(n: number): string {
   if (n > 0) return '↑ Increasing';
@@ -17,19 +23,13 @@ function formatPopulation(count: number): string {
   return String(scaled);
 }
 
-function phLabel(ph: number): string {
-  if (ph < 6.5) return `${ph.toFixed(1)} (Acidic)`;
-  if (ph > 7.2) return `${ph.toFixed(1)} (Alkaline)`;
-  return `${ph.toFixed(1)} (Neutral)`;
-}
-
 export interface DashboardCallbacks {
   onRegionSelect: (id: RegionId) => void;
   onPresetChange: (id: PresetId) => void;
   onBackToBody: () => void;
   onTrigger: (id: string) => void;
   onInoculate: (id: string) => void;
-  onEnvChange: (ph: number, moisture: number) => void;
+  onEnvChange: (env: Partial<Record<EnvVarId, number>>) => void;
 }
 
 export class Dashboard {
@@ -46,10 +46,9 @@ export class Dashboard {
   private postbioticStat!: HTMLElement;
   private integrityMeter!: HTMLElement;
   private inflammationMeter!: HTMLElement;
-  private phSlider!: HTMLInputElement;
-  private moistureSlider!: HTMLInputElement;
-  private phReadout!: HTMLElement;
-  private moistureReadout!: HTMLElement;
+  private envPanel!: HTMLElement;
+  private envSliders = new Map<EnvVarId, HTMLInputElement>();
+  private envReadouts = new Map<EnvVarId, HTMLElement>();
   private inoculationRow!: HTMLElement;
   private triggerRow!: HTMLElement;
   private engineBadge!: HTMLElement;
@@ -153,14 +152,8 @@ export class Dashboard {
       <div class="bd-controls">
         <div class="bd-panel bd-env">
           <h2>ENVIRONMENTAL VARIABLES</h2>
-          <div class="bd-slider-row">
-            <label>pH <output data-ph-readout>6.8</output></label>
-            <input type="range" min="4" max="8" step="0.1" value="6.8" data-ph />
-          </div>
-          <div class="bd-slider-row">
-            <label>Moisture <output data-moisture-readout>70%</output></label>
-            <input type="range" min="0" max="1" step="0.01" value="0.70" data-moisture />
-          </div>
+          <p class="bd-env-hint" data-env-hint>Region-specific tissue conditions</p>
+          <div class="bd-env-grid" data-env-panel></div>
         </div>
         <div class="bd-panel bd-inoc">
           <h2>BIOTIC INOCULATIONS</h2>
@@ -191,10 +184,7 @@ export class Dashboard {
     this.postbioticStat = this.root.querySelector('[data-postbiotic]')!;
     this.integrityMeter = this.root.querySelector('[data-integrity-meter]')!;
     this.inflammationMeter = this.root.querySelector('[data-inflammation-meter]')!;
-    this.phSlider = this.root.querySelector('[data-ph]')!;
-    this.moistureSlider = this.root.querySelector('[data-moisture]')!;
-    this.phReadout = this.root.querySelector('[data-ph-readout]')!;
-    this.moistureReadout = this.root.querySelector('[data-moisture-readout]')!;
+    this.envPanel = this.root.querySelector('[data-env-panel]')!;
     this.inoculationRow = this.root.querySelector('[data-inoculations]')!;
     this.triggerRow = this.root.querySelector('[data-triggers]')!;
     this.engineBadge = this.root.querySelector('[data-engine]')!;
@@ -221,20 +211,7 @@ export class Dashboard {
     this.presetSelect.addEventListener('change', () => {
       this.callbacks.onPresetChange(this.presetSelect.value as PresetId);
     });
-    this.phSlider.addEventListener('input', () => {
-      this.envDragging = true;
-      this.emitEnv();
-    });
-    this.moistureSlider.addEventListener('change', () => {
-      this.envDragging = false;
-    });
-    this.phSlider.addEventListener('change', () => {
-      this.envDragging = false;
-    });
-    this.moistureSlider.addEventListener('input', () => {
-      this.envDragging = true;
-      this.emitEnv();
-    });
+    this.renderEnvControls(this.currentRegion);
     this.setMicroView(false);
   }
 
@@ -243,11 +220,49 @@ export class Dashboard {
   }
 
   private emitEnv() {
-    const ph = parseFloat(this.phSlider.value);
-    const moisture = parseFloat(this.moistureSlider.value);
-    this.phReadout.textContent = phLabel(ph);
-    this.moistureReadout.textContent = `${Math.round(moisture * 100)}%`;
-    this.callbacks.onEnvChange(ph, moisture);
+    const env: Partial<Record<EnvVarId, number>> = {};
+    for (const [id, slider] of this.envSliders) {
+      env[id] = parseFloat(slider.value);
+      const readout = this.envReadouts.get(id);
+      if (readout) readout.textContent = ENV_VAR_DEFS[id].format(env[id]!);
+    }
+    this.callbacks.onEnvChange(env);
+  }
+
+  private renderEnvControls(regionId: RegionId) {
+    const controls = REGION_ENV_CONTROLS[regionId];
+    const region = getRegion(regionId);
+    this.envSliders.clear();
+    this.envReadouts.clear();
+    this.envPanel.innerHTML = controls
+      .map((id) => {
+        const def = ENV_VAR_DEFS[id];
+        const value = region.env[id];
+        return `
+        <div class="bd-slider-row">
+          <label>${def.label} <output data-env-readout="${id}">${def.format(value)}</output></label>
+          <input type="range" min="${def.min}" max="${def.max}" step="${def.step}"
+            value="${value}" data-env="${id}" />
+        </div>`;
+      })
+      .join('');
+
+    const hint = this.root.querySelector('[data-env-hint]') as HTMLElement;
+    hint.textContent = `${region.label} — adjust local tissue conditions`;
+
+    for (const id of controls) {
+      const slider = this.envPanel.querySelector(`[data-env="${id}"]`) as HTMLInputElement;
+      const readout = this.envPanel.querySelector(`[data-env-readout="${id}"]`) as HTMLElement;
+      this.envSliders.set(id, slider);
+      this.envReadouts.set(id, readout);
+      slider.addEventListener('input', () => {
+        this.envDragging = true;
+        this.emitEnv();
+      });
+      slider.addEventListener('change', () => {
+        this.envDragging = false;
+      });
+    }
   }
 
   private renderRegions() {
@@ -289,11 +304,6 @@ export class Dashboard {
     this.blogCta.href = article.url;
     this.blogCta.textContent = `Read: ${article.title} →`;
 
-    this.phSlider.value = String(preset.env.ph);
-    this.moistureSlider.value = String(preset.env.moisture);
-    this.phReadout.textContent = phLabel(preset.env.ph);
-    this.moistureReadout.textContent = `${Math.round(preset.env.moisture * 100)}%`;
-
     this.commensalRow.hidden = presetId !== 'allergy';
     this.biofilmRow.hidden = presetId !== 'candida';
     this.postbioticRow.hidden = presetId !== 'lifecycle';
@@ -313,11 +323,24 @@ export class Dashboard {
     this.bindActionButtons();
   }
 
-  syncEnvSliders(ph: number, moisture: number) {
-    this.phSlider.value = String(ph);
-    this.moistureSlider.value = String(moisture);
-    this.phReadout.textContent = phLabel(ph);
-    this.moistureReadout.textContent = `${Math.round(moisture * 100)}%`;
+  syncEnvSliders(biome: BiomeState, regionId: RegionId) {
+    if (regionId !== this.currentRegion) {
+      this.renderEnvControls(regionId);
+    }
+    for (const id of REGION_ENV_CONTROLS[regionId]) {
+      const slider = this.envSliders.get(id);
+      const readout = this.envReadouts.get(id);
+      const value = biome[id];
+      if (!slider || value === undefined) continue;
+      const str = id === 'moisture' || id === 'sebum' || id === 'cerumen' || id === 'salinity' ||
+        id === 'oxygenation' || id === 'sweatRate' || id === 'oxygenTension' || id === 'temperature'
+        ? value.toFixed(2)
+        : value.toFixed(1);
+      if (slider.value !== str) {
+        slider.value = str;
+        if (readout) readout.textContent = ENV_VAR_DEFS[id].format(value);
+      }
+    }
   }
 
   private bindActionButtons() {
@@ -364,6 +387,7 @@ export class Dashboard {
       btn.classList.toggle('bd-region--active', (btn as HTMLElement).dataset.region === id);
     });
     const region = getRegion(id);
+    this.renderEnvControls(id);
     this.updateLegend(region);
   }
 
@@ -454,16 +478,7 @@ export class Dashboard {
     this.callout.hidden = !this.microActive || b.inflammation < 0.35;
 
     if (!this.envDragging) {
-      const phVal = b.ph.toFixed(1);
-      const moistVal = b.moisture.toFixed(2);
-      if (this.phSlider.value !== phVal) {
-        this.phSlider.value = phVal;
-        this.phReadout.textContent = phLabel(b.ph);
-      }
-      if (this.moistureSlider.value !== moistVal) {
-        this.moistureSlider.value = moistVal;
-        this.moistureReadout.textContent = `${Math.round(b.moisture * 100)}%`;
-      }
+      this.syncEnvSliders(b, this.currentRegion);
     }
 
     this.eventLog.innerHTML = snap.events

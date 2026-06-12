@@ -45,6 +45,60 @@ export function createLumenChamber(kind: EpitheliumKind = 'sinus'): THREE.Group 
         0.22,
       ),
     );
+  } else if (kind === 'ear') {
+    const backdrop = new THREE.Mesh(
+      new THREE.PlaneGeometry(5.4, 2.6),
+      new THREE.MeshStandardMaterial({ color: 0x1a1008, roughness: 1 }),
+    );
+    backdrop.position.set(0, 0.55, -0.5);
+    group.add(backdrop);
+
+    const wash = new THREE.Mesh(
+      new THREE.PlaneGeometry(4.6, 1.4),
+      new THREE.MeshBasicMaterial({ color: 0xd4a040, transparent: true, opacity: 0.06 }),
+    );
+    wash.position.set(0, 0.72, -0.44);
+    group.add(wash);
+
+    group.add(
+      diagramLine(
+        [new THREE.Vector3(-2.1, 0.38, -0.42), new THREE.Vector3(2.1, 0.38, -0.42)],
+        0xc89858,
+        0.2,
+      ),
+    );
+    group.add(
+      diagramLine(
+        [new THREE.Vector3(2.05, 0.42, -0.42), new THREE.Vector3(2.05, 0.92, -0.42)],
+        0xe8d8c0,
+        0.28,
+      ),
+    );
+  } else if (kind === 'scalp') {
+    const backdrop = new THREE.Mesh(
+      new THREE.PlaneGeometry(6, 2.8),
+      new THREE.MeshStandardMaterial({ color: 0x181008, roughness: 1 }),
+    );
+    backdrop.position.set(0, 0.4, -0.5);
+    group.add(backdrop);
+
+    const wash = new THREE.Mesh(
+      new THREE.PlaneGeometry(5.4, 2.2),
+      new THREE.MeshBasicMaterial({ color: 0xf0d878, transparent: true, opacity: 0.06 }),
+    );
+    wash.position.set(0, 0.42, -0.44);
+    group.add(wash);
+
+    for (let i = 0; i < 5; i++) {
+      const y = 0.12 + i * 0.1;
+      group.add(
+        diagramLine(
+          [new THREE.Vector3(-2.4, y, -0.42), new THREE.Vector3(2.4, y, -0.42)],
+          0xd8b878,
+          0.12,
+        ),
+      );
+    }
   } else if (kind === 'skin') {
     const backdrop = new THREE.Mesh(
       new THREE.PlaneGeometry(6, 2.8),
