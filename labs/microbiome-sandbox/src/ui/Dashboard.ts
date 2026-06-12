@@ -13,17 +13,17 @@ import { PREBIOTICS, STRAINS, STRAIN_LIST, type PrebioticId, type StrainId } fro
 
 type CatalogTab = 'products' | 'strains' | 'prebiotics';
 import {
-  buildPrebioticImpact,
-  buildProductImpact,
-  buildStrainImpact,
+  buildImpactForSource,
   deltasForMeters,
   formatImpactDelta,
   type ActionImpact,
+  type ImpactSourceKind,
 } from './actionImpact';
 import type { HotspotProjection, TissueCalloutProjection } from '../scene/SceneManager';
 import { TISSUE_PICTOGRAMS } from '../scene/tissueCallouts';
 import { POPULATION_SCALE, type SimEngine } from '../sim/engine';
-import type { BiomeState } from '../sim/types';
+import { formatStrainList, summarizeLiveStrains, totalCells } from '../sim/strainSummary';
+import type { BiomeState, MicrobeNode } from '../sim/types';
 
 function trendLabel(n: number): string {
   if (n > 0) return '↑ Increasing';
@@ -96,8 +96,9 @@ export class Dashboard {
   private postbioticRow!: HTMLElement;
   private impactPanel!: HTMLElement;
   private impactCloseBtn!: HTMLButtonElement;
+  private actionBadge!: HTMLElement;
   private envDragging = false;
-  private impactSource: { kind: 'strain' | 'prebiotic' | 'product'; id: string } | null = null;
+  private impactSource: { kind: ImpactSourceKind; id: string } | null = null;
   private boundImpactKeyDown = (e: KeyboardEvent) => this.onImpactKeyDown(e);
 
   private currentPreset: PresetId = 'allergy';
@@ -136,6 +137,7 @@ export class Dashboard {
             <div class="bd-tissue-callout-layer" data-tissue-callouts hidden></div>
             <div class="bd-zoom-hud" data-zoom-hud>
               <span class="bd-mode-badge" data-mode-badge>BODY MAP</span>
+              <span class="bd-action-badge" data-action-badge hidden></span>
               <div class="bd-tissue-pictogram" data-tissue-pictogram hidden></div>
               <h2 class="bd-zoom-title" data-zoom-title>ZOOM LAYER</h2>
               <span class="bd-scale-label" data-scale-label></span>
@@ -186,12 +188,12 @@ export class Dashboard {
         </div>
         <div class="bd-panel bd-stressors">
           <h2>STRESSORS</h2>
-          <p class="bd-section-hint">Region-specific challenges — apply in tissue view</p>
+          <p class="bd-section-hint">Click to preview and apply — tissue view updates immediately</p>
           <div class="bd-btn-row bd-btn-row--stressors" data-triggers></div>
         </div>
         <div class="bd-panel bd-regional">
           <h2>REGIONAL CARE</h2>
-          <p class="bd-section-hint" data-suggested-hint>Suggested for this tissue</p>
+          <p class="bd-section-hint" data-suggested-hint>Suggested for this tissue — click to preview and apply</p>
           <div class="bd-btn-row bd-btn-row--suggested" data-suggested></div>
           <div class="bd-regional-care" data-regional-care-section>
             <h3 class="bd-subheading">Tissue-specific treatments</h3>
@@ -223,7 +225,7 @@ export class Dashboard {
               <button type="button" class="bd-impact-close" data-impact-close aria-label="Close preview" hidden>×</button>
             </div>
             <p class="bd-impact-placeholder" data-impact-placeholder>
-              Click a suggested shortcut or catalog item to see what it adds and how tissue metrics shift.
+              Click any stressor, regional treatment, or catalog item to preview its effect on this tissue.
             </p>
             <div class="bd-impact-body" data-impact-body hidden></div>
           </div>
@@ -290,6 +292,7 @@ export class Dashboard {
     this.postbioticRow = this.root.querySelector('[data-postbiotic-row]')!;
     this.impactPanel = this.root.querySelector('[data-impact-panel]')!;
     this.impactCloseBtn = this.root.querySelector('[data-impact-close]')!;
+    this.actionBadge = this.root.querySelector('[data-action-badge]')!;
 
     this.impactCloseBtn.addEventListener('click', () => this.dismissImpactPreview());
     document.addEventListener('keydown', this.boundImpactKeyDown);
@@ -375,27 +378,32 @@ export class Dashboard {
     el.addEventListener('click', onApply);
   }
 
-  private buildImpact(kind: 'strain' | 'prebiotic' | 'product', id: string): ActionImpact {
-    if (kind === 'strain') return buildStrainImpact(id as StrainId, this.currentRegion);
-    if (kind === 'prebiotic') return buildPrebioticImpact(id as PrebioticId, this.currentRegion);
-    return buildProductImpact(id as ProductId, this.currentRegion);
+  private buildImpact(kind: ImpactSourceKind, id: string): ActionImpact {
+    return buildImpactForSource(kind, id, this.currentRegion);
   }
 
   private renderImpactPanel(impact: ActionImpact) {
     const body = this.impactPanel.querySelector('[data-impact-body]')!;
-    const efficacyClass =
-      impact.efficacyPct >= 100
+    const isInstant = impact.category === 'stressor' || impact.category === 'regional';
+    const efficacyClass = isInstant
+      ? 'bd-impact-efficacy--full'
+      : impact.efficacyPct >= 100
         ? 'bd-impact-efficacy--full'
         : impact.efficacyPct >= 65
           ? 'bd-impact-efficacy--reduced'
           : 'bd-impact-efficacy--low';
+    const efficacyLabel = isInstant ? 'Instant' : `${impact.efficacyPct}% efficacy`;
+    const addsHeading =
+      impact.category === 'stressor' ? 'Introduces' : impact.category === 'regional' ? 'Applies' : 'Adds';
 
-    const addsHtml = impact.adds
-      .map(
-        (a) =>
-          `<li class="bd-impact-add bd-impact-add--${a.type}"><span class="bd-impact-add__count">${a.count}×</span> ${a.label}</li>`,
-      )
-      .join('');
+    const addsHtml = impact.adds.length
+      ? impact.adds
+          .map(
+            (a) =>
+              `<li class="bd-impact-add bd-impact-add--${a.type}"><span class="bd-impact-add__count">${a.count}×</span> ${a.label}</li>`,
+          )
+          .join('')
+      : `<li class="bd-impact-add bd-impact-add--neutral">Environmental shift only — no new microbes</li>`;
 
     const deltasHtml = impact.deltas.length
       ? impact.deltas
@@ -410,11 +418,11 @@ export class Dashboard {
       <div class="bd-impact-header">
         <strong class="bd-impact-title">${impact.title}</strong>
         ${impact.form ? `<span class="bd-impact-form">${impact.form}</span>` : ''}
-        <span class="bd-impact-efficacy ${efficacyClass}">${impact.efficacyPct}% efficacy</span>
+        <span class="bd-impact-efficacy ${efficacyClass}">${efficacyLabel}</span>
       </div>
       ${impact.warning ? `<p class="bd-impact-warning">${impact.warning}</p>` : ''}
       <div class="bd-impact-section">
-        <h4>Adds</h4>
+        <h4>${addsHeading}</h4>
         <ul class="bd-impact-adds">${addsHtml}</ul>
       </div>
       <div class="bd-impact-section">
@@ -426,16 +434,32 @@ export class Dashboard {
   }
 
   private openImpactPreview(
-    kind: 'strain' | 'prebiotic' | 'product',
+    kind: ImpactSourceKind,
     id: string,
     flashMeters = false,
+    actionTone: 'warn' | 'action' = 'action',
   ) {
     this.impactSource = { kind, id };
     const impact = this.buildImpact(kind, id);
     this.renderImpactPanel(impact);
     this.setImpactPanelActive(true);
     this.highlightPreviewButton(kind, id);
+    this.setActionBadge(impact.title, actionTone);
     if (flashMeters) this.flashMeterDeltas(impact);
+  }
+
+  private setActionBadge(label: string, tone: 'warn' | 'action') {
+    if (!this.microActive) return;
+    this.actionBadge.hidden = false;
+    this.actionBadge.textContent = `ACTIVE: ${label}`;
+    this.actionBadge.classList.remove('bd-action-badge--warn', 'bd-action-badge--action');
+    this.actionBadge.classList.add(tone === 'warn' ? 'bd-action-badge--warn' : 'bd-action-badge--action');
+  }
+
+  private clearActionBadge() {
+    this.actionBadge.hidden = true;
+    this.actionBadge.textContent = '';
+    this.actionBadge.classList.remove('bd-action-badge--warn', 'bd-action-badge--action');
   }
 
   private closeImpactPreview() {
@@ -457,15 +481,18 @@ export class Dashboard {
     this.impactCloseBtn.hidden = !active;
   }
 
-  private highlightPreviewButton(
-    kind: 'strain' | 'prebiotic' | 'product',
-    id: string,
-  ) {
+  private highlightPreviewButton(kind: ImpactSourceKind, id: string) {
     this.clearPreviewButtonHighlights();
-    const attr =
-      kind === 'strain' ? 'data-strain' : kind === 'prebiotic' ? 'data-prebiotic' : 'data-product';
-    const btn = this.root.querySelector(`[${attr}="${id}"]`);
-    btn?.classList.add('bd-btn--preview-active');
+    const selectors: Record<ImpactSourceKind, string> = {
+      strain: `[data-strain="${id}"], [data-suggest-strain="${id}"]`,
+      prebiotic: `[data-prebiotic="${id}"], [data-suggest-prebiotic="${id}"]`,
+      product: `[data-product="${id}"], [data-suggest-product="${id}"]`,
+      stressor: `[data-trigger="${id}"]`,
+      regional: `[data-regional-care="${id}"]`,
+    };
+    this.root.querySelectorAll(selectors[kind]).forEach((el) => {
+      el.classList.add('bd-btn--preview-active');
+    });
   }
 
   private clearPreviewButtonHighlights() {
@@ -502,8 +529,23 @@ export class Dashboard {
 
   private refreshImpactIfVisible() {
     if (!this.impactSource) return;
+    if (!this.isImpactSourceAvailable(this.impactSource)) {
+      this.closeImpactPreview();
+      return;
+    }
     const impact = this.buildImpact(this.impactSource.kind, this.impactSource.id);
     this.renderImpactPanel(impact);
+  }
+
+  private isImpactSourceAvailable(source: { kind: ImpactSourceKind; id: string }): boolean {
+    const region = getRegion(this.currentRegion);
+    if (source.kind === 'stressor') {
+      return region.triggers.some((t) => t.id === source.id);
+    }
+    if (source.kind === 'regional') {
+      return region.regionalCare.some((a) => a.id === source.id);
+    }
+    return true;
   }
 
   getCanvas(): HTMLCanvasElement {
@@ -611,7 +653,7 @@ export class Dashboard {
       .map((t) => `<button type="button" class="bd-btn bd-btn--warn" data-trigger="${t.id}">${t.label}</button>`)
       .join('');
 
-    this.suggestedHint.textContent = `Suggested for ${region.label}`;
+    this.suggestedHint.textContent = `Suggested for ${region.label} — click to preview and apply`;
 
     const chips: string[] = [];
     for (const id of suggestions.strains ?? []) {
@@ -665,16 +707,20 @@ export class Dashboard {
     this.triggerRow.querySelectorAll('[data-trigger]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const el = btn as HTMLButtonElement;
+        const id = el.dataset.trigger!;
         this.flashButton(el);
-        this.callbacks.onTrigger(el.dataset.trigger!);
+        this.openImpactPreview('stressor', id, true, 'warn');
+        this.callbacks.onTrigger(id);
       });
     });
 
     this.regionalCareRow.querySelectorAll('[data-regional-care]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const el = btn as HTMLButtonElement;
+        const id = el.dataset.regionalCare!;
         this.flashButton(el);
-        this.callbacks.onInoculate(el.dataset.regionalCare!);
+        this.openImpactPreview('regional', id, true, 'action');
+        this.callbacks.onInoculate(id);
       });
     });
 
@@ -743,12 +789,55 @@ export class Dashboard {
   }
 
   private updateLegend(region: RegionDef) {
-    const s = region.defaultStrains;
+    this.renderLegend(region, null);
+  }
+
+  private updateLegendFromSimulation(region: RegionDef, nodes: MicrobeNode[]) {
+    this.renderLegend(region, summarizeLiveStrains(nodes));
+  }
+
+  private renderLegend(region: RegionDef, live: ReturnType<typeof summarizeLiveStrains> | null) {
+    const baseline = region.defaultStrains;
+
+    const row = (
+      kind: 'probiotic' | 'pathogen' | 'allergen',
+      label: string,
+      entries: { strain: string; count: number }[],
+      fallback: string[],
+    ) => {
+      if (entries.length > 0) {
+        const strainCount = entries.length;
+        const cellCount = totalCells(entries);
+        const names = formatStrainList(entries);
+        const countLabel =
+          strainCount > 1 ? `${strainCount} strains · ${cellCount} cells` : `${cellCount} cells`;
+        return `
+          <div class="bd-legend__row ${kind}">● ${label} <span class="bd-legend__meta">(${countLabel})</span></div>
+          <div class="bd-legend__strains bd-legend__strains--${kind}">${names}</div>`;
+      }
+      return `<div class="bd-legend__row ${kind}">● ${label} <span class="bd-legend__meta">(baseline: ${fallback.join(', ')})</span></div>`;
+    };
+
+    const note =
+      live && live.probiotics.length > 1
+        ? 'Each green shade in the lumen = a different probiotic strain. Legend lists all strains currently present.'
+        : live && live.prebiotics.length > 0
+          ? 'Green capsules = probiotics · lime rods = prebiotic substrate feeding them.'
+          : 'Pathogens compete for tight junction attachment sites.';
+
+    const prebioticBlock =
+      live && live.prebiotics.length > 0
+        ? `
+          <div class="bd-legend__row prebiotic">● Prebiotic substrate <span class="bd-legend__meta">(${live.prebiotics.length} types · ${totalCells(live.prebiotics)} particles)</span></div>
+          <div class="bd-legend__strains bd-legend__strains--prebiotic">${formatStrainList(live.prebiotics)}</div>`
+        : '';
+
     this.legendBox.innerHTML = `
-      <div class="bd-legend__row probiotic">● Good Bacteria (${s.probiotics.join(', ')})</div>
-      <div class="bd-legend__row pathogen">● Pathogens (${s.pathogens.join(', ')})</div>
-      <div class="bd-legend__row allergen">● Allergens (${s.allergens.join(', ')})</div>
-      <div class="bd-legend__note">Pathogens compete for tight junction attachment sites.</div>
+      ${row('probiotic', 'Good Bacteria', live?.probiotics ?? [], baseline.probiotics)}
+      ${prebioticBlock}
+      ${row('pathogen', 'Pathogens', live?.pathogens ?? [], baseline.pathogens)}
+      ${row('allergen', 'Allergens', live?.allergens ?? [], baseline.allergens)}
+      <div class="bd-legend__note">${note}</div>
     `;
   }
 
@@ -778,6 +867,7 @@ export class Dashboard {
       this.callout.hidden = true;
       this.tissueCalloutLayer.innerHTML = '';
       this.tissuePictogram.innerHTML = '';
+      this.clearActionBadge();
     }
   }
 
@@ -807,8 +897,14 @@ export class Dashboard {
     const snap = engine.snapshot();
     const trends = engine.getTrends();
     const b = snap.biome;
+    const live = summarizeLiveStrains(snap.nodes);
 
-    this.probioticStat.textContent = `${formatPopulation(b.probioticCount)} ${trendLabel(trends.probiotic)}`;
+    const probioticStrainCount = live.probiotics.length;
+    const probioticLabel =
+      probioticStrainCount > 1
+        ? `${probioticStrainCount} strains · ${formatPopulation(b.probioticCount)}`
+        : formatPopulation(b.probioticCount);
+    this.probioticStat.textContent = `${probioticLabel} ${trendLabel(trends.probiotic)}`;
     this.pathogenStat.textContent = `${formatPopulation(b.pathogenCount)} ${trendLabel(trends.pathogen)}`;
     this.allergenStat.textContent = `${formatPopulation(b.allergenCount)} ${trendLabel(trends.allergen)}`;
     this.commensalStat.textContent = `${formatPopulation(b.commensalCount)} ${trendLabel(trends.commensal)}`;
@@ -830,6 +926,10 @@ export class Dashboard {
 
     if (!this.envDragging) {
       this.syncEnvSliders(b, this.currentRegion);
+    }
+
+    if (this.microActive) {
+      this.updateLegendFromSimulation(getRegion(this.currentRegion), snap.nodes);
     }
 
     this.eventLog.innerHTML = snap.events

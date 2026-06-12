@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { BiomeState, MicrobeNode } from '../sim/types';
 import { Epithelium3D, createLumenChamber, type EpitheliumKind } from './epithelium';
 import { LUMEN_BOUNDS, RECEPTOR_SITES, type LumenBounds } from './epithelium/tissueModels';
-import { bucketForType, createMicrobeMeshSet } from './microbes/MicrobeMeshes';
+import { bucketForType, colorForMicrobe, createMicrobeMeshSet } from './microbes/MicrobeMeshes';
 
 const SIM_X = 1.8;
 const SIM_Y = 0.9;
@@ -64,7 +64,10 @@ export class TissueLayer {
   private lumenGroup = new THREE.Group();
   private meshes = createMicrobeMeshSet(120);
   private dummy = new THREE.Object3D();
+  private instanceColor = new THREE.Color();
   private geometry: EpitheliumKind = 'sinus';
+  private burstKind: 'allergen' | 'probiotic' | 'alkaline' | 'stress' | 'default' | null = null;
+  private burstTime = 0;
 
   constructor() {
     this.epithelium.setKind('sinus');
@@ -102,14 +105,36 @@ export class TissueLayer {
   }
 
   playBurst(kind: 'allergen' | 'probiotic' | 'alkaline' | 'stress' | 'default') {
+    this.burstKind = kind;
+    this.burstTime = 1;
+    const b = LUMEN_BOUNDS[this.geometry];
     if (kind === 'allergen') {
-      const b = LUMEN_BOUNDS[this.geometry];
       this.lumenGroup.position.y = (b.allergenBase - b.mucusY) * 0.35;
+    } else if (kind === 'probiotic') {
+      this.lumenGroup.position.y = -(b.mucusY - b.epithelialY) * 0.2;
+    } else if (kind === 'alkaline') {
+      this.lumenGroup.position.y = -(b.mucusY - b.epithelialY) * 0.15;
     }
   }
 
   update(nodes: MicrobeNode[], biome: BiomeState, dt: number) {
+    if (this.burstTime > 0) {
+      this.burstTime = Math.max(0, this.burstTime - dt * 2.2);
+      const t = this.burstTime;
+      if (this.burstKind === 'stress') {
+        this.lumenGroup.position.x = Math.sin(t * 18) * 0.04 * t;
+      } else if (this.burstKind === 'default') {
+        const pulse = 1 + (1 - t) * 0.08;
+        this.lumenGroup.scale.setScalar(pulse);
+      }
+      if (this.burstTime <= 0) {
+        this.burstKind = null;
+        this.lumenGroup.scale.setScalar(1);
+      }
+    }
+
     this.lumenGroup.position.y = THREE.MathUtils.lerp(this.lumenGroup.position.y, 0, dt * 4);
+    this.lumenGroup.position.x = THREE.MathUtils.lerp(this.lumenGroup.position.x, 0, dt * 6);
     this.epithelium.update({
       inflammation: biome.inflammation,
       integrity: biome.integrity,
@@ -163,11 +188,16 @@ export class TissueLayer {
 
       this.dummy.updateMatrix();
       mesh.setMatrixAt(idx, this.dummy.matrix);
+      if (n.type === 'probiotic' || n.type === 'prebiotic' || n.type === 'pathogen' || n.type === 'yeast') {
+        this.instanceColor.setHex(colorForMicrobe(n.type, n.strain));
+        mesh.setColorAt(idx, this.instanceColor);
+      }
     }
 
     for (const [key, mesh] of Object.entries(this.meshes)) {
       mesh.count = buckets[key] ?? 0;
       mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     }
   }
 }

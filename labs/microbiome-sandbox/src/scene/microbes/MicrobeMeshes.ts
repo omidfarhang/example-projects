@@ -22,6 +22,29 @@ export function bucketForType(type: MicrobeType): InstanceBucket {
   return 'other';
 }
 
+/** Distinct hues within each microbe family so multi-strain products read clearly in tissue view. */
+const PROBIOTIC_PALETTE = [
+  0x4ade80, 0x34d399, 0x6ee7b7, 0x2dd4bf, 0xa3e635, 0x86efac, 0x5eead4, 0x22c55e,
+  0x10b981, 0x14b8a6,
+];
+const PATHOGEN_PALETTE = [0xf87171, 0xfb7185, 0xf472b6, 0xc084fc, 0xfbbf24];
+const PREBIOTIC_PALETTE = [0xa3e635, 0xbef264, 0x84cc16, 0x65a30d];
+
+function hashStrain(strain: string): number {
+  let h = 0;
+  for (let i = 0; i < strain.length; i++) h = (h * 31 + strain.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+export function colorForMicrobe(type: MicrobeType, strain: string): number {
+  if (type === 'probiotic') return PROBIOTIC_PALETTE[hashStrain(strain) % PROBIOTIC_PALETTE.length];
+  if (type === 'prebiotic') return PREBIOTIC_PALETTE[hashStrain(strain) % PREBIOTIC_PALETTE.length];
+  if (type === 'pathogen' || type === 'yeast') {
+    return PATHOGEN_PALETTE[hashStrain(strain) % PATHOGEN_PALETTE.length];
+  }
+  return TYPE_COLORS[type];
+}
+
 function createSpikyGeometry(): THREE.BufferGeometry {
   const geo = new THREE.IcosahedronGeometry(0.04, 1);
   const pos = geo.attributes.position;
@@ -54,6 +77,7 @@ export function createMicrobeMeshSet(maxPerBucket = 120): MicrobeMeshSet {
       emissiveIntensity: 0.15,
       roughness: 0.4,
       metalness: 0.1,
+      vertexColors: true,
     });
     const mesh = new THREE.InstancedMesh(geo, mat, maxPerBucket);
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
