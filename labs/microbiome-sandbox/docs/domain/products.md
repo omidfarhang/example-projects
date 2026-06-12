@@ -1,6 +1,6 @@
 # Products & Foods
 
-Whole supplements and fermented foods deliver **multiple strains and prebiotics** in one action. Individual strains are documented in [Biotics](biotics.md).
+Whole supplements, topical treatments, and fermented foods deliver **multiple strains and prebiotics** in one action. Individual strains are documented in [Biotics](biotics.md).
 
 Sources: [`src/data/products.ts`](../../src/data/products.ts), [`src/sim/engine.ts`](../../src/sim/engine.ts) — `applyProduct()`
 
@@ -8,7 +8,7 @@ Sources: [`src/data/products.ts`](../../src/data/products.ts), [`src/sim/engine.
 
 ## How products work
 
-1. User clicks a product button (available in **all regions**); hover shows the **Action Preview** panel first
+1. User clicks a product button (available in **all regions**); the **Action Preview** panel opens alongside the catalog
 2. Engine spawns each strain at `spawnCount × dose × regionMultiplier`
 3. Per-strain biome effects from the strain catalog applied (scaled by `dose × regionMultiplier`)
 4. Prebiotics in the product spawn similarly
@@ -19,11 +19,18 @@ Sources: [`src/data/products.ts`](../../src/data/products.ts), [`src/sim/engine.
 
 | Product | Form | Preferred regions | Preferred × | Other regions × |
 | --- | --- | --- | --- | --- |
-| Multi-strain synbiotic capsule | **capsule** | gut, oral | 1.0 | 0.65 |
-| Oral probiotic lozenge | **lozenge** | oral, nose, ear | 1.0 | 0.35 |
+| Multi-strain synbiotic capsule | capsule | gut, oral | 1.0 | 0.65 |
+| Oral probiotic lozenge | lozenge | oral, nose, ear | 1.0 | 0.35 |
+| Vaginal probiotic capsule | capsule | vaginal | 1.0 | 0.40 |
+| Probiotic topical cream | topical | skin, scalp | 1.0 | 0.45 |
 | Kefir drink | drink | gut, oral | 1.0 | 0.50 |
 | Probiotic yogurt | food | gut, oral | 1.0 | 0.55 |
 | Kimchi | food | gut | 1.0 | 0.45 |
+| Sauerkraut | food | gut | 1.0 | 0.50 |
+| Kombucha drink | drink | gut, oral | 1.0 | 0.48 |
+| Miso | food | gut | 1.0 | 0.52 |
+
+Per-region **Suggested** shortcuts live in [`regionSuggestions.ts`](../../src/data/regionSuggestions.ts).
 
 ---
 
@@ -51,6 +58,36 @@ Sources: [`src/data/products.ts`](../../src/data/products.ts), [`src/sim/engine.
 **Target tissues:** oral mucosa, gums, throat, nose, ear — full efficacy in `oral`, `nose`, `ear`; strongly reduced elsewhere (lozenge does not colonize gut/skin the same way).
 
 **Try it:** oral region after `thrush_bloom` or `dry_mouth`, or nose/ear after allergen stress.
+
+---
+
+## Vaginal probiotic capsule (`vaginal_probiotic_capsule`)
+
+**Form: capsule** (insertable — targets vaginal Lactobacillus dominance).
+
+| Component | Strains |
+| --- | --- |
+| Probiotics | L. acidophilus, L. rhamnosus, L. reuteri |
+| Biome bonus | pH −0.35, inflammation −0.12, integrity +0.08 |
+
+**Target tissues:** vaginal mucosa — full efficacy in `vaginal`; reduced elsewhere.
+
+**Try it:** vaginal region after `alkaline_flush` or `glycogen_spike`.
+
+---
+
+## Probiotic topical cream (`probiotic_topical_cream`)
+
+**Form: topical** (skin/scalp cream — not swallowed).
+
+| Component | Strains |
+| --- | --- |
+| Probiotics | L. acidophilus, L. rhamnosus |
+| Biome bonus | pH −0.20, biofilm −0.12, moisture +0.08, inflammation −0.10 |
+
+**Target tissues:** epidermis and scalp — full efficacy in `skin`, `scalp`; reduced elsewhere.
+
+**Try it:** skin after `alkaline` or `eczema_flare`, scalp after `sebum_surge`.
 
 ---
 
@@ -85,6 +122,42 @@ Fermented vegetables — high L. plantarum with fiber.
 | Probiotics | L. plantarum, L. casei, L. salivarius, L. reuteri |
 | Prebiotic | inulin (vegetable fiber) |
 | Biome bonus | pH −0.22, postbioticLevel +0.06, inflammation −0.10 |
+
+---
+
+## Sauerkraut (`sauerkraut`)
+
+Fermented cabbage — European counterpart to kimchi, L. plantarum-rich.
+
+| Component | Strains / prebiotics |
+| --- | --- |
+| Probiotics | L. plantarum, L. casei, L. reuteri |
+| Prebiotic | inulin (cabbage fiber) |
+| Biome bonus | pH −0.18, postbioticLevel +0.05, inflammation −0.08 |
+
+---
+
+## Kombucha drink (`kombucha`)
+
+Fermented tea with lactic acid bacteria and S. boulardii.
+
+| Component | Strains |
+| --- | --- |
+| Probiotics | L. casei, L. acidophilus, S. boulardii |
+| Biome bonus | pH −0.10, yeastVitality −0.15, postbioticLevel +0.04 |
+
+**Try it:** gut or oral in the **candida** preset after yeast bloom stressors.
+
+---
+
+## Miso (`miso`)
+
+Fermented soybean paste — diverse lactobacilli and bifidobacteria.
+
+| Component | Strains |
+| --- | --- |
+| Probiotics | L. casei, L. plantarum, B. bifidum, B. lactis |
+| Biome bonus | pH −0.12, postbioticLevel +0.05, integrity +0.04 |
 
 ---
 

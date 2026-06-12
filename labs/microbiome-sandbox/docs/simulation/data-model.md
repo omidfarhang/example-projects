@@ -147,6 +147,56 @@ type RegionEnv = Record<EnvVarId, number>;
 
 `EnvVarDef` includes min, max, step, default, label, and format function.
 
+### `ProductId` / `ProductDef`
+
+Catalog of whole supplements, topical treatments, and fermented foods. Source: [`products.ts`](../src/data/products.ts).
+
+```typescript
+type ProductId =
+  | 'synbiotic_supplement' | 'oral_probiotic_lozenge' | 'vaginal_probiotic_capsule'
+  | 'probiotic_topical_cream' | 'kefir_drink' | 'probiotic_yogurt' | 'kimchi'
+  | 'sauerkraut' | 'kombucha' | 'miso';
+
+type ProductCategory = 'supplement' | 'lozenge' | 'fermented' | 'topical';
+type ProductForm = 'capsule' | 'lozenge' | 'drink' | 'food' | 'topical';
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | ProductId | Engine action ID |
+| `label` | string | Dashboard button text |
+| `category` | ProductCategory | UI styling group |
+| `form` | ProductForm | Delivery form label |
+| `strains` | `{ id: StrainId, dose: number }[]` | Probiotic doses (scaled by region multiplier) |
+| `prebiotics` | `{ id: PrebioticId, dose: number }[]`? | Optional prebiotic doses |
+| `effects` | BiomeEffect? | Product-level biome bonus |
+| `preferredRegions` | RegionId[] | Full-efficacy tissues |
+| `preferredMultiplier` | number | Typically 1 |
+| `otherMultiplier` | number | Reduced efficacy elsewhere |
+
+### `PostbioticId` / `PostbioticDef`
+
+Direct SCFA metabolite applications. Source: [`postbiotics.ts`](../src/data/postbiotics.ts).
+
+```typescript
+type PostbioticId = 'scfa_mix' | 'butyrate' | 'propionate' | 'acetate';
+```
+
+Postbiotics modify `postbioticLevel` and related biome scalars — they do **not** spawn microbe nodes.
+
+### `RegionSuggestions`
+
+Per-region curated shortcuts for the **Suggested for [tissue]** chips. Source: [`regionSuggestions.ts`](../src/data/regionSuggestions.ts).
+
+```typescript
+interface RegionSuggestions {
+  strains?: StrainId[];
+  prebiotics?: PrebioticId[];
+  postbiotics?: PostbioticId[];
+  products?: ProductId[];
+}
+```
+
 ---
 
 ## Visualization types

@@ -1,3 +1,5 @@
+import type { PostbioticId } from '../data/postbiotics';
+import { POSTBIOTICS, postbioticRegionMultiplier } from '../data/postbiotics';
 import type { ProductId } from '../data/products';
 import { PRODUCTS, productRegionMultiplier } from '../data/products';
 import type { RegionId } from '../data/regions';
@@ -8,7 +10,7 @@ import { PREBIOTICS, STRAINS } from '../data/strains';
 import { mergeBiomeEffects, scaleBiomeEffect, scaleCount } from '../sim/bioticEffects';
 
 export type ActionCategory = 'catalog' | 'stressor' | 'regional';
-export type ImpactSourceKind = 'strain' | 'prebiotic' | 'product' | 'stressor' | 'regional';
+export type ImpactSourceKind = 'strain' | 'prebiotic' | 'postbiotic' | 'product' | 'stressor' | 'regional';
 
 export type ImpactMetric =
   | 'integrity'
@@ -23,7 +25,7 @@ export type ImpactMetric =
 export interface ImpactAdd {
   label: string;
   count: number;
-  type: 'probiotic' | 'prebiotic';
+  type: 'probiotic' | 'commensal' | 'prebiotic';
 }
 
 export interface ImpactDelta {
@@ -136,10 +138,11 @@ export function formatImpactEvent(impact: ActionImpact): string {
 export function buildStrainImpact(strainId: StrainId, regionId: RegionId): ActionImpact {
   const strain = STRAINS[strainId];
   const count = strain.spawnCount;
+  const microbeType = strain.kind === 'commensal' ? 'commensal' : 'probiotic';
   return {
     title: strain.name,
     efficacyPct: 100,
-    adds: [{ label: strain.name, count, type: 'probiotic' }],
+    adds: [{ label: strain.name, count, type: microbeType }],
     deltas: biomeToDeltas(strain.effects ?? {}, 'strain'),
     why: strain.why,
     category: 'catalog',
@@ -154,6 +157,28 @@ export function buildPrebioticImpact(prebioticId: PrebioticId, _regionId: Region
     adds: [{ label: pre.name.toUpperCase(), count: pre.spawnCount, type: 'prebiotic' }],
     deltas: [],
     why: pre.why,
+    category: 'catalog',
+  };
+}
+
+export function buildPostbioticImpact(postbioticId: PostbioticId, regionId: RegionId): ActionImpact {
+  const def = POSTBIOTICS[postbioticId];
+  const mult = postbioticRegionMultiplier(def, regionId);
+  const efficacyPct = Math.round(mult * 100);
+  const warning =
+    mult < 1
+      ? `Reduced efficacy outside ${def.preferredRegions.join(', ')} — ${efficacyPct}% dose applied.`
+      : undefined;
+
+  return {
+    title: def.label,
+    form: 'metabolite',
+    efficacyPct,
+    preferredRegions: def.preferredRegions,
+    adds: [],
+    deltas: biomeToDeltas(scaleBiomeEffect(def.effects, mult), 'strain'),
+    why: def.why,
+    warning,
     category: 'catalog',
   };
 }
@@ -318,6 +343,7 @@ export function buildImpactForSource(kind: ImpactSourceKind, id: string, regionI
   if (kind === 'regional') return buildRegionalCareImpact(id, regionId);
   if (kind === 'strain') return buildStrainImpact(id as StrainId, regionId);
   if (kind === 'prebiotic') return buildPrebioticImpact(id as PrebioticId, regionId);
+  if (kind === 'postbiotic') return buildPostbioticImpact(id as PostbioticId, regionId);
   return buildProductImpact(id as ProductId, regionId);
 }
 

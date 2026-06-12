@@ -45,6 +45,7 @@ index.html
 | **Presets** | `src/data/presets.ts` | Scenarios, URL parsing |
 | **Articles** | `src/data/articles.ts` | Blog URLs |
 | **Dashboard** | `src/ui/Dashboard.ts` | Full-screen lab UI overlay |
+| **Action impact** | `src/ui/actionImpact.ts` | Preview panel data for catalog, stressors, regional care |
 | **SceneManager** | `src/scene/SceneManager.ts` | Three.js scene orchestration |
 | **BodyMesh** | `src/scene/BodyMesh.ts` | Low-poly body + hotspots |
 | **CameraRig** | `src/scene/CameraRig.ts` | Macro/micro camera transitions |
@@ -71,11 +72,17 @@ src/
     types.ts
   data/
     regions.ts
+    stressors.ts
+    strains.ts
+    postbiotics.ts
+    products.ts
+    regionSuggestions.ts
     envVars.ts
     presets.ts
     articles.ts
   ui/
     Dashboard.ts
+    actionImpact.ts
   scene/
     SceneManager.ts
     BodyMesh.ts

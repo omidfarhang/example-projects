@@ -1,24 +1,31 @@
 import type { RegionId } from './regions';
 
-/** Canonical probiotic strain IDs used by inoculations and products. */
+/** Canonical strain IDs used by inoculations, products, and the strain library. */
 export type StrainId =
   | 'lrham'
   | 'lacid'
   | 'lcasei'
+  | 'lparacasei'
   | 'lsaliv'
   | 'lreuteri'
+  | 'lgasseri'
+  | 'lferment'
   | 'blactis'
   | 'blongum'
   | 'bbifidum'
+  | 'bbreve'
   | 'binf'
   | 'lplant'
   | 'lbulgaricus'
   | 'sthermo'
   | 'sboul'
   | 'ssaliv_k12'
-  | 'ssaliv_m18';
+  | 'ssaliv_m18'
+  | 'sepidermidis';
 
-export type PrebioticId = 'inulin' | 'fos';
+export type PrebioticId = 'inulin' | 'fos' | 'gos' | 'resistant_starch' | 'pectin' | 'beta_glucan';
+
+export type StrainKind = 'probiotic' | 'commensal';
 
 export interface BiomeEffect {
   ph?: number;
@@ -36,6 +43,8 @@ export interface BiomeEffect {
 export interface StrainDef {
   id: StrainId;
   name: string;
+  /** Probiotic (beneficial) or commensal (neutral resident). Default: probiotic. */
+  kind?: StrainKind;
   spawnCount: number;
   effects?: BiomeEffect;
   /** Regions where this strain is commonly used (UI hint only). */
@@ -48,6 +57,8 @@ export interface PrebioticDef {
   id: PrebioticId;
   name: string;
   spawnCount: number;
+  /** Regions where this substrate is commonly used (UI hint only). */
+  commonRegions?: RegionId[];
   why: string;
 }
 
@@ -76,6 +87,14 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     commonRegions: ['gut', 'oral'],
     why: 'Reduces inflammatory signaling while supporting tight junction repair.',
   },
+  lparacasei: {
+    id: 'lparacasei',
+    name: 'L. paracasei',
+    spawnCount: 14,
+    effects: { inflammation: -0.14, integrity: 0.09, postbioticLevel: 0.03 },
+    commonRegions: ['gut', 'oral', 'nose'],
+    why: 'Immune-modulatory strain with mild SCFA contribution — common in fermented dairy and supplements.',
+  },
   lsaliv: {
     id: 'lsaliv',
     name: 'L. salivarius',
@@ -91,6 +110,22 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { inflammation: -0.14, integrity: 0.09, ph: -0.15, phMin: 4.0 },
     commonRegions: ['gut', 'oral', 'vaginal'],
     why: 'Anti-inflammatory reuterin producer that acidifies niche and supports barrier recovery.',
+  },
+  lgasseri: {
+    id: 'lgasseri',
+    name: 'L. gasseri',
+    spawnCount: 14,
+    effects: { inflammation: -0.16, integrity: 0.1, ph: -0.12, phMin: 4.2 },
+    commonRegions: ['vaginal', 'oral', 'gut'],
+    why: 'Vaginal and oral Lactobacillus — acidifies mucosa and calms inflammatory signaling.',
+  },
+  lferment: {
+    id: 'lferment',
+    name: 'L. fermentum',
+    spawnCount: 12,
+    effects: { ph: -0.18, phMin: 5.0, postbioticLevel: 0.05, inflammation: -0.1 },
+    commonRegions: ['gut', 'oral'],
+    why: 'Fermentation specialist — acidifies lumen and raises SCFA from dietary substrates.',
   },
   blactis: {
     id: 'blactis',
@@ -115,6 +150,14 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { commensalVitality: 0.14, integrity: 0.06, postbioticLevel: 0.04 },
     commonRegions: ['gut'],
     why: 'Infant-associated bifidobacterium that nourishes commensals and produces SCFA.',
+  },
+  bbreve: {
+    id: 'bbreve',
+    name: 'B. breve',
+    spawnCount: 13,
+    effects: { commensalVitality: 0.16, integrity: 0.07, postbioticLevel: 0.05 },
+    commonRegions: ['gut'],
+    why: 'Early-life bifidobacterium — supports commensal ecology and SCFA output in infant-style niches.',
   },
   binf: {
     id: 'binf',
@@ -172,6 +215,15 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     commonRegions: ['oral', 'nose', 'ear'],
     why: 'BLIS M18 targets dental plaque biofilm and supports gum-line barrier integrity.',
   },
+  sepidermidis: {
+    id: 'sepidermidis',
+    name: 'S. epidermidis',
+    kind: 'commensal',
+    spawnCount: 20,
+    effects: { biofilm: -0.15 },
+    commonRegions: ['skin', 'scalp'],
+    why: 'Skin commensal — competes for biofilm attachment sites and supports acid mantle balance.',
+  },
 };
 
 export const PREBIOTICS: Record<PrebioticId, PrebioticDef> = {
@@ -179,17 +231,49 @@ export const PREBIOTICS: Record<PrebioticId, PrebioticDef> = {
     id: 'inulin',
     name: 'inulin',
     spawnCount: 20,
-    why: 'Soluble fiber substrate — probiotics convert nearby inulin into postbiotic SCFA over time.',
+    commonRegions: ['gut'],
+    why: 'Soluble chicory-root fiber — probiotics convert nearby inulin into postbiotic SCFA over time.',
   },
   fos: {
     id: 'fos',
     name: 'FOS',
     spawnCount: 18,
+    commonRegions: ['gut'],
     why: 'Fructooligosaccharide prebiotic that feeds bifidobacteria; converts to SCFA near probiotics.',
+  },
+  gos: {
+    id: 'gos',
+    name: 'GOS',
+    spawnCount: 16,
+    commonRegions: ['gut'],
+    why: 'Galactooligosaccharides mimic human milk oligosaccharides — selective fuel for bifidobacteria.',
+  },
+  resistant_starch: {
+    id: 'resistant_starch',
+    name: 'resistant starch',
+    spawnCount: 22,
+    commonRegions: ['gut'],
+    why: 'RS3 starch escapes small-intestine digestion — fermented in colon to butyrate-rich SCFA.',
+  },
+  pectin: {
+    id: 'pectin',
+    name: 'pectin',
+    spawnCount: 18,
+    commonRegions: ['gut', 'oral'],
+    why: 'Soluble fruit fiber — slow fermentation supports gradual SCFA rise and moisture retention.',
+  },
+  beta_glucan: {
+    id: 'beta_glucan',
+    name: 'beta-glucan',
+    spawnCount: 16,
+    commonRegions: ['gut'],
+    why: 'Oat/barley soluble fiber — feeds lactobacilli and bifidobacteria with immune-modulatory substrate.',
   },
 };
 
 export const STRAIN_LIST = Object.values(STRAINS);
+
+export const PREBIOTIC_LIST = Object.values(PREBIOTICS);
 
 export function getStrain(id: StrainId): StrainDef {
   return STRAINS[id];

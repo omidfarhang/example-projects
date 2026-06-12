@@ -354,11 +354,15 @@ Available via **Interventions → Strain library** tab. Source: [`src/data/strai
 | `lrham` | L. rhamnosus | 16 | inflammation −0.18, integrity +0.1 |
 | `lacid` | L. acidophilus | 18 | pH −0.5, biofilm −0.2 |
 | `lcasei` | L. casei | 14 | inflammation −0.12, integrity +0.08 |
+| `lparacasei` | L. paracasei | 14 | inflammation −0.14, integrity +0.09, postbiotic +0.03 |
 | `lsaliv` | L. salivarius | 18 | pH −0.2, biofilm −0.15 |
 | `lreuteri` | L. reuteri | 12 | inflammation −0.14, integrity +0.09, pH −0.15 |
+| `lgasseri` | L. gasseri | 14 | inflammation −0.16, integrity +0.10, pH −0.12 |
+| `lferment` | L. fermentum | 12 | pH −0.18, postbiotic +0.05, inflammation −0.10 |
 | `blactis` | B. lactis | 14 | commensal +0.15, postbiotic +0.04 |
 | `blongum` | B. longum | 12 | commensal +0.12, postbiotic +0.05 |
 | `bbifidum` | B. bifidum | 12 | commensal +0.14, postbiotic +0.04 |
+| `bbreve` | B. breve | 13 | commensal +0.16, postbiotic +0.05 |
 | `binf` | B. infantis | 14 | commensal +0.2, integrity +0.08 |
 | `lplant` | L. plantarum | 16 | inflammation −0.18, integrity +0.1 |
 | `lbulgaricus` | L. bulgaricus | 10 | pH −0.25, biofilm −0.1 |
@@ -366,19 +370,41 @@ Available via **Interventions → Strain library** tab. Source: [`src/data/strai
 | `sboul` | S. boulardii | 14 | yeast −0.25, inflammation −0.12 |
 | `ssaliv_k12` | S. salivarius K12 | 16 | biofilm −0.18, inflammation −0.1, moisture +0.08 |
 | `ssaliv_m18` | S. salivarius M18 | 16 | biofilm −0.22, integrity +0.06 |
+| `sepidermidis` | S. epidermidis (commensal) | 20 | biofilm −0.15 |
 
-Click any strain to preview in the **Action Preview** panel (catalog row).
+Commensal strains spawn as `commensal` nodes, not probiotics. Click any strain to preview in the **Action Preview** panel.
 
 ---
 
 ## Prebiotics (all regions)
 
-| Action ID | Substrate | Spawn | Effect |
-| --- | --- | --- | --- |
-| `inulin` | Inulin | 20 | Prebiotic nodes; convert to SCFA near probiotics (r=0.4) |
-| `fos` | FOS | 18 | Prebiotic nodes; convert to SCFA near probiotics (r=0.4) |
+Source: [`src/data/strains.ts`](../../src/data/strains.ts), `inoculatePrebiotic()`.
 
-Gut **Suggested** chips include inulin and FOS; full catalog under **Interventions → Prebiotics**.
+| Action ID | Substrate | Spawn | Common regions |
+| --- | --- | --- | --- |
+| `inulin` | Inulin | 20 | gut |
+| `fos` | FOS | 18 | gut |
+| `gos` | GOS | 16 | gut |
+| `resistant_starch` | Resistant starch | 22 | gut |
+| `pectin` | Pectin | 18 | gut, oral |
+| `beta_glucan` | Beta-glucan | 16 | gut |
+
+Prebiotic nodes convert to SCFA near probiotics (r=0.4). Gut **Suggested** chips include inulin, FOS, GOS, and resistant starch.
+
+---
+
+## Postbiotics (all regions)
+
+Source: [`src/data/postbiotics.ts`](../../src/data/postbiotics.ts), `applyPostbiotic()`. Postbiotics raise the `postbioticLevel` scalar directly — no microbe nodes spawned.
+
+| Action ID | Label | Preferred regions | Primary effects (scaled) |
+| --- | --- | --- | --- |
+| `scfa_mix` | SCFA mix | gut | postbiotic +0.3, integrity +0.12, inflammation −0.15 |
+| `butyrate` | Butyrate | gut | postbiotic +0.25, integrity +0.18, inflammation −0.12 |
+| `propionate` | Propionate | gut | postbiotic +0.15, inflammation −0.08, commensal +0.10 |
+| `acetate` | Acetate | gut, oral | postbiotic +0.12, pH −0.08, integrity +0.06 |
+
+Gut regional care **RELEASE SCFA BOOST** (`scfa`) delegates to `scfa_mix`. Use the **Postbiotics** catalog tab for individual metabolites.
 
 ---
 
@@ -390,9 +416,14 @@ Source: [`src/data/products.ts`](../../src/data/products.ts), `applyProduct()`. 
 | --- | --- | --- |
 | `synbiotic_supplement` | Multi-strain synbiotic capsule | gut, oral |
 | `oral_probiotic_lozenge` | Oral probiotic lozenge | oral, nose, ear |
+| `vaginal_probiotic_capsule` | Vaginal probiotic capsule | vaginal |
+| `probiotic_topical_cream` | Probiotic topical cream | skin, scalp |
 | `kefir_drink` | Kefir drink | gut, oral |
 | `probiotic_yogurt` | Probiotic yogurt | gut, oral |
 | `kimchi` | Kimchi (fermented) | gut |
+| `sauerkraut` | Sauerkraut (fermented) | gut |
+| `kombucha` | Kombucha drink | gut, oral |
+| `miso` | Miso (fermented) | gut |
 
 Products spawn strains, apply per-strain biome effects (scaled), apply product bonus, and log a structured event summary.
 

@@ -143,7 +143,7 @@ Sliders not in region subset are hidden/omitted.
 
 ## Interventions catalog
 
-Rendered once in `renderCatalog()` with three tabs (products, strains, prebiotics). Shares the preview row with [`actionImpact.ts`](../src/ui/actionImpact.ts).
+Rendered once in `renderCatalog()` with four tabs (products, strains, prebiotics, postbiotics). Shares the preview row with [`actionImpact.ts`](../src/ui/actionImpact.ts).
 
 `setCatalogTab(tab)` toggles panes. Suggested chips call `setCatalogTab` before apply so the matching catalog tab is visible.
 

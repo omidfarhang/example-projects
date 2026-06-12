@@ -110,6 +110,70 @@ Add entry to [`docs/domain/actions-reference.md`](../domain/actions-reference.md
 
 ---
 
+## Add a product or fermented food
+
+### 1. Define product
+
+Edit [`src/data/products.ts`](../src/data/products.ts):
+
+```typescript
+my_product: {
+  id: 'my_product',
+  label: 'MY PRODUCT LABEL',
+  category: 'fermented',  // supplement | lozenge | fermented | topical
+  form: 'food',           // capsule | lozenge | drink | food | topical
+  description: 'Short tooltip text',
+  why: 'Plain-language causal explanation for impact preview',
+  strains: [{ id: 'lplant', dose: 0.8 }],
+  prebiotics: [{ id: 'inulin', dose: 0.5 }],  // optional
+  effects: { ph: -0.15, phMin: 5.0 },       // optional product bonus
+  preferredRegions: ['gut'],
+  preferredMultiplier: 1,
+  otherMultiplier: 0.5,
+},
+```
+
+Add `'my_product'` to the `ProductId` union.
+
+Engine, Dashboard, and `actionImpact.ts` auto-discover new entries from `PRODUCTS`.
+
+### 2. Region shortcuts (optional)
+
+Add to [`regionSuggestions.ts`](../src/data/regionSuggestions.ts) for **Suggested for [tissue]** chips.
+
+### 3. Visual burst (optional)
+
+- Add ID to probiotic burst set in [`SceneManager.playBurst()`](../src/scene/SceneManager.ts)
+- Add burst color in [`EffectBurst.ts`](../src/scene/EffectBurst.ts)
+
+### 4. Styling (optional)
+
+Add `.bd-btn--<category>` in [`style.css`](../src/style.css) if using a new `ProductCategory`.
+
+### 5. Document
+
+Update [`docs/domain/products.md`](../domain/products.md) and [`docs/domain/actions-reference.md`](../domain/actions-reference.md).
+
+---
+
+## Add a strain, prebiotic, or postbiotic
+
+### Strain
+
+Edit [`src/data/strains.ts`](../src/data/strains.ts) — add to `STRAINS` and the `StrainId` union. Set `kind: 'commensal'` for commensal strains (default is probiotic).
+
+### Prebiotic
+
+Edit [`src/data/strains.ts`](../src/data/strains.ts) — add to `PREBIOTICS` and the `PrebioticId` union.
+
+### Postbiotic
+
+Edit [`src/data/postbiotics.ts`](../src/data/postbiotics.ts) — add to `POSTBIOTICS` and the `PostbioticId` union. Define `effects` (biome deltas) and region multipliers.
+
+Optional: add to [`regionSuggestions.ts`](../src/data/regionSuggestions.ts) for **Suggested** chips.
+
+---
+
 ## Add an environment variable
 
 ### 1. Extend types

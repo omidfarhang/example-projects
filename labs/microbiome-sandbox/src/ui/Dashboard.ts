@@ -5,13 +5,15 @@ import {
   type EnvVarId,
 } from '../data/envVars';
 import { PRESETS, type PresetId } from '../data/presets';
+import type { PostbioticId } from '../data/postbiotics';
+import { POSTBIOTIC_LIST, POSTBIOTICS } from '../data/postbiotics';
 import type { ProductId } from '../data/products';
 import { PRODUCT_LIST, PRODUCTS } from '../data/products';
 import { REGION_SUGGESTIONS } from '../data/regionSuggestions';
 import { getRegion, REGIONS, type RegionDef, type RegionId } from '../data/regions';
-import { PREBIOTICS, STRAINS, STRAIN_LIST, type PrebioticId, type StrainId } from '../data/strains';
+import { PREBIOTIC_LIST, PREBIOTICS, STRAINS, STRAIN_LIST, type PrebioticId, type StrainId } from '../data/strains';
 
-type CatalogTab = 'products' | 'strains' | 'prebiotics';
+type CatalogTab = 'products' | 'strains' | 'prebiotics' | 'postbiotics';
 import {
   buildImpactForSource,
   deltasForMeters,
@@ -45,6 +47,7 @@ export interface DashboardCallbacks {
   onInoculate: (id: string) => void;
   onApplyStrain: (id: StrainId) => void;
   onApplyPrebiotic: (id: PrebioticId) => void;
+  onApplyPostbiotic: (id: PostbioticId) => void;
   onApplyProduct: (id: ProductId) => void;
   onEnvChange: (env: Partial<Record<EnvVarId, number>>) => void;
 }
@@ -73,6 +76,7 @@ export class Dashboard {
   private suggestedHint!: HTMLElement;
   private strainRow!: HTMLElement;
   private prebioticRow!: HTMLElement;
+  private postbioticCatalogRow!: HTMLElement;
   private productRow!: HTMLElement;
   private catalogPanes = new Map<CatalogTab, HTMLElement>();
   private activeCatalogTab: CatalogTab = 'products';
@@ -208,15 +212,19 @@ export class Dashboard {
               <button type="button" class="bd-catalog-tab bd-catalog-tab--active" role="tab" data-catalog-tab="products" aria-selected="true">Products &amp; foods</button>
               <button type="button" class="bd-catalog-tab" role="tab" data-catalog-tab="strains" aria-selected="false">Strain library</button>
               <button type="button" class="bd-catalog-tab" role="tab" data-catalog-tab="prebiotics" aria-selected="false">Prebiotics</button>
+              <button type="button" class="bd-catalog-tab" role="tab" data-catalog-tab="postbiotics" aria-selected="false">Postbiotics</button>
             </div>
             <div class="bd-catalog-pane" data-catalog-pane="products">
               <div class="bd-btn-row bd-btn-row--products" data-products></div>
             </div>
             <div class="bd-catalog-pane" data-catalog-pane="strains" hidden>
-              <div class="bd-btn-row bd-btn-row--dense" data-strains></div>
+              <div class="bd-btn-row bd-btn-row--dense bd-btn-row--strains" data-strains></div>
             </div>
             <div class="bd-catalog-pane" data-catalog-pane="prebiotics" hidden>
-              <div class="bd-btn-row" data-prebiotics></div>
+              <div class="bd-btn-row bd-btn-row--prebiotics" data-prebiotics></div>
+            </div>
+            <div class="bd-catalog-pane" data-catalog-pane="postbiotics" hidden>
+              <div class="bd-btn-row bd-btn-row--postbiotics" data-postbiotics></div>
             </div>
           </div>
           <div class="bd-panel bd-impact bd-impact--inline bd-impact--empty" data-impact-panel>
@@ -262,8 +270,9 @@ export class Dashboard {
     this.suggestedHint = this.root.querySelector('[data-suggested-hint]')!;
     this.strainRow = this.root.querySelector('[data-strains]')!;
     this.prebioticRow = this.root.querySelector('[data-prebiotics]')!;
+    this.postbioticCatalogRow = this.root.querySelector('[data-postbiotics]')!;
     this.productRow = this.root.querySelector('[data-products]')!;
-    for (const tab of ['products', 'strains', 'prebiotics'] as CatalogTab[]) {
+    for (const tab of ['products', 'strains', 'prebiotics', 'postbiotics'] as CatalogTab[]) {
       const pane = this.root.querySelector(`[data-catalog-pane="${tab}"]`) as HTMLElement;
       this.catalogPanes.set(tab, pane);
     }
@@ -321,17 +330,21 @@ export class Dashboard {
   }
 
   private renderCatalog() {
-    this.strainRow.innerHTML = STRAIN_LIST.map(
-      (s) =>
-        `<button type="button" class="bd-btn bd-btn--strain" data-strain="${s.id}" title="${s.commonRegions ? 'Common: ' + s.commonRegions.join(', ') : ''}">${s.name}</button>`,
-    ).join('');
+    this.strainRow.innerHTML = STRAIN_LIST.map((s) => {
+      const kind = s.kind === 'commensal' ? 'commensal' : 'probiotic';
+      const regions = s.commonRegions?.length ? s.commonRegions.join(', ') : 'all regions';
+      return `<button type="button" class="bd-btn bd-btn--strain bd-btn--${kind}" data-strain="${s.id}" title="${s.why}">${s.name}<span class="bd-product-form">${kind} · ${regions}</span></button>`;
+    }).join('');
 
-    this.prebioticRow.innerHTML = Object.values(PREBIOTICS)
-      .map(
-        (p) =>
-          `<button type="button" class="bd-btn bd-btn--action bd-btn--compact" data-prebiotic="${p.id}">+ ${p.name.toUpperCase()}</button>`,
-      )
-      .join('');
+    this.prebioticRow.innerHTML = PREBIOTIC_LIST.map((p) => {
+      const regions = p.commonRegions?.length ? p.commonRegions.join(', ') : 'all regions';
+      return `<button type="button" class="bd-btn bd-btn--prebiotic" data-prebiotic="${p.id}" title="${p.why}">+ ${p.name.toUpperCase()}<span class="bd-product-form">fiber · ${regions}</span></button>`;
+    }).join('');
+
+    this.postbioticCatalogRow.innerHTML = POSTBIOTIC_LIST.map(
+      (p) =>
+        `<button type="button" class="bd-btn bd-btn--postbiotic" data-postbiotic="${p.id}" title="${p.description}">${p.label}<span class="bd-product-form">metabolite · ${p.preferredRegions.join(', ')}</span></button>`,
+    ).join('');
 
     this.productRow.innerHTML = PRODUCT_LIST.map(
       (p) =>
@@ -358,6 +371,16 @@ export class Dashboard {
       });
     });
 
+    this.postbioticCatalogRow.querySelectorAll('[data-postbiotic]').forEach((btn) => {
+      const el = btn as HTMLButtonElement;
+      const id = el.dataset.postbiotic as PostbioticId;
+      this.bindPreviewButton(el, 'postbiotic', id, () => {
+        this.flashButton(el);
+        this.openImpactPreview('postbiotic', id, true);
+        this.callbacks.onApplyPostbiotic(id);
+      });
+    });
+
     this.productRow.querySelectorAll('[data-product]').forEach((btn) => {
       const el = btn as HTMLButtonElement;
       const id = el.dataset.product as ProductId;
@@ -371,7 +394,7 @@ export class Dashboard {
 
   private bindPreviewButton(
     el: HTMLButtonElement,
-    kind: 'strain' | 'prebiotic' | 'product',
+    kind: 'strain' | 'prebiotic' | 'postbiotic' | 'product',
     id: string,
     onApply: () => void,
   ) {
@@ -394,7 +417,13 @@ export class Dashboard {
           : 'bd-impact-efficacy--low';
     const efficacyLabel = isInstant ? 'Instant' : `${impact.efficacyPct}% efficacy`;
     const addsHeading =
-      impact.category === 'stressor' ? 'Introduces' : impact.category === 'regional' ? 'Applies' : 'Adds';
+      impact.category === 'stressor'
+        ? 'Introduces'
+        : impact.category === 'regional'
+          ? 'Applies'
+          : impact.form === 'metabolite'
+            ? 'Metabolite shift'
+            : 'Adds';
 
     const addsHtml = impact.adds.length
       ? impact.adds
@@ -403,7 +432,9 @@ export class Dashboard {
               `<li class="bd-impact-add bd-impact-add--${a.type}"><span class="bd-impact-add__count">${a.count}×</span> ${a.label}</li>`,
           )
           .join('')
-      : `<li class="bd-impact-add bd-impact-add--neutral">Environmental shift only — no new microbes</li>`;
+      : impact.form === 'metabolite'
+        ? `<li class="bd-impact-add bd-impact-add--neutral">Direct SCFA metabolite — raises postbiotic level, no new microbes</li>`
+        : `<li class="bd-impact-add bd-impact-add--neutral">Environmental shift only — no new microbes</li>`;
 
     const deltasHtml = impact.deltas.length
       ? impact.deltas
@@ -486,6 +517,7 @@ export class Dashboard {
     const selectors: Record<ImpactSourceKind, string> = {
       strain: `[data-strain="${id}"], [data-suggest-strain="${id}"]`,
       prebiotic: `[data-prebiotic="${id}"], [data-suggest-prebiotic="${id}"]`,
+      postbiotic: `[data-postbiotic="${id}"], [data-suggest-postbiotic="${id}"]`,
       product: `[data-product="${id}"], [data-suggest-product="${id}"]`,
       stressor: `[data-trigger="${id}"]`,
       regional: `[data-regional-care="${id}"]`,
@@ -667,6 +699,13 @@ export class Dashboard {
         `<button type="button" class="bd-btn bd-btn--suggested bd-btn--suggested-prebiotic" data-suggest-prebiotic="${id}">+ ${pre.name.toUpperCase()}</button>`,
       );
     }
+    for (const id of suggestions.postbiotics ?? []) {
+      const post = POSTBIOTICS[id];
+      const short = post.name.toUpperCase();
+      chips.push(
+        `<button type="button" class="bd-btn bd-btn--suggested bd-btn--suggested-postbiotic" data-suggest-postbiotic="${id}" title="${post.label}">${short}</button>`,
+      );
+    }
     for (const id of suggestions.products ?? []) {
       const short = PRODUCTS[id].label.replace(' (FERMENTED)', '').split(' ').slice(0, 2).join(' ');
       chips.push(
@@ -743,6 +782,17 @@ export class Dashboard {
         this.setCatalogTab('prebiotics');
         this.openImpactPreview('prebiotic', id, true);
         this.callbacks.onApplyPrebiotic(id);
+      });
+    });
+
+    this.suggestedRow.querySelectorAll('[data-suggest-postbiotic]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLButtonElement;
+        const id = el.dataset.suggestPostbiotic as PostbioticId;
+        this.flashButton(el);
+        this.setCatalogTab('postbiotics');
+        this.openImpactPreview('postbiotic', id, true);
+        this.callbacks.onApplyPostbiotic(id);
       });
     });
 

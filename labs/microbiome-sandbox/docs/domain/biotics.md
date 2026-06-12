@@ -39,13 +39,17 @@ Pathogen count in the UI includes both `pathogen` and `yeast` node types.
 | --- | --- | --- | --- |
 | L. rhamnosus | `lrham` | ear, scalp, nose, vaginal (+ all via strain panel) | Spawn 16; inflammation −0.18; integrity +0.1 |
 | L. acidophilus | `lacid` | oral, skin, vaginal (+ strain panel) | Spawn 18; pH −0.5; biofilm −0.2 |
-| L. casei | `lcasei` | strain panel (all regions) | Spawn 14; inflammation −0.12; integrity +0.08 |
+| L. casei | `lcasei` | gut, oral (+ strain panel) | Spawn 14; inflammation −0.12; integrity +0.08 |
+| L. paracasei | `lparacasei` | gut, oral, nose (+ strain panel) | Spawn 14; inflammation −0.14; postbiotic +0.03 |
 | L. salivarius | `lsaliv` | oral (+ strain panel) | Spawn 18; pH −0.2; biofilm −0.15 |
-| L. reuteri | `lreuteri` | strain panel (all regions) | Spawn 12; inflammation −0.14; integrity +0.09; pH −0.15 |
-| B. lactis | `blactis` | strain panel (all regions) | Spawn 14; commensal +0.15; postbiotic +0.04 |
-| B. longum | `blongum` | strain panel (all regions) | Spawn 12; commensal +0.12; postbiotic +0.05 |
-| B. bifidum | `bbifidum` | strain panel (all regions) | Spawn 12; commensal +0.14; postbiotic +0.04 |
-| B. infantis | `binf` | nose (+ strain panel) | Spawn 14; commensal +0.2; integrity +0.08 |
+| L. reuteri | `lreuteri` | gut, oral, vaginal (+ strain panel) | Spawn 12; inflammation −0.14; pH −0.15 |
+| L. gasseri | `lgasseri` | vaginal, oral, gut (+ strain panel) | Spawn 14; inflammation −0.16; pH −0.12 |
+| L. fermentum | `lferment` | gut, oral (+ strain panel) | Spawn 12; pH −0.18; postbiotic +0.05 |
+| B. lactis | `blactis` | gut (+ strain panel) | Spawn 14; commensal +0.15; postbiotic +0.04 |
+| B. longum | `blongum` | gut (+ strain panel) | Spawn 12; commensal +0.12; postbiotic +0.05 |
+| B. bifidum | `bbifidum` | gut (+ strain panel) | Spawn 12; commensal +0.14; postbiotic +0.04 |
+| B. breve | `bbreve` | gut (+ strain panel) | Spawn 13; commensal +0.16; postbiotic +0.05 |
+| B. infantis | `binf` | nose, gut (+ strain panel) | Spawn 14; commensal +0.2; integrity +0.08 |
 | L. plantarum | `lplant` | gut (+ strain panel) | Spawn 16; inflammation −0.18; integrity +0.1 |
 | L. bulgaricus | `lbulgaricus` | strain panel (all regions) | Spawn 10; pH −0.25; biofilm −0.1 |
 | S. thermophilus | `sthermo` | strain panel (all regions) | Spawn 10; pH −0.15 |
@@ -74,12 +78,16 @@ Additional region modifiers in [Simulation dynamics](../simulation/dynamics.md).
 
 | Substrate | Action ID | Regions | Effect |
 | --- | --- | --- | --- |
-| Inulin | `prebiotic` / panel `inulin` | gut, all (panel) | Spawn 20 prebiotic nodes |
-| FOS | `prebiotic_fos` / panel `fos` | gut, all (panel) | Spawn 18 FOS nodes |
+| Inulin | `inulin` / legacy `prebiotic` | gut, all (panel) | Spawn 20 prebiotic nodes |
+| FOS | `fos` / legacy `prebiotic_fos` | gut, all (panel) | Spawn 18 FOS nodes |
+| GOS | `gos` | gut, all (panel) | Spawn 16 GOS nodes |
+| Resistant starch | `resistant_starch` | gut, all (panel) | Spawn 22 RS nodes |
+| Pectin | `pectin` | gut, oral (panel) | Spawn 18 pectin nodes |
+| Beta-glucan | `beta_glucan` | gut, all (panel) | Spawn 16 beta-glucan nodes |
 
 **Gut baseline:** 8 inulin prebiotic nodes seeded at region init.
 
-Use the **Prebiotics** row in the dashboard (+ INULIN / + FOS) or gut region action buttons.
+Use the **Prebiotics** tab in the Interventions catalog or gut **Suggested** chips.
 
 Prebiotics drift in the lumen layer. When a probiotic is within **0.4** units, prebiotic vitality decreases and `postbioticLevel` increases (conversion rate 0.008/tick, halved in gut when moisture < 0.45).
 
@@ -89,10 +97,22 @@ Prebiotics drift in the lumen layer. When a probiotic is within **0.4** units, p
 
 Postbiotics are modeled as **`postbioticLevel`** on `BiomeState` (0–1), not as individual microbe nodes.
 
+### Catalog (Interventions → Postbiotics tab)
+
+Source: [`src/data/postbiotics.ts`](../../src/data/postbiotics.ts)
+
+| Metabolite | Action ID | Preferred regions | Primary effects |
+| --- | --- | --- | --- |
+| SCFA mix | `scfa_mix` | gut | postbiotic +0.3, integrity +0.12, inflammation −0.15 |
+| Butyrate | `butyrate` | gut | postbiotic +0.25, integrity +0.18, inflammation −0.12 |
+| Propionate | `propionate` | gut | postbiotic +0.15, commensal +0.10, inflammation −0.08 |
+| Acetate | `acetate` | gut, oral | postbiotic +0.12, pH −0.08, integrity +0.06 |
+
 ### Sources
 
-1. **Direct inoculation** (`scfa`, gut only): postbioticLevel +0.3; integrity +0.12; inflammation −0.15
-2. **Prebiotic conversion:** proximity-based, see above
+1. **Direct application** — Postbiotics catalog or gut regional care `scfa` (maps to `scfa_mix`)
+2. **Prebiotic conversion** — proximity-based, see Prebiotics section
+3. **Probiotic strain effects** — some strains raise postbioticLevel on apply (e.g. B. longum)
 
 ### Emergent effects (continuous)
 
@@ -112,7 +132,7 @@ SCFA stat row visible only when preset is `lifecycle`.
 | Strain | Action ID | Regions | Effect |
 | --- | --- | --- | --- |
 | Generic commensal | (baseline) | all | Seeded per region baseline count |
-| S. epidermidis | `s_epidermidis` | scalp, skin | Spawn 20; biofilm −0.15 |
+| S. epidermidis | `sepidermidis` / regional `s_epidermidis` | skin, scalp (+ strain library) | Spawn 20 commensal; biofilm −0.15 |
 
 Commensals grow slowly (+0.0005/tick) when pH is 5.5–7.5. Harmed by allergens, antibiotics, and alkaline stress.
 
@@ -185,11 +205,11 @@ Instanced mesh colors ([`src/scene/microbes/MicrobeMeshes.ts`](../src/scene/micr
 
 | Type | Color |
 | --- | --- |
-| probiotic | `#4ade80` (green) |
+| probiotic | Green palette — **distinct hue per strain** so multi-strain products read clearly |
 | commensal | `#94a3b8` (slate) |
-| pathogen | `#f87171` (red) |
+| pathogen | Red/pink palette — distinct hue per strain |
 | allergen | `#fbbf24` (amber) |
-| prebiotic | `#a3e635` (lime) |
+| prebiotic | Lime palette — distinct hue per substrate |
 | other | `#2dd4bf` (teal) |
 
 Postbiotics affect tissue overlay emissive color in [`Epithelium3D`](../src/scene/epithelium/Epithelium3D.ts), not microbe meshes.

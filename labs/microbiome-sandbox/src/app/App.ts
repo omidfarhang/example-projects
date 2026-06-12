@@ -1,6 +1,7 @@
 import { parseUrlState, PRESETS, type PresetId } from '../data/presets';
 import { getRegion, REGIONS, type RegionId } from '../data/regions';
 import type { ProductId } from '../data/products';
+import type { PostbioticId } from '../data/postbiotics';
 import type { PrebioticId, StrainId } from '../data/strains';
 import { SceneManager } from '../scene/SceneManager';
 import { SimEngine } from '../sim/engine';
@@ -34,6 +35,7 @@ export class App {
         onInoculate: (id) => this.handleInoculate(id),
         onApplyStrain: (id) => this.handleApplyStrain(id),
         onApplyPrebiotic: (id) => this.handleApplyPrebiotic(id),
+        onApplyPostbiotic: (id) => this.handleApplyPostbiotic(id),
         onApplyProduct: (id) => this.handleApplyProduct(id),
         onEnvChange: (env) => this.engine.setEnv(env),
       },
@@ -90,6 +92,13 @@ export class App {
     this.engine.inoculatePrebiotic(id);
     this.dashboard.flashAction('action');
     this.scene.playBurst('prebiotic');
+  }
+
+  private handleApplyPostbiotic(id: PostbioticId) {
+    this.ensureMicroView();
+    this.engine.applyPostbiotic(id);
+    this.dashboard.flashAction('action');
+    this.scene.playBurst(id);
   }
 
   private handleApplyProduct(id: ProductId) {

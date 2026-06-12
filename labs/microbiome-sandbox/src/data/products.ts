@@ -4,14 +4,19 @@ import type { RegionId } from './regions';
 export type ProductId =
   | 'synbiotic_supplement'
   | 'oral_probiotic_lozenge'
+  | 'vaginal_probiotic_capsule'
+  | 'probiotic_topical_cream'
   | 'kefir_drink'
   | 'probiotic_yogurt'
-  | 'kimchi';
+  | 'kimchi'
+  | 'sauerkraut'
+  | 'kombucha'
+  | 'miso';
 
-export type ProductCategory = 'supplement' | 'lozenge' | 'fermented';
+export type ProductCategory = 'supplement' | 'lozenge' | 'fermented' | 'topical';
 
-/** Delivery form — educational label (capsule vs lozenge vs food). */
-export type ProductForm = 'capsule' | 'lozenge' | 'drink' | 'food';
+/** Delivery form — educational label (capsule vs lozenge vs food vs topical). */
+export type ProductForm = 'capsule' | 'lozenge' | 'drink' | 'food' | 'topical';
 
 export interface ProductStrainDose {
   id: StrainId;
@@ -86,6 +91,41 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     preferredMultiplier: 1,
     otherMultiplier: 0.35,
   },
+  vaginal_probiotic_capsule: {
+    id: 'vaginal_probiotic_capsule',
+    label: 'VAGINAL PROBIOTIC CAPSULE',
+    category: 'supplement',
+    form: 'capsule',
+    description:
+      'Insertable capsule with L. acidophilus, L. rhamnosus, and L. reuteri — targets vaginal Lactobacillus dominance.',
+    why: 'Vaginal capsule seeds acidophilus/rhamnosus/reuteri — acidifies mucosa, calms inflammation, and restores barrier after alkaline stress.',
+    strains: [
+      { id: 'lacid', dose: 0.85 },
+      { id: 'lrham', dose: 0.75 },
+      { id: 'lreuteri', dose: 0.7 },
+    ],
+    effects: { ph: -0.35, phMin: 3.8, inflammation: -0.12, integrity: 0.08 },
+    preferredRegions: ['vaginal'],
+    preferredMultiplier: 1,
+    otherMultiplier: 0.4,
+  },
+  probiotic_topical_cream: {
+    id: 'probiotic_topical_cream',
+    label: 'PROBIOTIC TOPICAL CREAM',
+    category: 'topical',
+    form: 'topical',
+    description:
+      'Skin/scalp cream with L. acidophilus and L. rhamnosus — supports acid mantle and commensal balance.',
+    why: 'Topical lactobacilli restore skin pH and moisture — biofilm clearance and barrier support on epidermis and scalp.',
+    strains: [
+      { id: 'lacid', dose: 0.8 },
+      { id: 'lrham', dose: 0.65 },
+    ],
+    effects: { ph: -0.2, phMin: 4.5, biofilm: -0.12, moisture: 0.08, inflammation: -0.1 },
+    preferredRegions: ['skin', 'scalp'],
+    preferredMultiplier: 1,
+    otherMultiplier: 0.45,
+  },
   kefir_drink: {
     id: 'kefir_drink',
     label: 'KEFIR DRINK',
@@ -143,6 +183,60 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     preferredRegions: ['gut'],
     preferredMultiplier: 1,
     otherMultiplier: 0.45,
+  },
+  sauerkraut: {
+    id: 'sauerkraut',
+    label: 'SAUERKRAUT (FERMENTED)',
+    category: 'fermented',
+    form: 'food',
+    description: 'Fermented cabbage rich in L. plantarum and vegetable fiber.',
+    why: 'Fermented cabbage delivers L. plantarum plus inulin fiber — acidifies gut lumen and feeds SCFA production.',
+    strains: [
+      { id: 'lplant', dose: 0.85 },
+      { id: 'lcasei', dose: 0.5 },
+      { id: 'lreuteri', dose: 0.35 },
+    ],
+    prebiotics: [{ id: 'inulin', dose: 0.35 }],
+    effects: { ph: -0.18, phMin: 5.0, postbioticLevel: 0.05, inflammation: -0.08 },
+    preferredRegions: ['gut'],
+    preferredMultiplier: 1,
+    otherMultiplier: 0.5,
+  },
+  kombucha: {
+    id: 'kombucha',
+    label: 'KOMBUCHA DRINK',
+    category: 'fermented',
+    form: 'drink',
+    description:
+      'Fermented tea with lactic acid bacteria and S. boulardii — mild acidity with yeast competition.',
+    why: 'Fermented tea acidifies gut/oral niches and introduces S. boulardii — competes with Candida while supporting lactic flora.',
+    strains: [
+      { id: 'lcasei', dose: 0.55 },
+      { id: 'lacid', dose: 0.5 },
+      { id: 'sboul', dose: 0.6 },
+    ],
+    effects: { ph: -0.1, phMin: 5.2, yeastVitality: -0.15, postbioticLevel: 0.04 },
+    preferredRegions: ['gut', 'oral'],
+    preferredMultiplier: 1,
+    otherMultiplier: 0.48,
+  },
+  miso: {
+    id: 'miso',
+    label: 'MISO (FERMENTED)',
+    category: 'fermented',
+    form: 'food',
+    description: 'Fermented soybean paste with diverse Lactobacillus and Bifidobacterium species.',
+    why: 'Fermented soy paste delivers mixed lactobacilli and bifidobacteria — supports commensal ecology and SCFA in gut lumen.',
+    strains: [
+      { id: 'lcasei', dose: 0.6 },
+      { id: 'lplant', dose: 0.55 },
+      { id: 'bbifidum', dose: 0.45 },
+      { id: 'blactis', dose: 0.4 },
+    ],
+    effects: { ph: -0.12, phMin: 5.4, postbioticLevel: 0.05, integrity: 0.04 },
+    preferredRegions: ['gut'],
+    preferredMultiplier: 1,
+    otherMultiplier: 0.52,
   },
 };
 

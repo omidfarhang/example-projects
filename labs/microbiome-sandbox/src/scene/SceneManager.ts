@@ -167,7 +167,10 @@ export class SceneManager {
       'lrham', 'binf', 'lacid', 'lplant', 'lcasei', 'lreuteri', 'blactis', 'blongum', 'bbifidum',
       'lbulgaricus', 'sthermo', 's_epidermidis', 'prebiotic', 'prebiotic_fos', 'scfa',
       'saline_mist', 'ph_serum', 'lsaliv', 'sboul',
-      'synbiotic_supplement', 'oral_probiotic_lozenge', 'kefir_drink', 'probiotic_yogurt', 'kimchi',
+      'synbiotic_supplement', 'oral_probiotic_lozenge', 'vaginal_probiotic_capsule',
+      'probiotic_topical_cream', 'kefir_drink', 'probiotic_yogurt', 'kimchi',
+      'sauerkraut', 'kombucha', 'miso',
+      'butyrate', 'propionate', 'acetate',
       'ssaliv_k12', 'ssaliv_m18',
     ]);
     const burstKind = probioticIds.has(kind) ? 'probiotic' : stressorBurstKind(kind);

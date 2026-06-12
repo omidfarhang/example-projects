@@ -1,5 +1,6 @@
 import type { EnvVarId } from '../data/envVars';
 import { getProduct, type ProductId } from '../data/products';
+import { getPostbiotic, postbioticRegionMultiplier, type PostbioticId } from '../data/postbiotics';
 import { getRegion, type RegionId } from '../data/regions';
 import { getStressor, type StressorBiomeDelta } from '../data/stressors';
 import type { PresetId } from '../data/presets';
@@ -166,20 +167,37 @@ export class SimEngine {
     }
   }
 
-  /** Apply a single probiotic strain (available in all regions). */
+  /** Apply a single strain from the library (probiotic or commensal). */
   inoculateStrain(strainId: StrainId) {
     const def = getStrain(strainId);
-    this.spawnBatch('probiotic', def.name, def.spawnCount);
+    const microbeType = def.kind === 'commensal' ? 'commensal' : 'probiotic';
+    this.spawnBatch(microbeType, def.name, def.spawnCount);
     this.applyStrainBiomeEffects(def.effects);
     this.events.push(this.legacyStrainEvent(strainId));
     this.updateCounts();
   }
 
-  /** Add prebiotic substrate (inulin or FOS). */
+  /** Add prebiotic substrate from the catalog. */
   inoculatePrebiotic(prebioticId: PrebioticId) {
     const def = PREBIOTICS[prebioticId];
     this.spawnBatch('prebiotic', def.name, def.spawnCount);
     this.events.push(`${def.name} prebiotic added — substrate for probiotics`);
+    this.updateCounts();
+  }
+
+  /** Apply a postbiotic metabolite directly (raises postbioticLevel scalar). */
+  applyPostbiotic(postbioticId: PostbioticId) {
+    const def = getPostbiotic(postbioticId);
+    const mult = postbioticRegionMultiplier(def, this.region);
+
+    if (mult < 1) {
+      this.events.push(
+        `${def.label} — reduced efficacy outside ${def.preferredRegions.join('/')}`,
+      );
+    }
+
+    this.applyStrainBiomeEffects(scaleBiomeEffect(def.effects, mult));
+    this.events.push(`${def.label} applied — postbiotic metabolites active`);
     this.updateCounts();
   }
 
@@ -331,19 +349,20 @@ export class SimEngine {
     }
 
     if (actionId === 'scfa') {
-      b.postbioticLevel = clamp(b.postbioticLevel + 0.3, 0, 1);
-      b.integrity = clamp(b.integrity + 0.12, 0, 1);
-      b.inflammation = Math.max(0, b.inflammation - 0.15);
-      this.events.push('SCFA postbiotic surge — barrier recovery');
-    } else if (actionId === 'saline_mist') {
+      this.applyPostbiotic('scfa_mix');
+      return;
+    }
+
+    if (actionId === 's_epidermidis') {
+      this.inoculateStrain('sepidermidis');
+      return;
+    }
+
+    if (actionId === 'saline_mist') {
       b.moisture = clamp(b.moisture + 0.15, 0, 1);
       b.inflammation = Math.max(0, b.inflammation - 0.1);
       this.allergenAdhesion = Math.max(0, this.allergenAdhesion - 0.2);
       this.events.push('Saline mist — moisture restored, inflammation easing');
-    } else if (actionId === 's_epidermidis') {
-      this.spawnBatch('commensal', 'S. epidermidis', 20);
-      b.biofilm = Math.max(0, b.biofilm - 0.15);
-      this.events.push('S. epidermidis applied — commensal biofilm competition');
     } else if (actionId === 'ph_serum') {
       b.ph = clamp(b.ph - 0.35, 3.8, 7);
       b.moisture = clamp(b.moisture + 0.05, 0, 1);
@@ -370,6 +389,11 @@ export class SimEngine {
       sthermo: 'S. thermophilus seeded — fermented dairy culture active',
       ssaliv_k12: 'S. salivarius K12 applied — oral BLIS activity, biofilm competition',
       ssaliv_m18: 'S. salivarius M18 applied — dental plaque & gum niche restoration',
+      lparacasei: 'L. paracasei inoculated — immune-modulatory strain active',
+      lgasseri: 'L. gasseri applied — vaginal/oral acidification and barrier support',
+      lferment: 'L. fermentum seeded — fermentation and SCFA production rising',
+      bbreve: 'B. breve inoculated — infant-style bifidobacterial niche expanding',
+      sepidermidis: 'S. epidermidis applied — commensal biofilm competition',
     };
     return messages[id] ?? `${getStrain(id).name} inoculated — strain colony forming`;
   }

@@ -25,9 +25,10 @@ Core educational lab features implemented and documented.
 | **CORE-01** | 7 active body regions, macro/micro 3D views, tissue callouts | `regions.ts`, `SceneManager.ts`, `tissueCallouts.ts` |
 | **CORE-02** | 3 educational presets + URL params (`preset`, `region`, `context`) | `presets.ts`, `user-guide.md` |
 | **CORE-03** | 82 stressor triggers + region-gated inoculations | `stressors.ts`, `regions.ts`, `engine.ts` |
-| **CORE-04** | Individual strains panel — 15 strains, all regions | `strains.ts`, `Dashboard.ts` |
-| **CORE-05** | Prebiotics panel — inulin + FOS spawn + conversion loop | `strains.ts`, `engine.ts` |
-| **CORE-06** | Products & fermented foods — 5 products with region multipliers | `products.ts`, `engine.ts` |
+| **CORE-04** | Individual strains panel — 20 strains (19 probiotic + 1 commensal), all regions | `strains.ts`, `Dashboard.ts` |
+| **CORE-05** | Prebiotics panel — 6 fiber substrates spawn + conversion loop | `strains.ts`, `engine.ts` |
+| **CORE-06** | Products & fermented foods — 10 products with region multipliers | `products.ts`, `engine.ts` |
+| **CORE-10** | Postbiotics panel — 4 SCFA metabolites (scalar postbioticLevel) | `postbiotics.ts`, `engine.ts` |
 | **CORE-07** | 9 environment sliders with region subsets | `envVars.ts`, `environment.md` |
 | **CORE-08** | Domain documentation pass (biotics, products, actions, regions) | `docs/domain/*` |
 | **CORE-09** | Deterministic sim engine + real-time stats + event log | `engine.ts`, `Dashboard.ts` |

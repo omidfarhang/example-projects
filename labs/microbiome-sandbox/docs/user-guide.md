@@ -93,9 +93,10 @@ Region-specific subset of sliders (see [Environment](domain/environment.md)). Dr
 - **Tissue-specific treatments** — non-strain actions only (saline mist, pH serum, S. epidermidis, SCFA boost)
 
 **Interventions catalog** — full-width row with tabs:
-- **Products & foods** — synbiotic capsule, oral lozenge, kefir, yogurt, kimchi
-- **Strain library** — all 15 probiotic strains
-- **Prebiotics** — inulin and FOS
+- **Products & foods** — synbiotic capsule, oral lozenge, vaginal capsule, topical cream, kefir, yogurt, kimchi, sauerkraut, kombucha, miso
+- **Strain library** — 20 strains (19 probiotic + S. epidermidis commensal)
+- **Prebiotics** — inulin, FOS, GOS, resistant starch, pectin, beta-glucan
+- **Postbiotics** — SCFA mix, butyrate, propionate, acetate (direct metabolite application)
 
 **Action preview** — sits alongside the catalog (side-by-side on desktop). Click a suggested shortcut or catalog item to open a sticky preview; dismiss with × or Escape, or select another action.
 

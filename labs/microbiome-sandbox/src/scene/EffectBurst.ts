@@ -54,6 +54,10 @@ export class EffectBurst {
       s_epidermidis: 0x4ade80,
       prebiotic: 0xa3e635,
       scfa: 0x2dd4bf,
+      butyrate: 0x14b8a6,
+      propionate: 0x5eead4,
+      acetate: 0x2dd4bf,
+      scfa_mix: 0x2dd4bf,
       saline_mist: 0x7dd3fc,
       ph_serum: 0x34d399,
       cerumen_impaction: 0xd4a040,
@@ -70,9 +74,14 @@ export class EffectBurst {
       sboul: 0xa3e635,
       synbiotic_supplement: 0xa78bfa,
       oral_probiotic_lozenge: 0x38bdf8,
+      vaginal_probiotic_capsule: 0xe879f9,
+      probiotic_topical_cream: 0x34d399,
       kefir_drink: 0xfbbf24,
       probiotic_yogurt: 0xfcd34d,
       kimchi: 0xf97316,
+      sauerkraut: 0xd9f99d,
+      kombucha: 0xfb923c,
+      miso: 0xca8a04,
     };
     this.color = colors[kind] ?? 0x38bdf8;
     const mat = this.ring.material as THREE.MeshBasicMaterial;
