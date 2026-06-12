@@ -65,10 +65,9 @@ export class SceneManager {
     this.scene.add(ambient, key, fill, rim, this.inflameLight);
 
     this.body = createBodyMesh();
-    this.scene.add(this.body);
-
     this.hotspots = createHotspots(regions);
-    this.scene.add(this.hotspots);
+    this.body.add(this.hotspots);
+    this.scene.add(this.body);
 
     this.tissue = new TissueLayer();
     this.scene.add(this.tissue.group);
@@ -85,6 +84,7 @@ export class SceneManager {
         this.hoveredRegion = null;
         for (const child of this.hotspots.children) {
           const mesh = child as THREE.Mesh;
+          if (!mesh.userData.regionId) continue;
           mesh.scale.setScalar(1);
         }
         if (hits.length > 0 && this.cameraRig.getMode() === 'macro') {
@@ -128,6 +128,7 @@ export class SceneManager {
 
     for (const child of this.hotspots.children) {
       const mesh = child as THREE.Mesh;
+      if (!mesh.userData.regionId) continue;
       const mat = mesh.material as THREE.MeshBasicMaterial;
       const isSelected = mesh.userData.regionId === id;
       mat.color.setHex(isSelected ? 0x38bdf8 : region.active ? 0x22d3ee : 0x475569);
@@ -147,6 +148,7 @@ export class SceneManager {
     this.cameraRig.flyToMacro();
     for (const child of this.hotspots.children) {
       const mesh = child as THREE.Mesh;
+      if (!mesh.userData.regionId) continue;
       const region = this.regions.find((r) => r.id === mesh.userData.regionId);
       const mat = mesh.material as THREE.MeshBasicMaterial;
       mat.color.setHex(region?.active ? 0x38bdf8 : 0x475569);
@@ -205,9 +207,10 @@ export class SceneManager {
 
     for (const child of this.hotspots.children) {
       const mesh = child as THREE.Mesh;
+      if (!mesh.userData.regionId) continue;
       const id = mesh.userData.regionId as RegionId;
       const active = mesh.userData.active as boolean;
-      vec.copy(mesh.position);
+      mesh.getWorldPosition(vec);
       vec.project(this.cameraRig.camera);
       const x = ((vec.x + 1) / 2) * rect.width;
       const y = ((-vec.y + 1) / 2) * rect.height;
