@@ -44,7 +44,7 @@ It does **not** predict real-world outcomes for any individual, strain, dose, or
 | Assumption | Reality gap |
 | --- | --- |
 | Postbiotics are a single scalar `postbioticLevel` | Real postbiotics include butyrate, propionate, acetate, enzymes, etc. |
-| No postbiotic microbe nodes | SCFA not visualized as particles (only tissue glow + stat) |
+| No postbiotic microbe nodes | SCFA shown as lumen particle field + epithelial glow, not individual agents |
 | Conversion is proximity-based instant feedback | Real fermentation has lag, metabolite diffusion, transporter dynamics |
 | Direct `scfa` button adds +0.3 instantly | No oral/gut pharmacokinetic model |
 

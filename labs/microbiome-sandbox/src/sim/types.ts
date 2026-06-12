@@ -30,6 +30,9 @@ export interface BiomeState {
   pathogenCount: number;
   allergenCount: number;
   commensalCount: number;
+  prebioticCount: number;
+  /** Mean vitality of live prebiotic nodes (0–1); drops as probiotics convert substrate. */
+  prebioticSubstrateLevel: number;
   postbioticLevel: number;
 }
 

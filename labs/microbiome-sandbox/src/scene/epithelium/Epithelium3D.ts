@@ -10,6 +10,13 @@ import {
 } from './tissueModels';
 import type { EpitheliumKind, EpitheliumState } from './types';
 
+/** Non-linear biofilm → overlay opacity — low levels stay visible (VIZ-03). */
+export function biofilmVisualOpacity(biofilm: number, max = 0.45): number {
+  const t = THREE.MathUtils.clamp(biofilm, 0, 1);
+  if (t <= 0) return 0;
+  return Math.min(max, 0.05 + Math.pow(t, 0.55) * (max - 0.05));
+}
+
 export class Epithelium3D {
   readonly group = new THREE.Group();
   private kind: EpitheliumKind = 'sinus';
@@ -78,7 +85,7 @@ export class Epithelium3D {
 
     for (const overlay of this.overlays) {
       if (overlay.userData.isBiofilm) {
-        (overlay.material as THREE.MeshStandardMaterial).opacity = state.biofilm * 0.45;
+        (overlay.material as THREE.MeshStandardMaterial).opacity = biofilmVisualOpacity(state.biofilm);
       }
       if (overlay.userData.isMucus) {
         const m = overlay.material as THREE.MeshStandardMaterial;
@@ -87,8 +94,9 @@ export class Epithelium3D {
       }
       if (overlay.userData.isScfa) {
         const m = overlay.material as THREE.MeshStandardMaterial;
-        m.opacity = state.postbioticLevel * 0.2;
-        m.emissiveIntensity = state.postbioticLevel * 0.4;
+        const boost = state.scfaGlowBoost ?? 0;
+        m.opacity = state.postbioticLevel * 0.2 + boost * 0.18;
+        m.emissiveIntensity = state.postbioticLevel * 0.4 + boost * 0.55;
       }
       if (overlay.userData.isSheen) {
         const dryPenalty = state.moisture < 0.35 ? (0.35 - state.moisture) * 0.3 : 0;
@@ -106,8 +114,9 @@ export class Epithelium3D {
         m.emissiveIntensity = state.sebum * 0.15;
       }
       if (overlay.userData.isThrush) {
+        const thrushBase = biofilmVisualOpacity(state.biofilm, 0.38);
         (overlay.material as THREE.MeshStandardMaterial).opacity =
-          0.04 + state.biofilm * 0.35 + (state.ph > 6.5 ? 0.08 : 0);
+          thrushBase + (state.ph > 6.5 ? 0.08 : 0);
       }
     }
   }

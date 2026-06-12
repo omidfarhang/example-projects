@@ -3,6 +3,7 @@ import type { BiomeState, MicrobeNode } from '../sim/types';
 import { Epithelium3D, createLumenChamber, type EpitheliumKind } from './epithelium';
 import { LUMEN_BOUNDS, RECEPTOR_SITES, type LumenBounds } from './epithelium/tissueModels';
 import { bucketForType, colorForMicrobe, createMicrobeMeshSet } from './microbes/MicrobeMeshes';
+import { ScfaParticleField } from './ScfaParticleField';
 
 const SIM_X = 1.8;
 const SIM_Y = 0.9;
@@ -68,6 +69,7 @@ export class TissueLayer {
   private geometry: EpitheliumKind = 'sinus';
   private burstKind: 'allergen' | 'probiotic' | 'alkaline' | 'stress' | 'default' | null = null;
   private burstTime = 0;
+  private scfaParticles = new ScfaParticleField();
 
   constructor() {
     this.epithelium.setKind('sinus');
@@ -77,12 +79,14 @@ export class TissueLayer {
       this.lumenGroup.add(mesh);
     }
     this.group.add(this.lumenGroup);
+    this.group.add(this.scfaParticles.group);
     this.group.visible = false;
   }
 
   setGeometry(kind: EpitheliumKind) {
     if (kind === this.geometry) return;
     this.geometry = kind;
+    this.scfaParticles.reset();
     this.epithelium.setKind(kind);
     this.group.remove(this.chamber);
     this.chamber.traverse((o) => {
@@ -135,11 +139,16 @@ export class TissueLayer {
 
     this.lumenGroup.position.y = THREE.MathUtils.lerp(this.lumenGroup.position.y, 0, dt * 4);
     this.lumenGroup.position.x = THREE.MathUtils.lerp(this.lumenGroup.position.x, 0, dt * 6);
+
+    const bounds = LUMEN_BOUNDS[this.geometry];
+    this.scfaParticles.update(bounds, biome.postbioticLevel, dt);
+
     this.epithelium.update({
       inflammation: biome.inflammation,
       integrity: biome.integrity,
       biofilm: biome.biofilm,
       postbioticLevel: biome.postbioticLevel,
+      scfaGlowBoost: this.scfaParticles.getGlowBoost(),
       ph: biome.ph,
       moisture: biome.moisture,
       sebum: biome.sebum,
@@ -147,13 +156,13 @@ export class TissueLayer {
       sweatRate: biome.sweatRate,
     });
 
-    const bounds = LUMEN_BOUNDS[this.geometry];
     const receptors = RECEPTOR_SITES[this.geometry];
     const time = performance.now();
     const buckets: Record<string, number> = {
       probiotic: 0,
       commensal: 0,
       pathogen: 0,
+      yeast: 0,
       allergen: 0,
       prebiotic: 0,
       other: 0,
@@ -174,8 +183,10 @@ export class TissueLayer {
 
       if (bucket === 'pathogen') {
         this.dummy.scale.setScalar(scale);
+      } else if (bucket === 'yeast') {
+        this.dummy.scale.set(scale * 1.08, scale * 0.88, scale * 1.02);
       } else if (bucket === 'allergen') {
-        this.dummy.scale.setScalar(scale * 0.65);
+        this.dummy.scale.setScalar(scale * 0.72);
       } else if (bucket === 'prebiotic') {
         this.dummy.scale.set(0.4, scale * 1.2, 0.4);
         this.dummy.rotation.z = n.id * 0.4;

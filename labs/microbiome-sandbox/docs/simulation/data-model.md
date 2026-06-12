@@ -54,6 +54,8 @@ Tissue environment and aggregate metrics.
 | `pathogenCount` | number | ≥ 0 | pathogen + yeast nodes |
 | `allergenCount` | number | ≥ 0 | Computed |
 | `commensalCount` | number | ≥ 0 | Computed |
+| `prebioticCount` | number | ≥ 0 | Prebiotic fiber nodes in lumen |
+| `prebioticSubstrateLevel` | number | 0–1 | Mean vitality of prebiotic nodes; drops during conversion |
 | `postbioticLevel` | number | 0–1 | Conversion + scfa action |
 
 ### `SimSnapshot`
@@ -218,7 +220,8 @@ Subset of biome passed to 3D tissue renderer.
 | `inflammation` | Emissive redness on inflamed meshes |
 | `integrity` | Overlay opacity |
 | `biofilm` | Biofilm overlay visibility |
-| `postbioticLevel` | Healing glow tint |
+| `postbioticLevel` | Lumen SCFA particle count/opacity + epithelial glow tint |
+| `scfaGlowBoost` | Brief emissive pulse on `isScfa` overlay when level rises |
 | `ph`, `moisture`, `sebum`, `cerumen`, `sweatRate` | Layer-specific visual tweaks |
 
 ---

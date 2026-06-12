@@ -104,6 +104,7 @@ Updated each frame in `update(engine, fps)`:
 | Pathogen stat | `pathogenCount × POPULATION_SCALE` + trend |
 | Allergen stat | `allergenCount × POPULATION_SCALE` + trend |
 | Commensal stat | `commensalCount × POPULATION_SCALE` + trend |
+| Prebiotic substrate | `prebioticCount × POPULATION_SCALE` + mean vitality % + trend (lifecycle only) |
 | Biofilm stat | `biome.biofilm × 100%` |
 | Postbiotic/SCFA | `biome.postbioticLevel × 100%` (lifecycle only) |
 
@@ -187,10 +188,11 @@ Preview data is derived from [`strains.ts`](../src/data/strains.ts) and [`produc
 
 | Condition | Behavior |
 | --- | --- |
-| `preset === 'lifecycle'` | Show postbiotic/SCFA stat row |
-| Other presets | Hide postbiotic row |
+| `preset === 'lifecycle'` | Show prebiotic substrate + postbiotic/SCFA stat rows |
+| Other presets | Hide prebiotic and postbiotic rows |
 | Region change | Rebuild env sliders and action buttons |
 | First micro view | Show hint (dismissible) |
+| Touch / tablet device | Show orbit/zoom/pan overlay until dismissed or first canvas touch |
 
 ---
 

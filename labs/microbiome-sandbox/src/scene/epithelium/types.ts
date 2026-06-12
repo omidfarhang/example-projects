@@ -5,6 +5,8 @@ export interface EpitheliumState {
   integrity: number;
   biofilm: number;
   postbioticLevel: number;
+  /** Brief boost when postbioticLevel rises — syncs lumen particles with SCFA tissue glow. */
+  scfaGlowBoost?: number;
   ph: number;
   moisture: number;
   sebum: number;

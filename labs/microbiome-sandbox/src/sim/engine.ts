@@ -38,8 +38,8 @@ export class SimEngine {
   private nextId = 1;
   private events: string[] = [];
   private rand: () => number;
-  private prevCounts = { probiotic: 0, pathogen: 0, allergen: 0, commensal: 0 };
-  private trends = { probiotic: 0, pathogen: 0, allergen: 0, commensal: 0 };
+  private prevCounts = { probiotic: 0, pathogen: 0, allergen: 0, commensal: 0, prebiotic: 0 };
+  private trends = { probiotic: 0, pathogen: 0, allergen: 0, commensal: 0, prebiotic: 0 };
   private allergenAdhesion = 0;
 
   region: RegionId = 'nose';
@@ -62,6 +62,8 @@ export class SimEngine {
     pathogenCount: 0,
     allergenCount: 0,
     commensalCount: 0,
+    prebioticCount: 0,
+    prebioticSubstrateLevel: 0,
     postbioticLevel: 0,
   };
 
@@ -611,6 +613,12 @@ export class SimEngine {
     b.pathogenCount = this.nodes.filter((n) => n.type === 'pathogen' || n.type === 'yeast').length;
     b.allergenCount = this.nodes.filter((n) => n.type === 'allergen').length;
     b.commensalCount = this.nodes.filter((n) => n.type === 'commensal').length;
+    const prebiotics = this.nodes.filter((n) => n.type === 'prebiotic');
+    b.prebioticCount = prebiotics.length;
+    b.prebioticSubstrateLevel =
+      prebiotics.length > 0
+        ? prebiotics.reduce((sum, n) => sum + n.vitality, 0) / prebiotics.length
+        : 0;
   }
 
   private updateTrends() {
@@ -619,11 +627,13 @@ export class SimEngine {
     this.trends.pathogen = Math.sign(b.pathogenCount - this.prevCounts.pathogen);
     this.trends.allergen = Math.sign(b.allergenCount - this.prevCounts.allergen);
     this.trends.commensal = Math.sign(b.commensalCount - this.prevCounts.commensal);
+    this.trends.prebiotic = Math.sign(b.prebioticCount - this.prevCounts.prebiotic);
     this.prevCounts = {
       probiotic: b.probioticCount,
       pathogen: b.pathogenCount,
       allergen: b.allergenCount,
       commensal: b.commensalCount,
+      prebiotic: b.prebioticCount,
     };
   }
 

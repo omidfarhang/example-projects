@@ -52,8 +52,8 @@ Core educational lab features implemented and documented.
 | --- | --- | --- | --- |
 | SIM-01 | P1 | No automated tests | Golden snapshot tests for deterministic engine (seed 42 + action sequence → expected biome) |
 | SIM-02 | P2 | Antibiotic effects are flat vitality deltas | Region-specific antibiotic spectra (e.g. gut vs topical vs vaginal) |
-| SIM-03 | P2 | Postbiotics are scalar only | Optional SCFA particle visualization when postbioticLevel rises; link to tissue glow |
-| SIM-04 | P2 | Prebiotic nodes don't appear in population stats | Dashboard row or legend entry for prebiotic substrate level |
+| SIM-03 | P2 | **Done** — SCFA lumen particles linked to tissue glow | Optional particle field when postbioticLevel ≥ 0.1; surge pulse syncs with epithelial SCFA overlay |
+| SIM-04 | P2 | **Done** — prebiotic substrate in stats + legend | Dashboard row (lifecycle) with particle count, % remaining, trend; legend always lists substrate on lifecycle |
 | SIM-05 | P3 | Single suppression radius (0.35) for all probiotics | Strain-specific competition strengths (L. acidophilus vs S. boulardii) |
 | SIM-06 | P3 | sugarLoad decays uniformly | Region-specific decay (oral faster, gut slower) |
 | SIM-07 | P2 | B. infantis listed in nose/gut labels but only inoculable on nose | Align default strain labels with inoculation availability or add gut inoculation |
@@ -100,10 +100,10 @@ Core educational lab features implemented and documented.
 
 | ID | Priority | Current state | Target / gap |
 | --- | --- | --- | --- |
-| VIZ-01 | P2 | Postbiotic effect is tissue overlay only | Lumen particle field proportional to postbioticLevel |
-| VIZ-02 | P3 | All microbe types share limited geometry variants | Distinct mesh for yeast vs bacterium vs allergen particle |
-| VIZ-03 | P2 | Biofilm opacity linear | Non-linear visual threshold so low biofilm still visible |
-| VIZ-04 | P3 | No mobile touch orbit hints | Touch gesture overlay for tablet users |
+| VIZ-01 | P2 | **Done** — lumen SCFA particle field | Instanced particles proportional to postbioticLevel (`ScfaParticleField.ts`) |
+| VIZ-02 | P3 | **Done** — distinct microbe meshes | Yeast ellipsoid, spiky bacterium (pathogen), pollen allergen (`MicrobeMeshes.ts`) |
+| VIZ-03 | P2 | **Done** — non-linear biofilm opacity | `biofilmVisualOpacity()` — low biofilm still visible on tissue overlays |
+| VIZ-04 | P3 | **Done** — touch gesture overlay | Orbit / pinch / pan hints on coarse-pointer devices (`touchGestureHints.ts`) |
 
 ---
 
@@ -147,10 +147,10 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 2. ~~**SIM-08** (product strain effects)~~ — shipped
 3. **SIM-01** (tests) — safety net for further sim changes
 4. **CONTENT-02** (article-linked strain notes) — extends impact preview
-5. **SIM-04** (prebiotic stats) — dashboard completeness
+5. ~~**SIM-04** (prebiotic stats)~~ — shipped
 6. **ENG-01** (data-driven actions) — reduces doc/code drift
 7. **UX-01, UX-02** (accessibility) — broadens audience
-8. **SIM-03, VIZ-01** (postbiotic visualization) — lifecycle preset payoff
+8. ~~**SIM-03, VIZ-01** (postbiotic visualization)~~ — shipped
 9. **STATE-01** (shareable state) — classroom sharing
 
 ---
@@ -162,6 +162,12 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 | CORE-01–09 | 2026 foundation | See Shipped foundation table |
 | UX-07 | June 2026 | Action Impact Preview Panel (`actionImpact.ts`, `Dashboard.ts`) |
 | SIM-08 | June 2026 | Per-strain biome effects on `applyProduct()` via `scaleBiomeEffect()` |
+| SIM-03 | June 2026 | SCFA lumen particle field linked to epithelial glow (`ScfaParticleField.ts`, `TissueLayer.ts`) |
+| VIZ-01 | June 2026 | Same pass as SIM-03 — lumen particles proportional to `postbioticLevel` |
+| SIM-04 | June 2026 | Prebiotic substrate stat row + lifecycle legend (`Dashboard.ts`, `engine.ts`) |
+| VIZ-02 | June 2026 | Distinct yeast / bacterium / allergen instanced meshes (`MicrobeMeshes.ts`) |
+| VIZ-03 | June 2026 | Non-linear biofilm overlay opacity (`biofilmVisualOpacity` in `Epithelium3D.ts`) |
+| VIZ-04 | June 2026 | Touch orbit/zoom/pan overlay for tablet users (`touchGestureHints.ts`, `Dashboard.ts`) |
 
 ---
 

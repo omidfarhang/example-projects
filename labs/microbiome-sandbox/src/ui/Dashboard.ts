@@ -26,6 +26,7 @@ import { TISSUE_PICTOGRAMS } from '../scene/tissueCallouts';
 import { POPULATION_SCALE, type SimEngine } from '../sim/engine';
 import { formatStrainList, summarizeLiveStrains, totalCells } from '../sim/strainSummary';
 import type { BiomeState, MicrobeNode } from '../sim/types';
+import { initTouchGestureHints } from './touchGestureHints';
 
 function trendLabel(n: number): string {
   if (n > 0) return '↑ Increasing';
@@ -63,6 +64,7 @@ export class Dashboard {
   private allergenStat!: HTMLElement;
   private commensalStat!: HTMLElement;
   private biofilmStat!: HTMLElement;
+  private prebioticStat!: HTMLElement;
   private postbioticStat!: HTMLElement;
   private integrityMeter!: HTMLElement;
   private inflammationMeter!: HTMLElement;
@@ -97,6 +99,7 @@ export class Dashboard {
   private tissuePictogram!: HTMLElement;
   private commensalRow!: HTMLElement;
   private biofilmRow!: HTMLElement;
+  private prebioticStatRow!: HTMLElement;
   private postbioticRow!: HTMLElement;
   private impactPanel!: HTMLElement;
   private impactCloseBtn!: HTMLButtonElement;
@@ -147,6 +150,38 @@ export class Dashboard {
               <span class="bd-scale-label" data-scale-label></span>
             </div>
             <p class="bd-hint" data-hint>Select a tissue region on the body map, then run a scenario trigger.</p>
+            <div class="bd-touch-hints" data-touch-hints hidden>
+              <button type="button" class="bd-touch-hints__dismiss" data-touch-hints-dismiss aria-label="Dismiss touch controls">×</button>
+              <p class="bd-touch-hints__title">Touch controls</p>
+              <ul class="bd-touch-hints__list">
+                <li>
+                  <svg class="bd-touch-hints__icon" viewBox="0 0 32 32" aria-hidden="true">
+                    <circle cx="16" cy="16" r="9" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+                    <path d="M16 7 A9 9 0 0 1 23 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="16" cy="7" r="2" fill="currentColor"/>
+                  </svg>
+                  <span>One finger — orbit</span>
+                </li>
+                <li>
+                  <svg class="bd-touch-hints__icon" viewBox="0 0 32 32" aria-hidden="true">
+                    <circle cx="11" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="21" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M7 16 H5 M27 16 H25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M8 12 L5 16 L8 20 M24 12 L27 16 L24 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Pinch — zoom</span>
+                </li>
+                <li>
+                  <svg class="bd-touch-hints__icon" viewBox="0 0 32 32" aria-hidden="true">
+                    <circle cx="10" cy="20" r="3" fill="currentColor" opacity="0.85"/>
+                    <circle cx="22" cy="12" r="3" fill="currentColor" opacity="0.85"/>
+                    <path d="M14 18 L20 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/>
+                    <path d="M6 20 H26 M22 20 L18 16 M22 20 L18 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Two fingers — pan</span>
+                </li>
+              </ul>
+            </div>
             <div class="bd-legend-box" data-legend-box hidden></div>
             <div class="bd-callout" data-callout hidden>INFLAMMATION SPIKE</div>
           </div>
@@ -176,6 +211,7 @@ export class Dashboard {
             <div class="bd-stat"><span>Allergen particles</span><strong data-allergen>0 →</strong></div>
             <div class="bd-stat" data-commensal-row hidden><span>Commensal count</span><strong data-commensal>0 →</strong></div>
             <div class="bd-stat" data-biofilm-row hidden><span>Biofilm level</span><strong data-biofilm>0%</strong></div>
+            <div class="bd-stat bd-stat--prebiotic" data-prebiotic-stat-row hidden><span>Prebiotic substrate</span><strong data-prebiotic-stat title="Fiber particles in the lumen; % remaining drops as probiotics convert substrate to SCFA">0 →</strong></div>
             <div class="bd-stat" data-postbiotic-row hidden><span>Postbiotic SCFA</span><strong data-postbiotic>0%</strong></div>
           </div>
           <div class="bd-event-log">
@@ -259,6 +295,7 @@ export class Dashboard {
     this.allergenStat = this.root.querySelector('[data-allergen]')!;
     this.commensalStat = this.root.querySelector('[data-commensal]')!;
     this.biofilmStat = this.root.querySelector('[data-biofilm]')!;
+    this.prebioticStat = this.root.querySelector('[data-prebiotic-stat]')!;
     this.postbioticStat = this.root.querySelector('[data-postbiotic]')!;
     this.integrityMeter = this.root.querySelector('[data-integrity-meter]')!;
     this.inflammationMeter = this.root.querySelector('[data-inflammation-meter]')!;
@@ -298,6 +335,7 @@ export class Dashboard {
     this.tissuePictogram = this.root.querySelector('[data-tissue-pictogram]')!;
     this.commensalRow = this.root.querySelector('[data-commensal-row]')!;
     this.biofilmRow = this.root.querySelector('[data-biofilm-row]')!;
+    this.prebioticStatRow = this.root.querySelector('[data-prebiotic-stat-row]')!;
     this.postbioticRow = this.root.querySelector('[data-postbiotic-row]')!;
     this.impactPanel = this.root.querySelector('[data-impact-panel]')!;
     this.impactCloseBtn = this.root.querySelector('[data-impact-close]')!;
@@ -314,6 +352,7 @@ export class Dashboard {
     this.renderEnvControls(this.currentRegion);
     this.renderCatalog();
     this.setMicroView(false);
+    initTouchGestureHints(this.viewport, this.getCanvas());
   }
 
   private setCatalogTab(tab: CatalogTab) {
@@ -671,6 +710,7 @@ export class Dashboard {
 
     this.commensalRow.hidden = presetId !== 'allergy';
     this.biofilmRow.hidden = presetId !== 'candida';
+    this.prebioticStatRow.hidden = presetId !== 'lifecycle';
     this.postbioticRow.hidden = presetId !== 'lifecycle';
 
     this.highlightRegion(regionId);
@@ -850,7 +890,7 @@ export class Dashboard {
     const baseline = region.defaultStrains;
 
     const row = (
-      kind: 'probiotic' | 'pathogen' | 'allergen',
+      kind: 'probiotic' | 'pathogen' | 'allergen' | 'prebiotic',
       label: string,
       entries: { strain: string; count: number }[],
       fallback: string[],
@@ -876,11 +916,13 @@ export class Dashboard {
           : 'Pathogens compete for tight junction attachment sites.';
 
     const prebioticBlock =
-      live && live.prebiotics.length > 0
-        ? `
+      this.currentPreset === 'lifecycle'
+        ? row('prebiotic', 'Prebiotic substrate', live?.prebiotics ?? [], ['inulin'])
+        : live && live.prebiotics.length > 0
+          ? `
           <div class="bd-legend__row prebiotic">● Prebiotic substrate <span class="bd-legend__meta">(${live.prebiotics.length} types · ${totalCells(live.prebiotics)} particles)</span></div>
           <div class="bd-legend__strains bd-legend__strains--prebiotic">${formatStrainList(live.prebiotics)}</div>`
-        : '';
+          : '';
 
     this.legendBox.innerHTML = `
       ${row('probiotic', 'Good Bacteria', live?.probiotics ?? [], baseline.probiotics)}
@@ -959,6 +1001,19 @@ export class Dashboard {
     this.allergenStat.textContent = `${formatPopulation(b.allergenCount)} ${trendLabel(trends.allergen)}`;
     this.commensalStat.textContent = `${formatPopulation(b.commensalCount)} ${trendLabel(trends.commensal)}`;
     this.biofilmStat.textContent = `${Math.round(b.biofilm * 100)}%`;
+
+    const prebioticStrainCount = live.prebiotics.length;
+    const prebioticCountLabel =
+      prebioticStrainCount > 1
+        ? `${prebioticStrainCount} types · ${formatPopulation(b.prebioticCount)}`
+        : formatPopulation(b.prebioticCount);
+    const substratePct = Math.round(b.prebioticSubstrateLevel * 100);
+    const prebioticValue =
+      b.prebioticCount > 0
+        ? `${prebioticCountLabel} · ${substratePct}% left ${trendLabel(trends.prebiotic)}`
+        : `${prebioticCountLabel} ${trendLabel(trends.prebiotic)}`;
+    this.prebioticStat.textContent = prebioticValue;
+
     this.postbioticStat.textContent = `${Math.round(b.postbioticLevel * 100)}%`;
 
     const integrityPct = Math.round(b.integrity * 100);

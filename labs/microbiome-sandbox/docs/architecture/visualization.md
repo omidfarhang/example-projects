@@ -16,6 +16,7 @@ Scene
 ├── TissueLayer (micro)
 │   ├── Epithelium3D (tissue cross-section)
 │   ├── MicrobeMeshes (instanced agents)
+│   ├── ScfaParticleField (SCFA lumen particles)
 │   └── EffectBurst (action rings)
 └── Fog (density tied to inflammation)
 ```
@@ -58,9 +59,19 @@ Scene
 
 - **Macro mode:** orbit full body
 - **Micro mode:** fly-to animation toward tissue-specific focal point
-- **OrbitControls** for user drag in both modes
+- **OrbitControls** for user drag in both modes (mouse on desktop; one-finger orbit, pinch zoom, two-finger pan on touch)
 - `flyToMicro(geometry)` / `flyToMacro()` — animated transitions
 - Separate camera instances or positions per mode
+
+### Touch gesture overlay (VIZ-04)
+
+[`touchGestureHints.ts`](../src/ui/touchGestureHints.ts) shows a dismissible card on coarse-pointer / touch devices:
+
+- One finger — orbit
+- Pinch — zoom
+- Two fingers — pan
+
+Dismissed via close button, first canvas touch, or `sessionStorage` for the rest of the session. Hidden on `(hover: hover) and (pointer: fine)` desktops.
 
 ---
 
@@ -101,9 +112,9 @@ Maps simulation coordinates (x, y, z) to 3D positions on epithelial surface.
 
 | Overlay flag | Biome inputs | Visual effect |
 | --- | --- | --- |
-| `isBiofilm` | biofilm | Opacity = biofilm × 0.45 |
+| `isBiofilm` | biofilm | Opacity via `biofilmVisualOpacity()` — gamma curve keeps low biofilm visible |
 | `isMucus` | moisture, postbioticLevel, inflammation | Mucus layer opacity |
-| `isScfa` | postbioticLevel | SCFA glow opacity + emissive |
+| `isScfa` | postbioticLevel, scfaGlowBoost | SCFA glow opacity + emissive (gut); boosted on level rise |
 | `isSheen` | moisture, ph, integrity | Barrier sheen |
 | `isCerumen` | cerumen, moisture | Ear wax layer |
 | `isSebum` | sebum, sweatRate | Lipid film |
@@ -119,12 +130,26 @@ Maps simulation coordinates (x, y, z) to 3D positions on epithelial surface.
 
 [`MicrobeMeshes.ts`](../src/scene/microbes/MicrobeMeshes.ts):
 
-- **InstancedMesh** buckets by type: probiotic, commensal, pathogen, allergen, prebiotic, other
-- Geometry variants: capsules (probiotic), spiky icosahedra (pathogen), spheres, cylinders
-- Color per type (see [Biotics](../domain/biotics.md))
+- **InstancedMesh** buckets by type: probiotic, commensal, pathogen, yeast, allergen, prebiotic, other
+- Geometry variants:
+  - **Probiotic / commensal** — capsules (rod bacteria)
+  - **Pathogen** — spiky icosahedron (irregular bacterium)
+  - **Yeast** — squashed ellipsoid (budding yeast, separate bucket from pathogens)
+  - **Allergen** — spiky pollen grain (distinct from bacteria)
+  - **Prebiotic** — lime fiber rods (cylinders)
+- Color per type with strain palettes (see [Biotics](../domain/biotics.md))
 - Instance count = live nodes of that type; hidden when vitality low
 
-Postbiotics are **not** instanced — only tissue SCFA overlay.
+Postbiotics are **not** instanced as microbe nodes — they appear as a lumen particle field plus tissue SCFA overlay.
+
+### SCFA lumen particles — ScfaParticleField
+
+[`ScfaParticleField.ts`](../src/scene/ScfaParticleField.ts):
+
+- Up to 48 instanced teal spheres in the lumen volume when `postbioticLevel ≥ 0.1`
+- Particle count, opacity, and vertical band scale with `postbioticLevel`
+- Particles settle toward the mucus/epithelial band as level rises (visual link to barrier glow)
+- When `postbioticLevel` increases, a brief **surge pulse** boosts particle brightness and passes `scfaGlowBoost` to [`Epithelium3D`](../src/scene/epithelium/Epithelium3D.ts) `isScfa` overlay
 
 ---
 

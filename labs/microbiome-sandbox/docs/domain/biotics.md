@@ -125,6 +125,10 @@ When `postbioticLevel > 0.2`:
 
 SCFA stat row visible only when preset is `lifecycle`.
 
+### Visualization
+
+When `postbioticLevel ≥ 0.1`, [`ScfaParticleField.ts`](../../src/scene/ScfaParticleField.ts) renders instanced teal particles in the lumen — count and opacity scale with level. On gut tissue, particles settle toward the epithelial band in sync with the `isScfa` overlay glow.
+
 ---
 
 ## Commensals

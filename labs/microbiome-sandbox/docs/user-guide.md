@@ -72,6 +72,7 @@ Describes the current preset narrative. A link opens the related omid.dev articl
 | **Allergens** | Allergen count × 1000, with trend |
 | **Commensals** | Commensal count × 1000, with trend |
 | **Biofilm** | Biofilm level (0–100%) |
+| **Prebiotic substrate** | Shown only for `lifecycle` preset — fiber particle count, % remaining, trend |
 | **SCFA / Postbiotic** | Shown only for `lifecycle` preset — postbiotic scalar level |
 
 Population numbers use `POPULATION_SCALE = 1000`: the UI displays raw node counts multiplied by 1000 (e.g. 8 nodes → 8k).
