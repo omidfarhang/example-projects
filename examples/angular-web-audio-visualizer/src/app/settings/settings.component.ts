@@ -4,11 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { VisualizationStyle } from '../visualizer/visualizer.component';
 
 @Component({
-  selector: 'app-settings',
-  standalone: true,
-  imports: [FormsModule],
-  templateUrl: './settings.component.html',
-  styleUrl: './settings.component.css',
+    selector: 'app-settings',
+    imports: [FormsModule],
+    templateUrl: './settings.component.html',
+    styleUrl: './settings.component.css'
 })
 export class SettingsComponent {
   styles: VisualizationStyle[] = ['Bar', 'Circular', 'Waveform'];

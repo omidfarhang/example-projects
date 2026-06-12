@@ -4,7 +4,7 @@ Companion project for [Building a Real-Time Collaborative Editor with Angular, F
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 24+
 - A Firebase project with **Anonymous Authentication** and **Cloud Firestore** enabled
 
 ## Setup

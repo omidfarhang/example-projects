@@ -78,11 +78,11 @@ Most frontend examples are Angular apps and open on `http://localhost:4200`. Som
 
 ## Common Requirements
 
-- Node.js 20+ and npm for most JavaScript and Angular examples. If you use `nvm`, run `nvm use` from the repository root.
-- Angular CLI 18+ for Angular projects:
+- Node.js 24+ and npm for most JavaScript and Angular examples. If you use `nvm`, run `nvm use` from the repository root.
+- Angular CLI 20+ for Angular projects:
 
 ```bash
-npm install -g @angular/cli@18
+npm install -g @angular/cli@20
 ```
 
 - Rust, `wasm-pack`, Python, `uv`, or Firebase access only for projects that explicitly mention them in their README.

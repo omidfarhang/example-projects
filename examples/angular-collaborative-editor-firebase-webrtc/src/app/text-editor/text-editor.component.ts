@@ -11,11 +11,10 @@ interface CollaborativeDocument {
 }
 
 @Component({
-  selector: 'app-text-editor',
-  standalone: true,
-  imports: [ReactiveFormsModule],
-  templateUrl: './text-editor.component.html',
-  styleUrl: './text-editor.component.css',
+    selector: 'app-text-editor',
+    imports: [ReactiveFormsModule],
+    templateUrl: './text-editor.component.html',
+    styleUrl: './text-editor.component.css'
 })
 export class TextEditorComponent implements OnInit, OnDestroy {
   private readonly firestore = inject(Firestore);

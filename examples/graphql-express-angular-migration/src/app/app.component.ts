@@ -5,11 +5,10 @@ import { FormsModule } from '@angular/forms';
 import { User, UsersApiService } from './users-api.service';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [FormsModule, UpperCasePipe],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+    selector: 'app-root',
+    imports: [FormsModule, UpperCasePipe],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
   private readonly api = inject(UsersApiService);

@@ -2,7 +2,7 @@
 
 Companion project for [Integrating GraphQL with Angular: A Practical Guide](https://omid.dev/2024/06/01/integrating-graphql-with-angular-a-practical-guide/).
 
-Includes a minimal GraphQL server and an Angular 18 client using Apollo.
+Includes a minimal GraphQL server and an Angular 20 client using Apollo.
 
 ## Run
 

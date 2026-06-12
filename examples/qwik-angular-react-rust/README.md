@@ -21,7 +21,7 @@ Each micro frontend builds into `qwik-micro-frontend/public/mfes/`. The shell lo
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 24+
 - Rust toolchain and `wasm-pack` (optional, for `rust-wasm`)
 
 ## Run locally

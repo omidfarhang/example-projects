@@ -9,13 +9,13 @@ This repository is a collection of small, self-contained projects under `example
 Good contributions include:
 
 - Fixing examples that no longer install, build, or match the linked article.
-- Updating dependencies when the change keeps the example easy to follow.
+- Updating dependencies when the change keeps the example easy to follow. Demos track the current Node LTS and supported Angular LTS; linked articles may reference the versions at publish time.
 - Improving local setup instructions.
 - Adding a new example under `examples/<slug>/` for a post that needs runnable source code.
 
 ## Local Setup
 
-Use Node.js 20 for JavaScript and Angular examples:
+Use Node.js 24 for JavaScript and Angular examples:
 
 ```bash
 nvm use

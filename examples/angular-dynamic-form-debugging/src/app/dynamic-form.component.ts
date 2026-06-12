@@ -4,10 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FormFieldMetadata, buildControlsBuggy, buildControlsFixed, sampleMetadata } from './form-builder';
 
 @Component({
-  selector: 'app-dynamic-form',
-  standalone: true,
-  imports: [ReactiveFormsModule],
-  template: `
+    selector: 'app-dynamic-form',
+    imports: [ReactiveFormsModule],
+    template: `
     <section class="debug-panel" aria-live="polite">
       <strong>{{ modeLabel }}</strong>
       <span>Metadata fields: {{ fields.length }}</span>
@@ -41,8 +40,8 @@ import { FormFieldMetadata, buildControlsBuggy, buildControlsFixed, sampleMetada
       <p>Loading metadata...</p>
     }
   `,
-  styles: [
-    `
+    styles: [
+        `
       form {
         display: grid;
         gap: 0.75rem;
@@ -75,7 +74,7 @@ import { FormFieldMetadata, buildControlsBuggy, buildControlsFixed, sampleMetada
         background: #fff8ed;
       }
     `,
-  ],
+    ]
 })
 export class DynamicFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);

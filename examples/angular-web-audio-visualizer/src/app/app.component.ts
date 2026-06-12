@@ -5,11 +5,10 @@ import { SettingsComponent } from './settings/settings.component';
 import { VisualizerComponent, VisualizationStyle } from './visualizer/visualizer.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [AudioPlayerComponent, SettingsComponent, VisualizerComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+    selector: 'app-root',
+    imports: [AudioPlayerComponent, SettingsComponent, VisualizerComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css'
 })
 export class AppComponent {
   selectedStyle: VisualizationStyle = 'Bar';

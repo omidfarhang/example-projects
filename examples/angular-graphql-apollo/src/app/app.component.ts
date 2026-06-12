@@ -4,11 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { GraphqlService, Item } from './graphql.service';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [FormsModule],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+    selector: 'app-root',
+    imports: [FormsModule],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
   private readonly graphqlService = inject(GraphqlService);

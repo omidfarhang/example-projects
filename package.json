@@ -8,6 +8,6 @@
     "build:playground:one": "node playground/scripts/build.mjs --only"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   }
 }

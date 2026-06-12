@@ -4,11 +4,11 @@ Companion project for [Creating Dynamic Music Visualizations with Angular and th
 
 **Live demo:** https://playground.omid.dev/examples/angular-web-audio-visualizer/ (prebuilt on [playground.omid.dev](https://playground.omid.dev))
 
-Angular 18 app with bar, circular, and waveform visualizations powered by the Web Audio API.
+Angular 20 app with bar, circular, and waveform visualizations powered by the Web Audio API.
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 24+
 - npm
 
 ## Setup

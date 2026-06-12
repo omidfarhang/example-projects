@@ -34,7 +34,7 @@ export class AudioService {
     if (!this.analyser || !this.dataArray) {
       return new Uint8Array(0);
     }
-    this.analyser.getByteFrequencyData(this.dataArray);
+    this.analyser.getByteFrequencyData(this.dataArray as Uint8Array<ArrayBuffer>);
     return this.dataArray;
   }
 

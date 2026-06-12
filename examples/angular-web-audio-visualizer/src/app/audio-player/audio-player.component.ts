@@ -5,11 +5,10 @@ import { faPause, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { AudioService } from '../audio.service';
 
 @Component({
-  selector: 'app-audio-player',
-  standalone: true,
-  imports: [FaIconComponent],
-  templateUrl: './audio-player.component.html',
-  styleUrl: './audio-player.component.css',
+    selector: 'app-audio-player',
+    imports: [FaIconComponent],
+    templateUrl: './audio-player.component.html',
+    styleUrl: './audio-player.component.css'
 })
 export class AudioPlayerComponent implements OnDestroy, OnInit {
   @ViewChild('audio', { static: true }) audioRef!: ElementRef<HTMLAudioElement>;

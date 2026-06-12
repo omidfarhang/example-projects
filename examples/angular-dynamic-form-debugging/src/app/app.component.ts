@@ -3,10 +3,9 @@ import { Component, signal } from '@angular/core';
 import { DynamicFormComponent } from './dynamic-form.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [DynamicFormComponent],
-  template: `
+    selector: 'app-root',
+    imports: [DynamicFormComponent],
+    template: `
     <main class="layout">
       <h1>Dynamic Form Debugging</h1>
       <p>
@@ -20,8 +19,8 @@ import { DynamicFormComponent } from './dynamic-form.component';
       <app-dynamic-form [useBuggyFlow]="buggy()" />
     </main>
   `,
-  styles: [
-    `
+    styles: [
+        `
       .layout {
         max-width: 640px;
         margin: 2rem auto;
@@ -34,7 +33,7 @@ import { DynamicFormComponent } from './dynamic-form.component';
         margin-top: 1rem;
       }
     `,
-  ],
+    ]
 })
 export class AppComponent {
   readonly buggy = signal(false);
