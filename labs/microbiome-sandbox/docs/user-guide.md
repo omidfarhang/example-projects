@@ -81,10 +81,10 @@ Population numbers use `POPULATION_SCALE = 1000`: the UI displays raw node count
 
 Below the blog CTA:
 
-- **Copy lab link** — copies a shareable URL with preset, region, biome scalars, simulation tick, and microbe positions encoded in the `lab` query parameter (plus readable `integrity`, `inflammation`, `tick` hints).
+- **Copy lab link** — copies a shareable URL: `preset`, `region`, and `context` in the query string; the full checkpoint lives in the `#lab=` **URL hash** (not sent to the server — avoids HTTP 431 errors from oversized URLs).
 - **Resume session** — after a refresh, if you had meaningful progress, a banner offers to restore the last autosaved snapshot from browser `localStorage` (dismiss with **Start fresh**).
 
-The lab autosaves every ~12 seconds once the simulation has run for a few seconds. Opening a shared `?lab=` link restores mid-simulation state directly.
+The lab autosaves every ~12 seconds once the simulation has run for a few seconds. Opening a shared link with `#lab=…` restores mid-simulation state in the browser.
 
 ### Event log
 
@@ -152,10 +152,7 @@ Share scenarios with query parameters:
 | `preset` | `allergy`, `candida`, `lifecycle` | `allergy` |
 | `region` | `ear`, `scalp`, `nose`, `oral`, `skin`, `vaginal`, `gut` | Preset default region |
 | `context` | `lifestage` (allergy only) | — |
-| `lab` | Base64url-encoded checkpoint (from **Copy lab link**) | — |
-| `tick` | Simulation tick (readable hint when sharing) | — |
-| `integrity` | Barrier integrity 0–1 (readable hint) | — |
-| `inflammation` | Inflammation 0–1 (readable hint) | — |
+| `#lab` | Base64url checkpoint in URL **hash** (from **Copy lab link**) | — |
 | `lang` | `en`, `de`, `fa` | browser default |
 
 Example full URL:

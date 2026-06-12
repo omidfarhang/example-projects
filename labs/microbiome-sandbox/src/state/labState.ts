@@ -2,13 +2,14 @@ import { REGION_ENV_CONTROLS, type EnvVarId } from '../data/envVars';
 import { PRESETS, type PresetId } from '../data/presets';
 import type { RegionId } from '../data/regions';
 import type { SimEngine } from '../sim/engine';
-import type { BiomeState, MicrobeNode } from '../sim/types';
+import type { BiomeState, MicrobeNode, MicrobeType } from '../sim/types';
 
 export const LAB_STATE_VERSION = 1 as const;
 export const STORAGE_KEY = 'bd-lab-session';
 export const RESUME_DISMISS_KEY = 'bd-resume-dismissed';
 export const MAX_STORED_EVENTS = 60;
 export const RESUME_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const HASH_LAB_PREFIX = 'lab=';
 
 /** Serializable mid-simulation checkpoint (STATE-01 / STATE-02). */
 export interface LabStateV1 {
@@ -40,25 +41,46 @@ export interface LabStateMeta {
   savedAt: number;
 }
 
-const BIOME_CHECKPOINT_KEYS = [
-  'integrity',
-  'inflammation',
-  'immuneActivity',
-  'biofilm',
-  'sugarLoad',
-  'postbioticLevel',
-] as const;
+/** Compact node tuple for smaller share payloads. */
+type CompactNode = [number, MicrobeType, string, number, number, number, number, number, number];
 
-function round4(n: number): number {
-  return Math.round(n * 10000) / 10000;
+function round3(n: number): number {
+  return Math.round(n * 1000) / 1000;
 }
 
-function extractEnv(biome: BiomeState, region: RegionId): Partial<Record<EnvVarId, number>> {
-  const env: Partial<Record<EnvVarId, number>> = {};
-  for (const id of REGION_ENV_CONTROLS[region]) {
-    env[id] = round4(biome[id] as number);
-  }
-  return env;
+function compactNodes(nodes: MicrobeNode[]): CompactNode[] {
+  return nodes.map((n) => [
+    n.id,
+    n.type,
+    n.strain,
+    round3(n.vitality),
+    round3(n.x),
+    round3(n.y),
+    round3(n.z),
+    round3(n.vx),
+    round3(n.vy),
+  ]);
+}
+
+function expandNodes(raw: unknown): MicrobeNode[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((entry) => {
+    if (Array.isArray(entry) && entry.length >= 9) {
+      const [id, type, strain, vitality, x, y, z, vx, vy] = entry;
+      return {
+        id: Number(id),
+        type: type as MicrobeType,
+        strain: String(strain),
+        vitality: Number(vitality),
+        x: Number(x),
+        y: Number(y),
+        z: Number(z),
+        vx: Number(vx),
+        vy: Number(vy),
+      };
+    }
+    return entry as MicrobeNode;
+  });
 }
 
 export function buildLabState(
@@ -145,13 +167,40 @@ function parseLabState(raw: unknown): LabStateV1 | null {
     nextMealIndex: Number(o.nextMealIndex ?? 0),
     env: (o.env as Partial<Record<EnvVarId, number>>) ?? {},
     biome,
-    nodes: o.nodes as MicrobeNode[],
-    events: Array.isArray(o.events) ? (o.events as string[]) : [],
+    nodes: expandNodes(o.nodes),
+    events: Array.isArray(o.events) ? (o.events as string[]).slice(-MAX_STORED_EVENTS) : [],
   };
 }
 
+/** JSON payload for encode — compact node tuples, trimmed events. */
+function serializeForWire(state: LabStateV1): string {
+  return JSON.stringify({
+    v: state.v,
+    savedAt: state.savedAt,
+    preset: state.preset,
+    region: state.region,
+    context: state.context,
+    tick: state.tick,
+    nextId: state.nextId,
+    allergenAdhesion: round3(state.allergenAdhesion),
+    dayNumber: state.dayNumber,
+    nextMealIndex: state.nextMealIndex,
+    env: state.env,
+    biome: {
+      integrity: round3(state.biome.integrity),
+      inflammation: round3(state.biome.inflammation),
+      immuneActivity: round3(state.biome.immuneActivity),
+      biofilm: round3(state.biome.biofilm),
+      sugarLoad: round3(state.biome.sugarLoad),
+      postbioticLevel: round3(state.biome.postbioticLevel),
+    },
+    nodes: compactNodes(state.nodes),
+    events: state.events.slice(-30),
+  });
+}
+
 export function encodeLabState(state: LabStateV1): string {
-  return encodeBase64Url(JSON.stringify(state));
+  return encodeBase64Url(serializeForWire(state));
 }
 
 export function decodeLabState(encoded: string): LabStateV1 | null {
@@ -164,42 +213,90 @@ export function decodeLabState(encoded: string): LabStateV1 | null {
   }
 }
 
-/** Build share URL with preset/region/context + compact `lab` blob (STATE-01 / STATE-02). */
+function readLabPayload(url: URL): string | null {
+  if (url.hash.startsWith(`#${HASH_LAB_PREFIX}`)) {
+    return url.hash.slice(HASH_LAB_PREFIX.length + 1);
+  }
+  return url.searchParams.get('lab');
+}
+
+function applyBrowseParams(state: LabStateV1, url: URL): void {
+  const preset = url.searchParams.get('preset');
+  const region = url.searchParams.get('region');
+  if (preset && isPresetId(preset)) state.preset = preset;
+  if (region && isRegionId(region)) state.region = region;
+  const context = url.searchParams.get('context');
+  state.context = context ?? undefined;
+}
+
+/** Strip oversized legacy query params (fixes HTTP 431 on reload). */
+export function stripLegacyLabQuery(): void {
+  const url = new URL(window.location.href);
+  if (
+    !url.searchParams.has('lab') &&
+    !url.searchParams.has('tick') &&
+    !url.searchParams.has('integrity') &&
+    !url.searchParams.has('inflammation')
+  ) {
+    return;
+  }
+  url.searchParams.delete('lab');
+  url.searchParams.delete('tick');
+  url.searchParams.delete('integrity');
+  url.searchParams.delete('inflammation');
+  window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+}
+
+/**
+ * Share URL: preset/region/context in query; full checkpoint in `#lab=` hash.
+ * Hash is not sent to the server — avoids HTTP 431 from oversized request lines.
+ */
 export function buildShareUrl(state: LabStateV1, baseUrl = window.location.href): string {
   const url = new URL(baseUrl);
   url.searchParams.set('preset', state.preset);
   url.searchParams.set('region', state.region);
   if (state.context) url.searchParams.set('context', state.context);
   else url.searchParams.delete('context');
-
-  url.searchParams.set('tick', String(Math.round(state.tick)));
-  url.searchParams.set('integrity', round4(state.biome.integrity).toString());
-  url.searchParams.set('inflammation', round4(state.biome.inflammation).toString());
-  url.searchParams.set('lab', encodeLabState(state));
-
+  url.searchParams.delete('lab');
+  url.searchParams.delete('tick');
+  url.searchParams.delete('integrity');
+  url.searchParams.delete('inflammation');
+  url.hash = `${HASH_LAB_PREFIX}${encodeLabState(state)}`;
   return url.toString();
 }
 
-export function parseLabFromUrl(search = window.location.search): LabStateV1 | null {
-  const params = new URLSearchParams(search);
-  const encoded = params.get('lab');
+export function parseLabFromUrl(href = window.location.href): LabStateV1 | null {
+  const url = new URL(href);
+  const encoded = readLabPayload(url);
   if (!encoded) return null;
   const state = decodeLabState(encoded);
   if (!state) return null;
-
-  const preset = params.get('preset');
-  const region = params.get('region');
-  if (preset && isPresetId(preset)) state.preset = preset;
-  if (region && isRegionId(region)) state.region = region;
-  const context = params.get('context');
-  state.context = context ?? undefined;
-
+  applyBrowseParams(state, url);
   return state;
+}
+
+export function hasLabCheckpoint(href = window.location.href): boolean {
+  const url = new URL(href);
+  return Boolean(readLabPayload(url));
+}
+
+/** Sync only lightweight browse params — never put checkpoint blob in query string. */
+export function syncBrowseParams(preset: PresetId, region: RegionId, context?: string): void {
+  const url = new URL(window.location.href);
+  url.searchParams.set('preset', preset);
+  url.searchParams.set('region', region);
+  if (context) url.searchParams.set('context', context);
+  else url.searchParams.delete('context');
+  url.searchParams.delete('lab');
+  url.searchParams.delete('tick');
+  url.searchParams.delete('integrity');
+  url.searchParams.delete('inflammation');
+  window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
 }
 
 export function saveLabStateToStorage(state: LabStateV1): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, serializeForWire(state));
   } catch {
     /* quota / private mode */
   }
@@ -239,23 +336,9 @@ export function dismissResumePrompt(): void {
   }
 }
 
-/** Offer resume when local snapshot is meaningfully ahead of a fresh URL load (STATE-03). */
 export function shouldOfferResume(stored: LabStateV1, hasUrlLab: boolean): boolean {
   if (hasUrlLab || isResumeDismissed()) return false;
   if (Date.now() - stored.savedAt > RESUME_MAX_AGE_MS) return false;
   if (stored.tick < 180 && stored.events.length < 2) return false;
   return true;
-}
-
-export function syncUrlFromLabState(state: LabStateV1): void {
-  const url = new URL(window.location.href);
-  url.searchParams.set('preset', state.preset);
-  url.searchParams.set('region', state.region);
-  if (state.context) url.searchParams.set('context', state.context);
-  else url.searchParams.delete('context');
-  url.searchParams.set('tick', String(Math.round(state.tick)));
-  url.searchParams.set('integrity', round4(state.biome.integrity).toString());
-  url.searchParams.set('inflammation', round4(state.biome.inflammation).toString());
-  url.searchParams.set('lab', encodeLabState(state));
-  window.history.replaceState(null, '', url.toString());
 }

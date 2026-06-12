@@ -108,8 +108,7 @@ Parsed on load by [`parseUrlState()`](../src/data/presets.ts) and [`parseLabFrom
 | `preset` | `allergy`, `candida`, `lifecycle` | `allergy` |
 | `region` | `ear`, `scalp`, `nose`, `oral`, `skin`, `vaginal`, `gut` | Preset's `defaultRegion` |
 | `context` | `lifestage` (allergy preset) | — |
-| `lab` | Full checkpoint (share link) | — |
-| `integrity`, `inflammation`, `tick` | Human-readable hints alongside `lab` | — |
+| `#lab` | Full checkpoint in URL hash (share links) | — |
 
 Examples:
 

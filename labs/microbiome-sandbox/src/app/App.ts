@@ -11,11 +11,13 @@ import {
   buildShareUrl,
   clearStoredLabState,
   dismissResumePrompt,
+  hasLabCheckpoint,
   loadStoredLabState,
   parseLabFromUrl,
   saveLabStateToStorage,
   shouldOfferResume,
-  syncUrlFromLabState,
+  stripLegacyLabQuery,
+  syncBrowseParams,
   type LabStateV1,
 } from '../state/labState';
 import { Dashboard } from '../ui/Dashboard';
@@ -35,6 +37,7 @@ export class App {
   private restoredFromShare = false;
 
   constructor(mount: HTMLElement) {
+    stripLegacyLabQuery();
     const url = parseUrlState();
     const urlLab = parseLabFromUrl();
     const stored = loadStoredLabState();
@@ -73,7 +76,7 @@ export class App {
     } else {
       const presetDef = PRESETS[this.preset];
       this.engine.setPreset(this.preset, presetDef.env);
-      if (stored && shouldOfferResume(stored, false)) {
+      if (stored && shouldOfferResume(stored, hasLabCheckpoint())) {
         this.dashboard.showResumePrompt(stored);
       }
     }
@@ -108,7 +111,7 @@ export class App {
     this.dashboard.applyContext(state.context);
     this.dashboard.setRegionActions(state.region);
     this.dashboard.syncEnvSliders(this.engine.biome, state.region);
-    syncUrlFromLabState(state);
+    syncBrowseParams(state.preset, state.region, state.context);
   }
 
   private resumeStoredSession() {
@@ -129,9 +132,7 @@ export class App {
   }
 
   private persistLabState() {
-    const state = buildLabState(this.engine, this.preset, this.context);
-    saveLabStateToStorage(state);
-    syncUrlFromLabState(state);
+    saveLabStateToStorage(buildLabState(this.engine, this.preset, this.context));
     this.lastAutosaveAt = performance.now();
   }
 
@@ -156,7 +157,7 @@ export class App {
       this.dashboard.showShareFeedback('manual');
       window.prompt('Copy lab link:', url);
     }
-    syncUrlFromLabState(state);
+    window.history.replaceState(null, '', url);
     saveLabStateToStorage(state);
   }
 
@@ -268,18 +269,7 @@ export class App {
   }
 
   private syncUrlParams() {
-    const params = new URLSearchParams(window.location.search);
-    params.set('preset', this.preset);
-    params.set('region', this.region);
-    if (this.context) params.set('context', this.context);
-    else params.delete('context');
-    params.delete('lab');
-    params.delete('tick');
-    params.delete('integrity');
-    params.delete('inflammation');
-    const query = params.toString();
-    const next = `${window.location.pathname}${query ? `?${query}` : ''}`;
-    window.history.replaceState(null, '', next);
+    syncBrowseParams(this.preset, this.region, this.context);
   }
 
   private loop() {
