@@ -14,26 +14,37 @@ export function createLumenChamber(kind: EpitheliumKind = 'sinus'): THREE.Group 
 
   if (kind === 'gut') {
     const backdrop = new THREE.Mesh(
-      new THREE.PlaneGeometry(5, 3.2),
-      new THREE.MeshStandardMaterial({ color: 0x1a1028, roughness: 1 }),
+      new THREE.PlaneGeometry(6, 2.6),
+      new THREE.MeshStandardMaterial({ color: 0x120818, roughness: 1 }),
     );
-    backdrop.position.set(0, 0.85, -0.55);
+    backdrop.position.set(0, 0.52, -0.5);
     group.add(backdrop);
 
-    const wash = new THREE.Mesh(
-      new THREE.PlaneGeometry(4.2, 2.4),
-      new THREE.MeshBasicMaterial({ color: 0xe8a0a0, transparent: true, opacity: 0.06 }),
+    const chyme = new THREE.Mesh(
+      new THREE.PlaneGeometry(5.4, 0.72),
+      new THREE.MeshBasicMaterial({ color: 0xc87858, transparent: true, opacity: 0.07 }),
     );
-    wash.position.set(0, 0.75, -0.48);
-    group.add(wash);
+    chyme.position.set(0, 0.92, -0.44);
+    group.add(chyme);
 
-    const arcPts: THREE.Vector3[] = [];
-    for (let i = 0; i <= 24; i++) {
-      const t = i / 24;
-      const angle = Math.PI * (1 - t);
-      arcPts.push(new THREE.Vector3(Math.cos(angle) * 1.1, 0.22 + Math.sin(angle) * 1.1, -0.42));
+    for (let i = 0; i < 4; i++) {
+      const ly = 0.82 + i * 0.08;
+      group.add(
+        diagramLine(
+          [new THREE.Vector3(-2.5, ly, -0.42), new THREE.Vector3(2.5, ly, -0.42)],
+          0xd89070,
+          0.12,
+        ),
+      );
     }
-    group.add(diagramLine(arcPts, 0xf0a8a0, 0.28));
+
+    group.add(
+      diagramLine(
+        [new THREE.Vector3(-2.5, 0.38, -0.42), new THREE.Vector3(2.5, 0.38, -0.42)],
+        0xa86860,
+        0.22,
+      ),
+    );
   } else if (kind === 'skin') {
     const backdrop = new THREE.Mesh(
       new THREE.PlaneGeometry(6, 2.8),

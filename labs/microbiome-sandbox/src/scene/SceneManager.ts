@@ -136,6 +136,7 @@ export class SceneManager {
 
     this.microGeometry = region.microGeometry;
     this.tissue.setGeometry(region.microGeometry);
+    this.burst.setTissueKind(region.microGeometry);
     this.tissue.show();
     this.cameraRig.flyToMicro(region.microGeometry);
   }

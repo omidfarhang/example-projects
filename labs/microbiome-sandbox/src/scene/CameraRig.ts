@@ -5,7 +5,7 @@ import type { EpitheliumKind } from './epithelium/types';
 export type ViewMode = 'macro' | 'micro';
 
 const MICRO_FRAMES: Record<EpitheliumKind, { pos: THREE.Vector3; target: THREE.Vector3 }> = {
-  gut: { pos: new THREE.Vector3(0, 0.82, 2.2), target: new THREE.Vector3(0, 0.72, 0) },
+  gut: { pos: new THREE.Vector3(0, 0.52, 2.05), target: new THREE.Vector3(0, 0.48, 0) },
   skin: { pos: new THREE.Vector3(0, 0.34, 1.95), target: new THREE.Vector3(0, 0.3, 0) },
   sinus: { pos: new THREE.Vector3(0, 0.58, 2.3), target: new THREE.Vector3(0, 0.48, 0) },
 };

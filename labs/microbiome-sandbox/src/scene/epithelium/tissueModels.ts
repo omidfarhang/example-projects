@@ -37,102 +37,131 @@ function mucusSheet(w: number, h: number, y: number, z: number) {
 }
 
 /**
- * GUT — U-shaped wall with vertical finger villi rooted on the inner mucosa.
- * Villi extend straight up (+Y); no lookAt tilting.
+ * GUT — textbook longitudinal small-intestine mucosa (matches skin layer clarity):
+ * muscularis → submucosa → muscularis mucosae → lamina propria → villi & crypts → lumen.
  */
 export function buildGutTissue(): TissueBuildResult {
   const group = new THREE.Group();
   const overlays: THREE.Mesh[] = [];
   const inflamedMeshes: THREE.Mesh[] = [];
+  const W = 5.2;
 
-  const baseY = 0.18;
-  const tubeR = 1.42;
-  const innerR = tubeR - 0.3;
+  const layers: { name: string; h: number; color: number }[] = [
+    { name: 'muscularis', h: 0.18, color: P.muscularis },
+    { name: 'submucosa', h: 0.1, color: P.laminaDeep },
+    { name: 'muscularisMucosae', h: 0.022, color: 0x6a3848 },
+    { name: 'laminaPropria', h: 0.08, color: P.villusCore },
+  ];
 
-  const muscle = new THREE.Mesh(
-    new THREE.TorusGeometry(tubeR, 0.22, 14, 56, Math.PI),
-    mat(P.muscularis, { roughness: 0.82 }),
-  );
-  muscle.position.set(0, baseY, 0);
-  group.add(muscle, outline(muscle, 0x8a5868, 0.45));
+  let y = 0;
+  for (const layer of layers) {
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(W, layer.h, DEPTH), mat(layer.color, { roughness: layer.name === 'muscularis' ? 0.78 : 0.55 }));
+    slab.position.set(0, y + layer.h / 2, 0);
+    group.add(slab, outline(slab, layer.name === 'muscularis' ? 0x8a5868 : 0xa07068, 0.35));
 
-  const submucosa = new THREE.Mesh(
-    new THREE.TorusGeometry(tubeR - 0.17, 0.075, 10, 48, Math.PI),
-    mat(P.laminaDeep),
-  );
-  submucosa.position.set(0, baseY + 0.02, 0.03);
-  group.add(submucosa);
+    if (layer.name === 'muscularis') {
+      for (let i = 0; i < 7; i++) {
+        const ring = new THREE.Mesh(
+          new THREE.TorusGeometry(0.012, 0.003, 4, 8),
+          mat(0x5a3040, { roughness: 0.9 }),
+        );
+        ring.rotation.y = Math.PI / 2;
+        ring.position.set(-W / 2 + 0.35 + i * ((W - 0.7) / 6), y + layer.h / 2, (i % 2) * 0.04 - 0.02);
+        group.add(ring);
+      }
+    }
 
-  const mucosa = new THREE.Mesh(
-    new THREE.TorusGeometry(innerR, 0.04, 8, 48, Math.PI),
-    mat(P.villusEpi),
-  );
-  mucosa.position.set(0, baseY + 0.03, 0.05);
-  group.add(mucosa);
+    if (layer.name === 'submucosa') {
+      for (let i = 0; i < 5; i++) {
+        const vessel = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.012, 0.012, layer.h * 0.7, 6),
+          mat(P.capillary, { roughness: 0.35 }),
+        );
+        vessel.rotation.z = Math.PI / 2;
+        vessel.position.set(-W / 2 + 0.6 + i * 0.95, y + layer.h / 2, 0.04);
+        group.add(vessel);
+      }
+    }
 
-  const villusCount = 13;
-  const villusLen = 0.36;
-  const villusR = 0.068;
-  let maxVillusTop = 0;
+    y += layer.h;
+  }
+
+  const mucosalSurfaceY = y;
+  const villusCount = 11;
+  const margin = 0.32;
+  const pitch = (W - margin * 2) / (villusCount - 1);
+  let maxVillusTop = mucosalSurfaceY;
 
   for (let i = 0; i < villusCount; i++) {
-    const t = i / (villusCount - 1);
-    const angle = Math.PI * (1 - t);
-    const bx = Math.cos(angle) * innerR;
-    const by = baseY + Math.sin(angle) * innerR;
-    const inflamed = i >= 4 && i <= 8;
-    const tipY = by + villusR * 2 + villusLen;
+    const vx = -W / 2 + margin + i * pitch;
+    const inflamed = i >= 3 && i <= 7;
+    const villusH = 0.3 + (i % 3) * 0.07;
+    const villusR = 0.052;
+    const tipY = mucosalSurfaceY + villusR * 2 + villusH;
     maxVillusTop = Math.max(maxVillusTop, tipY);
 
     const villus = new THREE.Mesh(
-      new THREE.CapsuleGeometry(villusR, villusLen, 10, 14),
+      new THREE.CapsuleGeometry(villusR, villusH, 10, 14),
       mat(inflamed ? P.cytoplasmDeep : P.villusEpi),
     );
-    villus.position.set(bx, by + villusR + villusLen * 0.5, 0.07);
+    villus.position.set(vx, mucosalSurfaceY + villusR + villusH * 0.5, 0.06);
     group.add(villus, outline(villus, 0xe89090, 0.38));
     if (inflamed) {
       villus.userData.baseColor = P.villusEpi;
       inflamedMeshes.push(villus);
     }
 
-    const core = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.028, villusLen * 0.65, 6, 8),
-      mat(P.lacteal, { roughness: 0.28 }),
+    const brushBorder = new THREE.Mesh(
+      new THREE.TorusGeometry(villusR * 0.92, 0.006, 6, 16),
+      mat(0xfff8f0, { roughness: 0.25 }),
     );
-    core.position.set(bx, by + villusR + villusLen * 0.42, 0.09);
-    group.add(core);
+    brushBorder.rotation.x = Math.PI / 2;
+    brushBorder.position.set(vx, tipY - 0.01, 0.1);
+    group.add(brushBorder);
+
+    const lacteal = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.018, villusH * 0.72, 6, 8),
+      mat(P.lacteal, { roughness: 0.22 }),
+    );
+    lacteal.position.set(vx, mucosalSurfaceY + villusR + villusH * 0.44, 0.08);
+    group.add(lacteal);
+
+    const capillary = new THREE.Mesh(
+      new THREE.TorusGeometry(villusR * 0.55, 0.005, 4, 10),
+      mat(P.capillary, { roughness: 0.4 }),
+    );
+    capillary.rotation.x = Math.PI / 2;
+    capillary.position.set(vx, mucosalSurfaceY + villusR * 1.6, 0.07);
+    group.add(capillary);
 
     if (i % 2 === 1) {
-      const t2 = (i - 0.5) / (villusCount - 1);
-      const a2 = Math.PI * (1 - t2);
-      const cx = Math.cos(a2) * (innerR - 0.04);
-      const cy = baseY + Math.sin(a2) * (innerR - 0.04);
+      const cx = vx - pitch * 0.5;
       const crypt = new THREE.Mesh(
-        new THREE.BoxGeometry(0.09, 0.05, DEPTH * 0.45),
+        new THREE.BoxGeometry(pitch * 0.55, 0.055, DEPTH * 0.55),
         mat(P.crypt),
       );
-      crypt.position.set(cx, cy - 0.02, 0.05);
-      group.add(crypt);
+      crypt.position.set(cx, mucosalSurfaceY - 0.028, 0.04);
+      group.add(crypt, outline(crypt, 0x6a3848, 0.3));
     }
   }
 
-  const lumenY = maxVillusTop + 0.12;
+  const lumenFloor = maxVillusTop + 0.04;
   const lumen = new THREE.Mesh(
-    new THREE.PlaneGeometry(tubeR * 1.35, tubeR * 0.75),
-    mat(0x0c2848, { transparent: true, opacity: 0.48, side: THREE.DoubleSide }),
+    new THREE.PlaneGeometry(W * 0.96, 0.55),
+    mat(0x1a3858, { transparent: true, opacity: 0.42, side: THREE.DoubleSide, depthWrite: false }),
   );
-  lumen.position.set(0, lumenY, -0.02);
+  lumen.position.set(0, lumenFloor + 0.28, -0.02);
   group.add(lumen);
 
-  const mucus = mucusSheet(2.5, 0.95, lumenY + 0.35, 0.06);
+  const mucus = mucusSheet(W * 0.88, 0.22, lumenFloor + 0.06, 0.1);
   group.add(mucus);
   overlays.push(mucus);
 
   const scfa = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.2, 0.75),
+    new THREE.PlaneGeometry(W * 0.82, 0.38),
     mat(0x2dd4bf, { transparent: true, opacity: 0, emissive: 0x2dd4bf, emissiveIntensity: 0 }),
   );
-  scfa.position.set(0, lumenY + 0.55, 0.07);
+  scfa.position.set(0, lumenFloor + 0.22, 0.11);
   scfa.userData.isScfa = true;
   group.add(scfa);
   overlays.push(scfa);
@@ -400,8 +429,64 @@ export function buildNasalTissue(): TissueBuildResult {
   return { group, inflamedMeshes, overlays, kind: 'sinus' };
 }
 
-export const LUMEN_BOUNDS: Record<EpitheliumKind, { yMin: number; yMax: number; allergenBase: number }> = {
-  gut: { yMin: 0.95, yMax: 1.85, allergenBase: 1.7 },
-  skin: { yMin: 0.48, yMax: 1.35, allergenBase: 1.25 },
-  sinus: { yMin: 0.55, yMax: 1.45, allergenBase: 1.35 },
+/** 3D volume where microbes swim, aligned to each tissue cross-section. */
+export interface LumenBounds {
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+  zMin: number;
+  zMax: number;
+  /** Epithelial attachment band — commensals & pathogens dock here. */
+  epithelialY: number;
+  /** Mucus / sebum layer — probiotics colonize here. */
+  mucusY: number;
+  allergenBase: number;
+  allergenHeight: number;
+}
+
+export const LUMEN_BOUNDS: Record<EpitheliumKind, LumenBounds> = {
+  sinus: {
+    xMin: -2.35,
+    xMax: 2.35,
+    yMin: 0.52,
+    yMax: 1.32,
+    zMin: 0.04,
+    zMax: 0.26,
+    epithelialY: 0.56,
+    mucusY: 0.72,
+    allergenBase: 0.98,
+    allergenHeight: 0.42,
+  },
+  skin: {
+    xMin: -2.45,
+    xMax: 2.45,
+    yMin: 0.5,
+    yMax: 0.98,
+    zMin: 0.1,
+    zMax: 0.46,
+    epithelialY: 0.52,
+    mucusY: 0.64,
+    allergenBase: 0.82,
+    allergenHeight: 0.22,
+  },
+  gut: {
+    xMin: -2.4,
+    xMax: 2.4,
+    yMin: 0.78,
+    yMax: 1.05,
+    zMin: 0.08,
+    zMax: 0.4,
+    epithelialY: 0.72,
+    mucusY: 0.82,
+    allergenBase: 0.92,
+    allergenHeight: 0.18,
+  },
+};
+
+/** Epithelial receptor columns — attachment sites along the tissue surface. */
+export const RECEPTOR_SITES: Record<EpitheliumKind, number[]> = {
+  sinus: Array.from({ length: 12 }, (_, i) => -2.5 + i * (5 / 11)),
+  skin: Array.from({ length: 13 }, (_, i) => -2.5 + i * (5.2 / 12)),
+  gut: Array.from({ length: 11 }, (_, i) => -2.6 + 0.32 + i * ((5.2 - 0.64) / 10)),
 };

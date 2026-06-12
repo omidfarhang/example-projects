@@ -1,9 +1,12 @@
 import * as THREE from 'three';
+import type { EpitheliumKind } from './epithelium/types';
+import { LUMEN_BOUNDS } from './epithelium/tissueModels';
 
 export class EffectBurst {
   private ring: THREE.Mesh;
   private life = 0;
   private color = 0xffffff;
+  private kind: EpitheliumKind = 'sinus';
 
   constructor(parent: THREE.Group) {
     const geo = new THREE.RingGeometry(0.1, 0.15, 32);
@@ -14,8 +17,21 @@ export class EffectBurst {
       side: THREE.DoubleSide,
     });
     this.ring = new THREE.Mesh(geo, mat);
-    this.ring.position.set(0, 0.3, 0.2);
+    this.reposition();
     parent.add(this.ring);
+  }
+
+  setTissueKind(kind: EpitheliumKind) {
+    this.kind = kind;
+    this.reposition();
+  }
+
+  private reposition() {
+    const b = LUMEN_BOUNDS[this.kind];
+    const cx = (b.xMin + b.xMax) * 0.5;
+    const cy = (b.mucusY + b.yMax) * 0.5;
+    const cz = (b.zMin + b.zMax) * 0.5;
+    this.ring.position.set(cx, cy, cz);
   }
 
   play(kind: string) {

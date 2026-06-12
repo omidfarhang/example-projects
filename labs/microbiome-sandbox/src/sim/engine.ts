@@ -85,6 +85,7 @@ export class SimEngine {
   }
 
   private spawnBatch(type: MicrobeType, strain: string, count: number, opts?: { fromAbove?: boolean }) {
+    const epithelial = type === 'commensal' || type === 'pathogen' || type === 'yeast' || type === 'probiotic';
     for (let i = 0; i < count && this.nodes.length < MAX_NODES; i++) {
       const fromAbove = opts?.fromAbove ?? false;
       this.nodes.push({
@@ -92,11 +93,15 @@ export class SimEngine {
         type,
         strain,
         vitality: 0.7 + this.rand() * 0.3,
-        x: (this.rand() - 0.5) * 3,
-        y: fromAbove ? 0.6 + this.rand() * 0.8 : (this.rand() - 0.5) * 1.2,
-        z: (this.rand() - 0.5) * 0.8,
-        vx: (this.rand() - 0.5) * 0.02,
-        vy: fromAbove ? -0.015 - this.rand() * 0.01 : (this.rand() - 0.5) * 0.01,
+        x: (this.rand() - 0.5) * 3.4,
+        y: fromAbove
+          ? 0.55 + this.rand() * 0.7
+          : epithelial
+            ? -0.55 + this.rand() * 0.65
+            : (this.rand() - 0.5) * 1.2,
+        z: (this.rand() - 0.5) * 1.4,
+        vx: (this.rand() - 0.5) * 0.018,
+        vy: fromAbove ? -0.015 - this.rand() * 0.01 : (this.rand() - 0.5) * 0.012,
       });
     }
   }
@@ -167,12 +172,25 @@ export class SimEngine {
     const b = this.biome;
 
     for (const node of this.nodes) {
+      // Epithelial receptor affinity — commensals & pathogens dock low, allergens float high.
+      if (node.type === 'commensal' || node.type === 'pathogen' || node.type === 'yeast') {
+        node.vy -= 0.0008;
+        node.vx += Math.sin(this.tick * 0.04 + node.id * 1.7) * 0.00015;
+      } else if (node.type === 'probiotic') {
+        node.vy -= 0.0004;
+        node.vx += Math.sin(this.tick * 0.03 + node.id) * 0.00012;
+      } else if (node.type === 'prebiotic') {
+        node.vy += Math.sin(this.tick * 0.04 + node.id) * 0.0006;
+        node.vx += Math.cos(this.tick * 0.035 + node.id * 0.8) * 0.0004;
+      }
+
       node.x += node.vx;
       node.y += node.vy;
 
       if (node.type === 'allergen') {
-        node.vy = Math.min(node.vy, -0.005);
-        if (node.y < -0.3) node.vy = 0;
+        node.vy = Math.min(node.vy, -0.004);
+        node.vx += Math.sin(this.tick * 0.05 + node.id) * 0.0005;
+        if (node.y < -0.15) node.vy = Math.abs(node.vy) * 0.3;
       }
 
       if (Math.abs(node.x) > 1.8) node.vx *= -1;

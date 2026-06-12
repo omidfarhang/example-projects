@@ -1,8 +1,61 @@
 import * as THREE from 'three';
 import type { BiomeState, MicrobeNode } from '../sim/types';
 import { Epithelium3D, createLumenChamber, type EpitheliumKind } from './epithelium';
-import { LUMEN_BOUNDS } from './epithelium/tissueModels';
+import { LUMEN_BOUNDS, RECEPTOR_SITES, type LumenBounds } from './epithelium/tissueModels';
 import { bucketForType, createMicrobeMeshSet } from './microbes/MicrobeMeshes';
+
+const SIM_X = 1.8;
+const SIM_Y = 0.9;
+const SIM_Z = 0.8;
+
+function normSim(v: number, half: number): number {
+  return THREE.MathUtils.clamp((v + half) / (half * 2), 0, 1);
+}
+
+function snapToReceptor(x: number, receptors: number[], nodeId: number): number {
+  let nearest = receptors[0];
+  let best = Infinity;
+  for (const rx of receptors) {
+    const d = Math.abs(x - rx);
+    if (d < best) {
+      best = d;
+      nearest = rx;
+    }
+  }
+  const jitter = (((nodeId * 7.13) % 1) - 0.5) * 0.07;
+  return nearest + jitter;
+}
+
+function placeMicrobe(n: MicrobeNode, bounds: LumenBounds, receptors: number[], time: number) {
+  const nx = normSim(n.x, SIM_X);
+  const ny = normSim(n.y, SIM_Y);
+  const nz = normSim(n.z, SIM_Z);
+
+  let x = bounds.xMin + nx * (bounds.xMax - bounds.xMin);
+  let y = bounds.yMin + ny * (bounds.yMax - bounds.yMin);
+  let z = bounds.zMin + nz * (bounds.zMax - bounds.zMin);
+
+  if (n.type === 'commensal' || n.type === 'pathogen' || n.type === 'yeast') {
+    x = snapToReceptor(x, receptors, n.id);
+    y = THREE.MathUtils.lerp(bounds.epithelialY, bounds.mucusY, ny * 0.45);
+    z = bounds.zMin + nz * (bounds.zMax - bounds.zMin) * 0.55 + 0.015;
+  } else if (n.type === 'probiotic') {
+    x = snapToReceptor(x, receptors, n.id + 17);
+    y = THREE.MathUtils.lerp(bounds.mucusY, bounds.yMax, ny * 0.55 + 0.2);
+    z = bounds.zMin + nz * (bounds.zMax - bounds.zMin) * 0.75 + 0.02;
+  } else if (n.type === 'allergen') {
+    y = bounds.allergenBase + ny * bounds.allergenHeight;
+    z = bounds.zMin + nz * 0.45 * (bounds.zMax - bounds.zMin);
+    y += Math.sin(time * 0.002 + n.id) * 0.015;
+    x += Math.cos(time * 0.0015 + n.id * 0.7) * 0.02;
+  } else if (n.type === 'prebiotic') {
+    y = THREE.MathUtils.lerp(bounds.mucusY, bounds.yMax, ny);
+    y += Math.sin(time * 0.0018 + n.id * 1.3) * 0.012;
+    x += Math.cos(time * 0.0012 + n.id) * 0.018;
+  }
+
+  return { x, y, z };
+}
 
 export class TissueLayer {
   readonly group = new THREE.Group();
@@ -49,7 +102,10 @@ export class TissueLayer {
   }
 
   playBurst(kind: 'allergen' | 'probiotic' | 'alkaline' | 'stress' | 'default') {
-    if (kind === 'allergen') this.lumenGroup.position.y = 0.08;
+    if (kind === 'allergen') {
+      const b = LUMEN_BOUNDS[this.geometry];
+      this.lumenGroup.position.y = (b.allergenBase - b.mucusY) * 0.35;
+    }
   }
 
   update(nodes: MicrobeNode[], biome: BiomeState, dt: number) {
@@ -62,6 +118,8 @@ export class TissueLayer {
     });
 
     const bounds = LUMEN_BOUNDS[this.geometry];
+    const receptors = RECEPTOR_SITES[this.geometry];
+    const time = performance.now();
     const buckets: Record<string, number> = {
       probiotic: 0,
       commensal: 0,
@@ -77,15 +135,7 @@ export class TissueLayer {
       const mesh = this.meshes[bucket];
       if (idx >= mesh.instanceMatrix.count) continue;
 
-      const x = n.x * 0.48;
-      const normY = (n.y + 1) * 0.5;
-      let y = bounds.yMin + normY * (bounds.yMax - bounds.yMin);
-      const z = 0.14 + n.z * 0.08;
-
-      if (n.type === 'allergen') {
-        y = bounds.allergenBase + normY * 0.35;
-      }
-
+      const { x, y, z } = placeMicrobe(n, bounds, receptors, time);
       this.dummy.position.set(x, y, z);
       const vitality = n.vitality;
       const pulse = n.type === 'allergen' ? 1 + Math.sin(performance.now() * 0.008 + n.id) * 0.2 : 1;
