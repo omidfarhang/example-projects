@@ -17,6 +17,7 @@ export const de: I18nStrings = {
     clickToZoom: 'Klicken Sie auf eine hervorgehobene Region zum Zoomen',
     dragToOrbit: 'ziehen zum Drehen · scrollen zum Zoomen',
     tissueGuideTitle: 'Querschnitt-Leitfaden',
+    liveMicrobes: 'Lebende Mikroben',
     microbeHint: 'Partikelformen entsprechen der Legende — Farben kodieren Mikrobentyp',
     inflammationSpike: 'ENTZÜNDUNGSSPIKE',
     autoMicroBanner: 'Wechsel zur Gewebeansicht — {region}',
@@ -30,6 +31,10 @@ export const de: I18nStrings = {
   },
   stats: {
     title: 'Echtzeit-Statistiken',
+    sectionBarrier: 'Barriere & Stress',
+    sectionMicrobes: 'Mikrobielles Gleichgewicht',
+    sectionLifecycle: 'Biotischer Lebenszyklus',
+    sectionAdvanced: 'Erweiterte Signale',
     integrity: 'Barrierenintegrität',
     inflammation: 'Entzündung',
     immune: 'Immunaktivität',

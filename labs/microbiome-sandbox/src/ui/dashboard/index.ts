@@ -2,6 +2,7 @@ import { blogPanelPartial } from './blogPanel';
 import { labControlsPartial } from './controls';
 import { dashboardFooterPartial } from './footer';
 import { dashboardHeaderPartial } from './header';
+import { presetBarPartial } from './presetPanel';
 import { regionsPanelPartial } from './regionsPanel';
 import { viewportPartial } from './viewport';
 
@@ -9,6 +10,7 @@ import { viewportPartial } from './viewport';
 export function renderDashboardShell(): string {
   return [
     dashboardHeaderPartial(),
+    presetBarPartial(),
     `<div class="bd-grid">`,
     regionsPanelPartial(),
     viewportPartial(),

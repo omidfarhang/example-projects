@@ -49,6 +49,17 @@ function formatPopulation(count: number): string {
   return String(scaled);
 }
 
+const POPULATION_METER_MAX = 72;
+
+function populationMeterPct(count: number): number {
+  return Math.min(100, Math.round((count / POPULATION_METER_MAX) * 100));
+}
+
+function setMeterFill(el: HTMLElement | null | undefined, pct: number) {
+  if (!el) return;
+  el.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+}
+
 export interface DashboardCallbacks {
   onRegionSelect: (id: RegionId) => void;
   onPresetChange: (id: PresetId) => void;
@@ -77,16 +88,24 @@ export class Dashboard {
   private pathogenStat!: HTMLElement;
   private allergenStat!: HTMLElement;
   private commensalStat!: HTMLElement;
-  private biofilmStat!: HTMLElement;
   private prebioticStat!: HTMLElement;
   private postbioticStat!: HTMLElement;
   private tryptophanStat!: HTMLElement;
+  private sugarLoadStat!: HTMLElement;
   private integrityMeter!: HTMLElement;
   private inflammationMeter!: HTMLElement;
   private immuneMeter!: HTMLElement;
+  private probioticMeter!: HTMLElement;
+  private pathogenMeter!: HTMLElement;
+  private allergenMeter!: HTMLElement;
+  private commensalMeter!: HTMLElement;
+  private biofilmMeter!: HTMLElement;
+  private prebioticMeter!: HTMLElement;
+  private postbioticMeter!: HTMLElement;
+  private tryptophanMeter!: HTMLElement;
+  private sugarMeter!: HTMLElement;
   private immuneRow!: HTMLElement;
   private sugarRow!: HTMLElement;
-  private sugarLoadStat!: HTMLElement;
   private advancedModeToggle!: HTMLInputElement;
   private advancedDisclaimer!: HTMLElement;
   private advancedFooterNote!: HTMLElement;
@@ -141,14 +160,16 @@ export class Dashboard {
   private hotspotLayer!: HTMLElement;
   private tissueCalloutLayer!: HTMLElement;
   private tissuePictogram!: HTMLElement;
+  private tissueDock!: HTMLElement;
   private tissueGuide!: HTMLElement;
   private tissueGuideLayers!: HTMLElement;
   private tissueGuideText!: HTMLElement;
   private commensalRow!: HTMLElement;
-  private biofilmRow!: HTMLElement;
   private prebioticStatRow!: HTMLElement;
   private postbioticRow!: HTMLElement;
   private tryptophanRow!: HTMLElement;
+  private lifecycleSection!: HTMLElement;
+  private advancedSection!: HTMLElement;
   private impactPanel!: HTMLElement;
   private impactCloseBtn!: HTMLButtonElement;
   private actionBadge!: HTMLElement;
@@ -188,16 +209,24 @@ export class Dashboard {
     this.pathogenStat = this.root.querySelector('[data-pathogen]')!;
     this.allergenStat = this.root.querySelector('[data-allergen]')!;
     this.commensalStat = this.root.querySelector('[data-commensal]')!;
-    this.biofilmStat = this.root.querySelector('[data-biofilm]')!;
     this.prebioticStat = this.root.querySelector('[data-prebiotic-stat]')!;
     this.postbioticStat = this.root.querySelector('[data-postbiotic]')!;
     this.tryptophanStat = this.root.querySelector('[data-tryptophan]')!;
+    this.sugarLoadStat = this.root.querySelector('[data-sugar-load]')!;
     this.integrityMeter = this.root.querySelector('[data-integrity-meter]')!;
     this.inflammationMeter = this.root.querySelector('[data-inflammation-meter]')!;
     this.immuneMeter = this.root.querySelector('[data-immune-meter]')!;
+    this.probioticMeter = this.root.querySelector('[data-probiotic-meter]')!;
+    this.pathogenMeter = this.root.querySelector('[data-pathogen-meter]')!;
+    this.allergenMeter = this.root.querySelector('[data-allergen-meter]')!;
+    this.commensalMeter = this.root.querySelector('[data-commensal-meter]')!;
+    this.biofilmMeter = this.root.querySelector('[data-biofilm-meter]')!;
+    this.prebioticMeter = this.root.querySelector('[data-prebiotic-meter]')!;
+    this.postbioticMeter = this.root.querySelector('[data-postbiotic-meter]')!;
+    this.tryptophanMeter = this.root.querySelector('[data-tryptophan-meter]')!;
+    this.sugarMeter = this.root.querySelector('[data-sugar-meter]')!;
     this.immuneRow = this.root.querySelector('[data-immune-row]')!;
     this.sugarRow = this.root.querySelector('[data-sugar-row]')!;
-    this.sugarLoadStat = this.root.querySelector('[data-sugar-load]')!;
     this.advancedModeToggle = this.root.querySelector('[data-advanced-mode]') as HTMLInputElement;
     this.advancedDisclaimer = this.root.querySelector('[data-advanced-disclaimer]')!;
     this.advancedFooterNote = this.root.querySelector('[data-advanced-footer-note]')!;
@@ -256,14 +285,16 @@ export class Dashboard {
     this.hotspotLayer = this.root.querySelector('[data-hotspot-layer]')!;
     this.tissueCalloutLayer = this.root.querySelector('[data-tissue-callouts]')!;
     this.tissuePictogram = this.root.querySelector('[data-tissue-pictogram]')!;
+    this.tissueDock = this.root.querySelector('[data-tissue-dock]')!;
     this.tissueGuide = this.root.querySelector('[data-tissue-guide]')!;
     this.tissueGuideLayers = this.root.querySelector('[data-tissue-guide-layers]')!;
     this.tissueGuideText = this.root.querySelector('[data-tissue-guide-text]')!;
     this.commensalRow = this.root.querySelector('[data-commensal-row]')!;
-    this.biofilmRow = this.root.querySelector('[data-biofilm-row]')!;
     this.prebioticStatRow = this.root.querySelector('[data-prebiotic-stat-row]')!;
     this.postbioticRow = this.root.querySelector('[data-postbiotic-row]')!;
     this.tryptophanRow = this.root.querySelector('[data-tryptophan-row]')!;
+    this.lifecycleSection = this.root.querySelector('[data-lifecycle-section]')!;
+    this.advancedSection = this.root.querySelector('[data-advanced-section]')!;
     this.impactPanel = this.root.querySelector('[data-impact-panel]')!;
     this.impactCloseBtn = this.root.querySelector('[data-impact-close]')!;
     this.actionBadge = this.root.querySelector('[data-action-badge]')!;
@@ -685,6 +716,7 @@ export class Dashboard {
     this.advancedDisclaimer.hidden = !on;
     this.advancedDisclaimer.textContent = ADVANCED_DISCLAIMER;
     this.advancedFooterNote.hidden = !on;
+    this.advancedSection.hidden = !on;
     this.immuneRow.hidden = !on;
     this.sugarRow.hidden = !on;
     this.daySimPanel.hidden = !on || !DAY_SIM_REGIONS.includes(regionId);
@@ -826,7 +858,7 @@ export class Dashboard {
     this.blogCta.textContent = t('preset.readArticle', { title: article.title });
 
     this.commensalRow.hidden = presetId !== 'allergy';
-    this.biofilmRow.hidden = presetId !== 'candida';
+    this.lifecycleSection.hidden = presetId !== 'lifecycle';
     this.prebioticStatRow.hidden = presetId !== 'lifecycle';
     this.postbioticRow.hidden = presetId !== 'lifecycle';
     this.tryptophanRow.hidden = presetId !== 'lifecycle' || regionId !== 'gut';
@@ -1079,6 +1111,7 @@ export class Dashboard {
           : '';
 
     this.legendBox.innerHTML = `
+      <p class="bd-legend__heading">${t('viewport.liveMicrobes')}</p>
       ${row('probiotic', 'Good Bacteria', live?.probiotics ?? [], baseline.probiotics)}
       ${prebioticBlock}
       ${row('pathogen', 'Pathogens', live?.pathogens ?? [], baseline.pathogens)}
@@ -1090,11 +1123,10 @@ export class Dashboard {
   setMicroView(active: boolean, region?: RegionDef, options?: { auto?: boolean }) {
     this.microActive = active;
     this.backBtn.hidden = !active;
-    this.legendBox.hidden = !active;
+    this.tissueDock.hidden = !active;
     this.hotspotLayer.hidden = active;
     this.tissueCalloutLayer.hidden = !active;
     this.tissuePictogram.hidden = !active;
-    this.tissueGuide.hidden = !active;
 
     if (active && region) {
       this.modeBadge.textContent = t('viewport.tissueView');
@@ -1196,7 +1228,19 @@ export class Dashboard {
     this.pathogenStat.textContent = `${formatPopulation(b.pathogenCount)} ${trendLabel(trends.pathogen)}`;
     this.allergenStat.textContent = `${formatPopulation(b.allergenCount)} ${trendLabel(trends.allergen)}`;
     this.commensalStat.textContent = `${formatPopulation(b.commensalCount)} ${trendLabel(trends.commensal)}`;
-    this.biofilmStat.textContent = `${Math.round(b.biofilm * 100)}%`;
+
+    this.root.querySelector('[data-probiotic-val]')!.textContent = formatPopulation(b.probioticCount);
+    this.root.querySelector('[data-pathogen-val]')!.textContent = formatPopulation(b.pathogenCount);
+    this.root.querySelector('[data-allergen-val]')!.textContent = formatPopulation(b.allergenCount);
+    this.root.querySelector('[data-commensal-val]')!.textContent = formatPopulation(b.commensalCount);
+    setMeterFill(this.probioticMeter, populationMeterPct(b.probioticCount));
+    setMeterFill(this.pathogenMeter, populationMeterPct(b.pathogenCount));
+    setMeterFill(this.allergenMeter, populationMeterPct(b.allergenCount));
+    setMeterFill(this.commensalMeter, populationMeterPct(b.commensalCount));
+
+    const biofilmPct = Math.round(b.biofilm * 100);
+    this.root.querySelector('[data-biofilm-val]')!.textContent = `${biofilmPct}%`;
+    setMeterFill(this.biofilmMeter, biofilmPct);
 
     const prebioticStrainCount = live.prebiotics.length;
     const prebioticCountLabel =
@@ -1209,23 +1253,35 @@ export class Dashboard {
         ? `${prebioticCountLabel} · ${substratePct}% left ${trendLabel(trends.prebiotic)}`
         : `${prebioticCountLabel} ${trendLabel(trends.prebiotic)}`;
     this.prebioticStat.textContent = prebioticValue;
+    this.root.querySelector('[data-prebiotic-val]')!.textContent = `${substratePct}%`;
+    setMeterFill(this.prebioticMeter, substratePct);
 
-    this.postbioticStat.textContent = `${Math.round(b.postbioticLevel * 100)}%`;
-    this.tryptophanStat.textContent = `${Math.round(b.tryptophanSupport * 100)}%`;
+    const postbioticPct = Math.round(b.postbioticLevel * 100);
+    this.postbioticStat.textContent = `${postbioticPct}% SCFA in lumen`;
+    this.root.querySelector('[data-postbiotic-val]')!.textContent = `${postbioticPct}%`;
+    setMeterFill(this.postbioticMeter, postbioticPct);
+
+    const tryptophanPct = Math.round(b.tryptophanSupport * 100);
+    this.tryptophanStat.textContent = `${tryptophanPct}% — low inflammation + strong SCFA`;
+    this.root.querySelector('[data-tryptophan-val]')!.textContent = `${tryptophanPct}%`;
+    setMeterFill(this.tryptophanMeter, tryptophanPct);
 
     const integrityPct = Math.round(b.integrity * 100);
     const inflamePct = Math.round(b.inflammation * 100);
-    this.integrityMeter.style.width = `${integrityPct}%`;
-    this.inflammationMeter.style.width = `${inflamePct}%`;
+    setMeterFill(this.integrityMeter, integrityPct);
+    setMeterFill(this.inflammationMeter, inflamePct);
     this.root.querySelector('[data-integrity-val]')!.textContent = `${integrityPct}%`;
     this.root.querySelector('[data-inflammation-val]')!.textContent = `${inflamePct}%`;
     this.checkStatAnnouncements(integrityPct, inflamePct);
 
     if (this.advancedMode) {
       const immunePct = Math.round(b.immuneActivity * 100);
-      this.immuneMeter.style.width = `${immunePct}%`;
+      setMeterFill(this.immuneMeter, immunePct);
       this.root.querySelector('[data-immune-val]')!.textContent = `${immunePct}%`;
-      this.sugarLoadStat.textContent = `${Math.round(b.sugarLoad * 100)}%`;
+      const sugarPct = Math.round(b.sugarLoad * 100);
+      setMeterFill(this.sugarMeter, sugarPct);
+      this.root.querySelector('[data-sugar-val]')!.textContent = `${sugarPct}%`;
+      this.sugarLoadStat.textContent = `${sugarPct}% dietary substrate in lumen`;
       this.updateDaySimUI(engine);
     }
 

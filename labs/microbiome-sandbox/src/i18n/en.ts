@@ -15,6 +15,7 @@ export const en = {
     clickToZoom: 'Click a highlighted region to zoom in',
     dragToOrbit: 'drag to orbit · scroll to zoom',
     tissueGuideTitle: 'Cross-section guide',
+    liveMicrobes: 'Live microbes',
     microbeHint: 'Particle shapes match the legend below — colors encode microbe type',
     inflammationSpike: 'INFLAMMATION SPIKE',
     autoMicroBanner: 'Entering tissue view — {region}',
@@ -28,6 +29,10 @@ export const en = {
   },
   stats: {
     title: 'REAL-TIME STATS',
+    sectionBarrier: 'Barrier & stress',
+    sectionMicrobes: 'Microbial balance',
+    sectionLifecycle: 'Biotic lifecycle',
+    sectionAdvanced: 'Advanced signals',
     integrity: 'Barrier integrity',
     inflammation: 'Inflammation',
     immune: 'Immune activity',

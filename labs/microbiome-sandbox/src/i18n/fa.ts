@@ -17,6 +17,7 @@ export const fa: I18nStrings = {
     clickToZoom: 'روی ناحیه برجسته کلیک کنید تا بزرگ‌نمایی شود',
     dragToOrbit: 'کشیدن برای چرخش · اسکرول برای زوم',
     tissueGuideTitle: 'راهنمای برش مقطع',
+    liveMicrobes: 'میکروب‌های زنده',
     microbeHint: 'شکل ذرات با راهنمای پایین مطابقت دارد — رنگ‌ها نوع میکروب را نشان می‌دهند',
     inflammationSpike: 'جهش التهاب',
     autoMicroBanner: 'ورود به نمای بافت — {region}',
@@ -30,6 +31,10 @@ export const fa: I18nStrings = {
   },
   stats: {
     title: 'آمار لحظه‌ای',
+    sectionBarrier: 'سد و استرس',
+    sectionMicrobes: 'تعادل میکروبی',
+    sectionLifecycle: 'چرخه بیوتیک',
+    sectionAdvanced: 'سیگنال‌های پیشرفته',
     integrity: 'یکپارچگی سد',
     inflammation: 'التهاب',
     immune: 'فعالیت ایمنی',
