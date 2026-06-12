@@ -39,10 +39,10 @@ Links to [Probiotics Through the Ages](https://omid.dev/2024/09/10/probiotics-th
 ### Suggested exploration path (nose)
 
 1. Select **Nose / Sinus**
-2. **Trigger:** `allergen` — watch inflammation spike, integrity drop, allergen count rise
-3. **Trigger:** `histamine` — further inflammation
-4. **Inoculate:** `lrham` — probiotics spawn, inflammation eases, integrity recovers
-5. **Inoculate:** `saline_mist` — moisture restored, allergen adhesion reduced
+2. **Trigger:** `allergen` — watch allergen count rise, integrity drop, **immune activity** spike (advanced), inflammation rise emergently
+3. **Trigger:** `histamine` — further **immune activity**; inflammation follows over ticks
+4. **Inoculate:** `lrham` — probiotics spawn, compete with pathogens; inflammation eases as pressure falls
+5. **Inoculate:** `saline_mist` — moisture restored, allergen adhesion reduced; inflammation eases as immune signal decays
 6. Optionally lower **moisture** slider and re-trigger `dry_air` to see mucus-layer thinning
 
 ### Expected outcomes
@@ -80,8 +80,8 @@ Links to [Probiotics Through the Ages](https://omid.dev/2024/09/10/probiotics-th
 ### Suggested exploration path (oral)
 
 1. Select **Oral / Mouth**
-2. **Trigger:** `thrush_bloom` — C. albicans patches, biofilm + inflammation rise
-3. **Inoculate:** `sboul` — yeast vitality penalized, inflammation eases
+2. **Trigger:** `thrush_bloom` — C. albicans patches, biofilm rise; inflammation follows yeast load
+3. **Inoculate:** `sboul` — yeast vitality penalized; inflammation eases emergently
 4. **Trigger:** `dry_mouth` then **Inoculate:** `lsaliv` — saliva niche restoration
 
 ### Expected outcomes
@@ -96,31 +96,33 @@ Links to [Probiotics Through the Ages](https://omid.dev/2024/09/10/probiotics-th
 
 ### Narrative
 
-> Free-play across unlocked regions. Select gut tissue to add prebiotic fiber, watch probiotics consume it, and observe postbiotic SCFA particles healing epithelial integrity.
+> Free-play across unlocked regions. On gut tissue, add prebiotic fiber and watch probiotics ferment it into SCFA — as gut inflammation eases, tryptophan availability rises, supporting serotonin production along the gut-brain axis.
 
 ### Recommended regions
 
 | Region | Why |
 | --- | --- |
-| **gut** | Only region with prebiotic baseline, prebiotic inoculation, and SCFA action |
+| **gut** | Only region with prebiotic baseline, prebiotic inoculation, SCFA action, and **tryptophan support** stat |
 | Other regions | Free exploration with full trigger/inoculation sets, but no SCFA stat panel |
 
 ### Suggested exploration path (gut)
 
 1. Select **Gut**
-2. Note baseline: L. plantarum probiotics + inulin prebiotics already seeded
+2. Note baseline: L. plantarum probiotics + inulin prebiotics already seeded; **tryptophan support** ~30–35%
 3. Watch **SCFA / Postbiotic** stat — rises as prebiotics convert near probiotics
-4. **Trigger:** `antibiotic_disruption` — commensals depleted, postbiotic level drops, integrity stressed
-5. **Inoculate:** `prebiotic` — add more inulin substrate
-6. **Inoculate:** `lplant` — seed additional L. plantarum
-7. Wait for prebiotic → postbiotic conversion; integrity recovers when postbioticLevel > 0.2
-8. **Inoculate:** `scfa` — direct postbiotic surge for immediate barrier recovery
+4. **Trigger:** `stress_cortisol` or `sleep_deprivation` — immune signaling and inflammation rise; tryptophan support falls
+5. **Trigger:** `antibiotic_disruption` — commensals depleted, postbiotic level drops, integrity stressed
+6. **Inoculate:** `prebiotic` — add more inulin substrate
+7. **Inoculate:** `lplant` or `blactis` — seed additional fermenters
+8. Wait for prebiotic → postbiotic conversion; integrity and **tryptophan support** recover when postbioticLevel > 0.2 and inflammation is low
+9. **Inoculate:** `scfa` — direct postbiotic surge for immediate barrier recovery
 
 ### Expected outcomes
 
 - SCFA stat visible only under this preset
+- **Tryptophan support** stat visible under this preset on gut only
 - postbioticLevel rises gradually from conversion or instantly from `scfa` action
-- Integrity trend improves after postbiotic accumulation
+- Integrity and tryptophan support improve when postbiotic accumulates and inflammation stays low
 - Event log shows fiber addition, probiotic seeding, and barrier recovery messages
 
 ---

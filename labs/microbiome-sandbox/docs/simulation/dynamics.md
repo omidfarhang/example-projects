@@ -16,9 +16,9 @@ Each `simulateTick()` executes in this order:
 4. For each node: movement, boundary reflection, type-specific vitality update
 5. Probiotic suppression pass (strain-specific radius and strength — see `strains.ts` `competition`)
 6. Prune nodes with vitality ≤ 0.05
-7. Emergent biome updates (integrity, inflammation, biofilm)
+7. Emergent biome updates (integrity, inflammation dynamics, biofilm; gut tryptophan on gut tissue)
 8. Region-specific integrity decay from low moisture / high vaginal pH
-9. `updateCounts()`
+9. `updateInflammationDynamics()` then `updateCounts()`
 
 ---
 
@@ -150,6 +150,24 @@ No suppression of commensals or other probiotics.
 
 ## Emergent biome effects
 
+Source modules: [`inflammationDynamics.ts`](../../src/sim/inflammationDynamics.ts), [`gutBrainDynamics.ts`](../../src/sim/gutBrainDynamics.ts)
+
+### Inflammation and immune signaling
+
+**`inflammation`** is an **emergent tissue load**, not a direct +/- on most actions. Each tick (and after each trigger/inoculation via `syncEmergentInflammation()`), it moves toward a target computed from:
+
+| Input | Weight in target |
+| --- | --- |
+| Pathogen + yeast count | High |
+| Allergen count | High |
+| Low barrier integrity | Medium |
+| Biofilm level | Medium |
+| `immuneActivity` (acute immune signaling) | Medium |
+
+**`immuneActivity`** rises when immune-mediator stressors fire (`histamine`, allergens, smoke, NSAIDs, cortisol, etc.) and decays over time — faster when postbiotics are high and pathogen load is low. Postbiotics and a few probiotic strains apply small **`immuneActivity`** reductions on apply.
+
+**Action apply effects** use `BiomeEffect` fields: `ph`, `integrity`, `biofilm`, `postbioticLevel`, `immuneActivity`, `commensalVitality`, `yeastVitality` — not direct `inflammation`.
+
 ### Inflammation → integrity
 
 If inflammation > 0.3: integrity −0.0008/tick (floor 0.15)
@@ -159,7 +177,21 @@ If inflammation > 0.3: integrity −0.0008/tick (floor 0.15)
 If postbioticLevel > 0.2:
 
 - integrity +0.001/tick
-- inflammation −0.0005/tick
+
+(Postbiotic-driven inflammation easing is handled by the emergent inflammation target, not a separate per-tick subtraction.)
+
+### Gut-brain: tryptophan support (gut only)
+
+**`tryptophanSupport`** (0–1) is an educational proxy for tryptophan / serotonin-precursor availability along the gut-brain axis. Updated each tick on **gut** tissue only. Rises when:
+
+- Gut inflammation is low
+- `postbioticLevel` (SCFA) is strong
+- Barrier integrity is healthy
+- `immuneActivity` is calm
+
+Falls under psychosocial stress, sleep deprivation, and other immune/barrier insults. Visible in the dashboard on **Lifecycle preset + Gut region** as **Tryptophan support**.
+
+~90% of body serotonin is produced in the gut in real physiology; the sim links calm mucosa + SCFA to this scalar — not mood prediction.
 
 ### Biofilm growth
 

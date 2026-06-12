@@ -15,6 +15,10 @@ export const ARTICLES = {
     title: "Unlocking Prebiotics, Probiotics, and Postbiotics",
     url: "https://omid.dev/2024/09/10/prebiotics-probiotics-postbiotics/",
   },
+  gutBrain: {
+    title: "Probiotics Through the Ages — Gut-Brain & Mental Well-being",
+    url: "https://omid.dev/2024/09/10/probiotics-through-the-ages/",
+  },
 } as const;
 
 export type ArticleKey = keyof typeof ARTICLES;

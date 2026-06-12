@@ -38,6 +38,9 @@ export const de: I18nStrings = {
     biofilm: 'Biofilm-Level',
     prebiotic: 'Präbiotisches Substrat',
     postbiotic: 'Postbiotische SCFA',
+    tryptophanSupport: 'Tryptophan-Unterstützung',
+    tryptophanSupportTitle:
+      'Lehrmodell — steigt bei ruhiger Darmschleimhaut und starker SCFA-Produktion; Serotonin-Vorstufe',
     populationScaleNote:
       'Populationszahlen nutzen ×{scale} Anzeigeskala — jede Einheit steht für ~{scale} simulierte Zellen.',
     populationScaleTitle: 'Anzeigeskala: Rohzellzahl mit {scale} multiplizieren',
@@ -104,7 +107,7 @@ export const de: I18nStrings = {
     candida:
       'Candida-Szenario: Oral-, Vaginal- oder Darmgewebe wählen — pH alkalisch verschieben, Zucker hinzufügen, dann säuernde Behandlungen.',
     lifecycle:
-      'Lebenszyklus-Szenario: Darmgewebe öffnen, präbiotische Faser hinzufügen, Umwandlung in postbiotische SCFA beobachten.',
+      'Lebenszyklus-Szenario: Darmgewebe öffnen, Stress + Präbiotika testen — Tryptophan-Unterstützung steigt, wenn Entzündung sinkt und SCFA ansteigen.',
   },
   a11y: {
     regionShortcut: '{label} — Taste {key}',

@@ -78,7 +78,7 @@ s(
   'MY TRIGGER LABEL',
   ['gut'],  // regions where available
   ['Human-readable event log line'],
-  { inflammation: 0.2, integrity: -0.1, integrityMin: 0.2 },  // biome deltas
+  { integrity: -0.1, integrityMin: 0.2, immuneActivity: 0.15 },  // immune stressor — inflammation rises emergently
   [{ type: 'pathogen', strain: 'Enteropathogen', count: 8 }], // optional spawns
   'stress',  // optional burst: allergen | alkaline | stress | default
 ),

@@ -66,7 +66,8 @@ Describes the current preset narrative. A link opens the related omid.dev articl
 | Stat | Meaning |
 | --- | --- |
 | **Integrity** | Epithelial barrier strength (0–100%) |
-| **Inflammation** | Local inflammatory load (0–100%) |
+| **Inflammation** | Emergent tissue inflammatory load (0–100%) — rises with pathogens, allergens, barrier damage, biofilm, and immune signaling |
+| **Immune activity** | Advanced mode — acute immune signaling proxy (`immuneActivity`); histamine/cytokine stressors raise it |
 | **Probiotics** | Probiotic node count × 1000, with trend arrow |
 | **Pathogens** | Pathogen + yeast count × 1000, with trend |
 | **Allergens** | Allergen count × 1000, with trend |
@@ -74,6 +75,7 @@ Describes the current preset narrative. A link opens the related omid.dev articl
 | **Biofilm** | Biofilm level (0–100%) |
 | **Prebiotic substrate** | Shown only for `lifecycle` preset — fiber particle count, % remaining, trend |
 | **SCFA / Postbiotic** | Shown only for `lifecycle` preset — postbiotic scalar level |
+| **Tryptophan support** | Shown only for `lifecycle` preset **on gut tissue** — educational gut-brain / serotonin-precursor proxy |
 
 Population numbers use `POPULATION_SCALE = 1000`: the UI displays raw node counts multiplied by 1000 (e.g. 8 nodes → 8k).
 
@@ -165,11 +167,11 @@ https://playground.omid.dev/labs/microbiome-sandbox/?preset=lifecycle&region=gut
 
 ## Tips
 
-1. **Run stress then recovery** — trigger an allergen or alkaline flush, watch integrity and inflammation rise, then apply the matching inoculation.
+1. **Run stress then recovery** — trigger an allergen or pathogen bloom; watch **immune activity** (advanced) and **inflammation** rise emergently, then apply matching probiotics or saline mist.
 2. **Watch the event log** — every action pushes human-readable messages explaining what changed.
 3. **Adjust env sliders during simulation** — pH and moisture changes affect ongoing growth rates, not just immediate state.
 4. **Try cross-region exploration** — the candida preset works well on oral, vaginal, and skin; allergy preset on nose and ear.
-5. **Lifecycle preset on gut** — add prebiotic fiber, seed L. plantarum, watch SCFA level rise as prebiotics convert near probiotics.
+5. **Lifecycle preset on gut** — run cortisol stress or sleep deprivation, then add prebiotic fiber + bifidobacteria; watch SCFA and **tryptophan support** rise as inflammation falls.
 
 ---
 

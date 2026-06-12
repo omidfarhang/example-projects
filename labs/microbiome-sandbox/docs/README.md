@@ -55,7 +55,7 @@ Use these when changing simulation behavior, adding regions, or closing document
 | Document | Description |
 | --- | --- |
 | [domain/regions.md](domain/regions.md) | Seven body regions: anatomy, baselines, geometry |
-| [domain/biotics.md](domain/biotics.md) | Microbe taxonomy, strains, pre/pro/postbiotic lifecycle |
+| [domain/biotics.md](domain/biotics.md) | Microbe taxonomy, strains, pre/pro/postbiotic lifecycle, gut-brain tryptophan proxy |
 | [domain/environment.md](domain/environment.md) | Env sliders, region subsets, derived metrics |
 | [domain/actions-reference.md](domain/actions-reference.md) | Exhaustive trigger and inoculation catalog |
 | [domain/products.md](domain/products.md) | Supplements and fermented foods catalog |
@@ -65,7 +65,7 @@ Use these when changing simulation behavior, adding regions, or closing document
 | Document | Description |
 | --- | --- |
 | [simulation/model-overview.md](simulation/model-overview.md) | Engine design, tick loop, determinism |
-| [simulation/dynamics.md](simulation/dynamics.md) | Growth, competition, conversion, emergent rules |
+| [simulation/dynamics.md](simulation/dynamics.md) | Growth, competition, conversion, emergent inflammation & gut-brain rules |
 | [simulation/data-model.md](simulation/data-model.md) | Types, BiomeState, SimSnapshot contract |
 | [simulation/assumptions-and-limits.md](simulation/assumptions-and-limits.md) | Scientific simplifications and non-goals |
 

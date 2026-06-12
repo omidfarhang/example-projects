@@ -107,6 +107,8 @@ Updated each frame in `update(engine, fps)`:
 | Prebiotic substrate | `prebioticCount × POPULATION_SCALE` + mean vitality % + trend (lifecycle only) |
 | Biofilm stat | `biome.biofilm × 100%` |
 | Postbiotic/SCFA | `biome.postbioticLevel × 100%` (lifecycle only) |
+| Tryptophan support | `biome.tryptophanSupport × 100%` (lifecycle + gut only) |
+| Immune activity | `biome.immuneActivity × 100%` (advanced mode) |
 
 **Population formatting:** counts ≥ 1000 displayed as `Nk` (e.g. 8000 → 8k).
 

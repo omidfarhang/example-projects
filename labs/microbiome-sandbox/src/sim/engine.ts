@@ -20,6 +20,8 @@ import {
 import { getStressor, type StressorBiomeDelta } from '../data/stressors';
 import { buildProductImpact, formatImpactEvent } from '../ui/actionImpact';
 import { applyBiomeEffects, scaleBiomeEffect, scaleCount } from './bioticEffects';
+import { decayImmuneActivity, stepEmergentInflammation } from './inflammationDynamics';
+import { stepTryptophanSupport } from './gutBrainDynamics';
 import type { BiomeState, MicrobeNode, MicrobeType, SimSnapshot } from './types';
 import type { LabStateV1 } from '../state/labState';
 import { MAX_STORED_EVENTS } from '../state/labState';
@@ -76,6 +78,7 @@ export class SimEngine {
     prebioticCount: 0,
     prebioticSubstrateLevel: 0,
     postbioticLevel: 0,
+    tryptophanSupport: 0,
   };
 
   constructor(
@@ -104,7 +107,7 @@ export class SimEngine {
 
     this.biome.integrity = b.integrity ?? 0.85;
     this.biome.inflammation = b.inflammation ?? 0.1;
-    this.biome.immuneActivity = (b.inflammation ?? 0.1) * 0.75;
+    this.biome.immuneActivity = (b.inflammation ?? 0.1) * 0.5;
     this.biome.biofilm = b.biofilm ?? 0.05;
     this.applyEnv(def.env);
     this.biome.sugarLoad = 0;
@@ -113,6 +116,12 @@ export class SimEngine {
     this.dayNumber = 1;
     this.nextMealIndex = 0;
     this.updateCounts();
+    this.biome.inflammation = stepEmergentInflammation(this.biome, 1);
+    if (this.region === 'gut') {
+      this.biome.tryptophanSupport = stepTryptophanSupport(this.biome, 1);
+    } else {
+      this.biome.tryptophanSupport = 0;
+    }
   }
 
   setPreset(preset: PresetId, env?: Partial<Record<EnvVarId, number>>) {
@@ -180,6 +189,16 @@ export class SimEngine {
     }
     if (effects.yeastVitality !== undefined) {
       this.adjustVitality(['yeast'], effects.yeastVitality);
+    }
+    this.syncEmergentInflammation(0.55);
+  }
+
+  /** Pull tissue inflammation toward emergent target after biome / population changes. */
+  private syncEmergentInflammation(blend = 0.55) {
+    this.updateCounts();
+    this.biome.inflammation = stepEmergentInflammation(this.biome, blend);
+    if (this.region === 'gut') {
+      this.biome.tryptophanSupport = stepTryptophanSupport(this.biome, blend);
     }
   }
 
@@ -277,7 +296,7 @@ export class SimEngine {
       this.events.push(line);
     }
 
-    this.updateCounts();
+    this.syncEmergentInflammation(0.55);
   }
 
   private applyStressorBiome(e: StressorBiomeDelta) {
@@ -301,8 +320,8 @@ export class SimEngine {
     add('oxygenTension', e.oxygenTension);
     add('sweatRate', e.sweatRate, undefined, e.sweatRateMax);
     add('integrity', e.integrity, e.integrityMin, 1);
-    if (e.inflammation !== undefined) {
-      b.inflammation = clamp(b.inflammation + e.inflammation, 0, 1);
+    if (e.immuneActivity !== undefined) {
+      b.immuneActivity = clamp(b.immuneActivity + e.immuneActivity, 0, 1);
     }
     if (e.biofilm !== undefined) {
       b.biofilm = clamp(b.biofilm + e.biofilm, 0, 1);
@@ -365,7 +384,7 @@ export class SimEngine {
       this.events.push(def.eventLog);
     }
 
-    this.updateCounts();
+    this.syncEmergentInflammation(0.55);
   }
 
   applyEnv(env: Partial<Record<EnvVarId, number>>) {
@@ -452,16 +471,12 @@ export class SimEngine {
     };
   }
 
-  private updateImmuneActivity() {
+  private updateInflammationDynamics() {
     const b = this.biome;
-    const pathogenPressure = Math.min(1, b.pathogenCount / 35);
-    const target = clamp(b.inflammation * 0.85 + pathogenPressure * 0.22, 0, 1);
-    b.immuneActivity = clamp(b.immuneActivity + (target - b.immuneActivity) * 0.018, 0, 1);
-    if (b.postbioticLevel > 0.25) {
-      b.immuneActivity = Math.max(0, b.immuneActivity - 0.00035);
-    }
-    if (b.inflammation < 0.15 && b.pathogenCount < 8) {
-      b.immuneActivity = Math.max(0, b.immuneActivity - 0.0002);
+    b.immuneActivity = decayImmuneActivity(b);
+    b.inflammation = stepEmergentInflammation(b);
+    if (this.region === 'gut') {
+      b.tryptophanSupport = stepTryptophanSupport(b);
     }
   }
 
@@ -592,7 +607,6 @@ export class SimEngine {
     }
     if (b.postbioticLevel > 0.2) {
       b.integrity = clamp(b.integrity + 0.001, 0, 1);
-      b.inflammation = Math.max(0, b.inflammation - 0.0005);
     }
 
     if (b.ph > 7 && b.moisture > 0.5) {
@@ -632,7 +646,7 @@ export class SimEngine {
       }
     }
 
-    this.updateImmuneActivity();
+    this.updateInflammationDynamics();
     this.updateCounts();
   }
 

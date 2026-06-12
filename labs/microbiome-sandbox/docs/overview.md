@@ -32,11 +32,12 @@ The lab is a visual companion to health articles on [omid.dev](https://omid.dev)
 
 After exploring the lab, users should understand:
 
-1. **Barrier integrity and inflammation** — stressors damage epithelial barriers; recovery depends on environment and interventions
+1. **Barrier integrity and emergent inflammation** — stressors damage barriers, spawn pathogens, or raise immune signaling; inflammation tracks those pressures over time rather than jumping instantly on every button
 2. **Environmental drivers** — pH, moisture, oxygenation, sebum, cerumen, and salinity shift growth conditions
 3. **Microbe competition** — probiotics suppress nearby pathogens, allergens, and yeast within a spatial radius
 4. **Biotics lifecycle** — prebiotic fiber feeds probiotics, which produce postbiotic SCFA that supports barrier recovery (gut preset)
-5. **Region specificity** — the same intervention (e.g. L. rhamnosus) behaves differently across ear, nose, skin, gut, etc.
+5. **Gut-brain axis (gut preset)** — calm gut inflammation + SCFA support **`tryptophanSupport`**, an educational proxy linked to serotonin-precursor availability (~90% of serotonin is made in the gut in real physiology)
+6. **Region specificity** — the same intervention (e.g. L. rhamnosus) behaves differently across ear, nose, skin, gut, etc.
 
 ---
 
@@ -70,6 +71,7 @@ See [Assumptions and limits](simulation/assumptions-and-limits.md) for detailed 
 | `lifestage` | Probiotics Through the Ages | [omid.dev/.../probiotics-through-the-ages/](https://omid.dev/2024/09/10/probiotics-through-the-ages/) |
 | `candidiasis` | How Probiotics Help with Candidiasis | [omid.dev/.../how-probiotics-help-with-candidiasis/](https://omid.dev/2024/09/10/how-probiotics-help-with-candidiasis/) |
 | `lifecycle` | Unlocking Prebiotics, Probiotics, and Postbiotics | [omid.dev/.../prebiotics-probiotics-postbiotics/](https://omid.dev/2024/09/10/prebiotics-probiotics-postbiotics/) |
+| `gutBrain` | Probiotics Through the Ages — Gut-Brain & Mental Well-being | [omid.dev/.../probiotics-through-the-ages/](https://omid.dev/2024/09/10/probiotics-through-the-ages/) |
 
 Presets map to articles via [`src/data/presets.ts`](../src/data/presets.ts) and [`src/data/articles.ts`](../src/data/articles.ts).
 

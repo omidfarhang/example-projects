@@ -36,6 +36,9 @@ export const en = {
     biofilm: 'Biofilm level',
     prebiotic: 'Prebiotic substrate',
     postbiotic: 'Postbiotic SCFA',
+    tryptophanSupport: 'Tryptophan support',
+    tryptophanSupportTitle:
+      'Educational proxy — rises when gut inflammation is low and SCFA output is strong; linked to serotonin precursor availability',
     populationScaleNote:
       'Population counts use ×{scale} display scale — each unit represents ~{scale} simulated cells for readability.',
     populationScaleTitle: 'Display scale: multiply raw cell count by {scale}',
@@ -102,7 +105,7 @@ export const en = {
     candida:
       'Candida preset: pick oral, vaginal, or gut tissue — shift pH alkaline and add sugar load, then acidifying treatments.',
     lifecycle:
-      'Lifecycle preset: open gut tissue, add prebiotic fiber, watch probiotics convert substrate into postbiotic SCFA.',
+      'Lifecycle preset: open gut tissue, run stress then prebiotics/probiotics — tryptophan support rises as inflammation falls and SCFA accumulate.',
   },
   a11y: {
     regionShortcut: '{label} — press {key}',

@@ -17,6 +17,10 @@ export const PRESET_REGION_NARRATIVES: Partial<
     scalp:
       'Scalp: sebum surge triggers Malassezia yeast bloom — related Candida dynamics on a lipid-rich, follicular barrier. Try seborrheic flare then L. acidophilus or topical cream.',
   },
+  lifecycle: {
+    gut:
+      'Gut-brain axis: ~90% of serotonin is made in the gut. Try psychosocial stress or sleep deprivation, then restore with prebiotics + bifidobacteria — watch tryptophan support rise as inflammation falls and SCFA accumulates.',
+  },
 };
 
 export function regionExplorationBlurb(presetId: PresetId, regionId: RegionId): string | undefined {

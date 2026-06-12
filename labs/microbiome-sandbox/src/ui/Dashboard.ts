@@ -79,6 +79,7 @@ export class Dashboard {
   private biofilmStat!: HTMLElement;
   private prebioticStat!: HTMLElement;
   private postbioticStat!: HTMLElement;
+  private tryptophanStat!: HTMLElement;
   private integrityMeter!: HTMLElement;
   private inflammationMeter!: HTMLElement;
   private immuneMeter!: HTMLElement;
@@ -143,6 +144,7 @@ export class Dashboard {
   private biofilmRow!: HTMLElement;
   private prebioticStatRow!: HTMLElement;
   private postbioticRow!: HTMLElement;
+  private tryptophanRow!: HTMLElement;
   private impactPanel!: HTMLElement;
   private impactCloseBtn!: HTMLButtonElement;
   private actionBadge!: HTMLElement;
@@ -185,6 +187,7 @@ export class Dashboard {
     this.biofilmStat = this.root.querySelector('[data-biofilm]')!;
     this.prebioticStat = this.root.querySelector('[data-prebiotic-stat]')!;
     this.postbioticStat = this.root.querySelector('[data-postbiotic]')!;
+    this.tryptophanStat = this.root.querySelector('[data-tryptophan]')!;
     this.integrityMeter = this.root.querySelector('[data-integrity-meter]')!;
     this.inflammationMeter = this.root.querySelector('[data-inflammation-meter]')!;
     this.immuneMeter = this.root.querySelector('[data-immune-meter]')!;
@@ -253,6 +256,7 @@ export class Dashboard {
     this.biofilmRow = this.root.querySelector('[data-biofilm-row]')!;
     this.prebioticStatRow = this.root.querySelector('[data-prebiotic-stat-row]')!;
     this.postbioticRow = this.root.querySelector('[data-postbiotic-row]')!;
+    this.tryptophanRow = this.root.querySelector('[data-tryptophan-row]')!;
     this.impactPanel = this.root.querySelector('[data-impact-panel]')!;
     this.impactCloseBtn = this.root.querySelector('[data-impact-close]')!;
     this.actionBadge = this.root.querySelector('[data-action-badge]')!;
@@ -818,6 +822,7 @@ export class Dashboard {
     this.biofilmRow.hidden = presetId !== 'candida';
     this.prebioticStatRow.hidden = presetId !== 'lifecycle';
     this.postbioticRow.hidden = presetId !== 'lifecycle';
+    this.tryptophanRow.hidden = presetId !== 'lifecycle' || regionId !== 'gut';
 
     this.syncPresetTip();
     this.highlightRegion(regionId);
@@ -1172,6 +1177,7 @@ export class Dashboard {
     this.prebioticStat.textContent = prebioticValue;
 
     this.postbioticStat.textContent = `${Math.round(b.postbioticLevel * 100)}%`;
+    this.tryptophanStat.textContent = `${Math.round(b.tryptophanSupport * 100)}%`;
 
     const integrityPct = Math.round(b.integrity * 100);
     const inflamePct = Math.round(b.inflammation * 100);

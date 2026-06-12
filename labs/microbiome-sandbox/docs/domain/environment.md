@@ -59,11 +59,12 @@ These fields are simulated, not directly slider-controlled:
 | Field | Range | Meaning |
 | --- | --- | --- |
 | `integrity` | 0–1 | Epithelial barrier strength |
-| `inflammation` | 0–1 | Local inflammatory load |
-| `immuneActivity` | 0–1 | Advanced mode only — simplified cytokine/macrophage proxy (lags `inflammation`) |
+| `inflammation` | 0–1 | **Emergent** tissue inflammatory load — computed from pathogen/allergen pressure, barrier defect, biofilm, and `immuneActivity` |
+| `immuneActivity` | 0–1 | Acute immune signaling (histamine/cytokine proxy); raised by immune stressors; advanced stats meter |
 | `biofilm` | 0–1 | Microbial biofilm accumulation |
 | `sugarLoad` | 0–1 | Available sugar substrate (region-specific decay; day meals add load in advanced mode) |
 | `postbioticLevel` | 0–1 | SCFA postbiotic concentration |
+| `tryptophanSupport` | 0–1 | Gut only — educational tryptophan / gut-brain proxy (lifecycle + gut UI) |
 | `probioticCount` | integer | Live probiotic nodes |
 | `pathogenCount` | integer | Pathogen + yeast nodes |
 | `allergenCount` | integer | Allergen nodes |

@@ -42,7 +42,7 @@ Per-region **Suggested** shortcuts live in [`regionSuggestions.ts`](../../src/da
 | --- | --- |
 | Probiotics | L. acidophilus, L. casei, L. rhamnosus, L. salivarius, L. reuteri, B. lactis, B. longum, B. bifidum |
 | Prebiotic | FOS |
-| Biome bonus | integrity +0.06, inflammation −0.08 (scaled) |
+| Biome bonus | integrity +0.06 (scaled) |
 
 ---
 
@@ -53,7 +53,7 @@ Per-region **Suggested** shortcuts live in [`regionSuggestions.ts`](../../src/da
 | Component | Strains |
 | --- | --- |
 | Probiotics | S. salivarius K12, S. salivarius M18 (>10⁹ CFU educational label) |
-| Biome bonus | biofilm −0.15, moisture +0.12 (saliva film), inflammation −0.12, integrity +0.08 |
+| Biome bonus | biofilm −0.15, moisture +0.12 (saliva film), integrity +0.08 |
 
 **Target tissues:** oral mucosa, gums, throat, nose, ear — full efficacy in `oral`, `nose`, `ear`; strongly reduced elsewhere (lozenge does not colonize gut/skin the same way).
 
@@ -68,7 +68,7 @@ Per-region **Suggested** shortcuts live in [`regionSuggestions.ts`](../../src/da
 | Component | Strains |
 | --- | --- |
 | Probiotics | L. acidophilus, L. rhamnosus, L. reuteri |
-| Biome bonus | pH −0.35, inflammation −0.12, integrity +0.08 |
+| Biome bonus | pH −0.35, integrity +0.08 |
 
 **Target tissues:** vaginal mucosa — full efficacy in `vaginal`; reduced elsewhere.
 
@@ -83,7 +83,7 @@ Per-region **Suggested** shortcuts live in [`regionSuggestions.ts`](../../src/da
 | Component | Strains |
 | --- | --- |
 | Probiotics | L. acidophilus, L. rhamnosus |
-| Biome bonus | pH −0.20, biofilm −0.12, moisture +0.08, inflammation −0.10 |
+| Biome bonus | pH −0.20, biofilm −0.12, moisture +0.08 |
 
 **Target tissues:** epidermis and scalp — full efficacy in `skin`, `scalp`; reduced elsewhere.
 
@@ -121,7 +121,7 @@ Fermented vegetables — high L. plantarum with fiber.
 | --- | --- |
 | Probiotics | L. plantarum, L. casei, L. salivarius, L. reuteri |
 | Prebiotic | inulin (vegetable fiber) |
-| Biome bonus | pH −0.22, postbioticLevel +0.06, inflammation −0.10 |
+| Biome bonus | pH −0.22, postbioticLevel +0.06 |
 
 ---
 
@@ -133,7 +133,7 @@ Fermented cabbage — European counterpart to kimchi, L. plantarum-rich.
 | --- | --- |
 | Probiotics | L. plantarum, L. casei, L. reuteri |
 | Prebiotic | inulin (cabbage fiber) |
-| Biome bonus | pH −0.18, postbioticLevel +0.05, inflammation −0.08 |
+| Biome bonus | pH −0.18, postbioticLevel +0.05 |
 
 ---
 

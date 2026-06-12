@@ -14,6 +14,23 @@ Actions are **region-gated**: calling a disallowed action logs `"Trigger/Inocula
 
 Each stressor defines biome deltas, optional microbe spawns, event-log messages, and a visual burst category (`allergen`, `alkaline`, `stress`, or `default`). See `StressorDef` in [`stressors.ts`](../src/data/stressors.ts) for the full schema.
 
+### How stressors affect tissue (June 2026 model)
+
+Stressors no longer apply a flat **`inflammation`** delta in most cases. Instead:
+
+| Mechanism | Stressor examples | Effect |
+| --- | --- | --- |
+| **Immune signaling** | `histamine`, `allergen`, smoke, NSAIDs, cortisol stress | Raises `immuneActivity` (histamine / cytokine proxy) |
+| **Barrier & environment** | dry air, alkaline wash, dehydration | Lowers `integrity`, pH, moisture — inflammation rises **emergently** |
+| **Microbial pressure** | bacterial sinusitis, enteropathogen bloom, thrush | Spawns pathogens/yeast — inflammation tracks load over ticks |
+| **Substrate / biofilm** | sugar exposure, sebum surge, poor hygiene | Raises `sugarLoad` or `biofilm` — pathogens grow, inflammation follows |
+
+After each trigger, `syncEmergentInflammation()` pulls **`inflammation`** toward a computed target. See [Simulation dynamics](../simulation/dynamics.md#inflammation-and-immune-signaling).
+
+**Antibiotic triggers** (`antibiotic_ear_drops`, `topical_antibiotic`, `antibiotic_course`, `antibiotic_disruption`, `c_diff_after_antibiotics`) resolve route-specific spectra from [`antibioticSpectra.ts`](../src/data/antibioticSpectra.ts): otic, topical, gut_broad, vaginal_systemic. Per-trigger `biome` fields merge as extras (e.g. C. diff adds spawns and barrier stress on top of gut_broad).
+
+---
+
 ### Ear canal (12)
 
 | ID | Label |
@@ -161,11 +178,11 @@ Each stressor defines biome deltas, optional microbe spawns, event-log messages,
 
 Legacy per-trigger effect tables (original 18) are preserved in git history; all effect values now live in [`stressors.ts`](../src/data/stressors.ts).
 
-**Antibiotic triggers** (`antibiotic_ear_drops`, `topical_antibiotic`, `antibiotic_course`, `antibiotic_disruption`, `c_diff_after_antibiotics`) resolve route-specific spectra from [`antibioticSpectra.ts`](../src/data/antibioticSpectra.ts): otic, topical, gut_broad, vaginal_systemic. Per-trigger `biome` fields merge as extras (e.g. C. diff adds inflammation and spawns on top of gut_broad).
-
 ---
 
 ## Inoculations
+
+On apply, catalog strains/products modify **`BiomeEffect`** scalars (pH, integrity, `immuneActivity`, postbiotic, etc.) and then **`syncEmergentInflammation()`** recalculates tissue **`inflammation`**. Probiotics rarely set inflammation directly — they act through competition, acidification, barrier support, and (for a few strains) mild **`immuneActivity`** reduction.
 
 ### `prebiotic` — ADD PREBIOTIC FIBER
 
@@ -187,7 +204,9 @@ Legacy per-trigger effect tables (original 18) are preserved in git history; all
 | --- | --- |
 | postbioticLevel | +0.3 |
 | integrity | +0.12 |
-| inflammation | −0.15 |
+| immuneActivity | −0.05 |
+
+**Emergent:** postbioticLevel and lower immune signaling pull inflammation down over subsequent ticks.
 
 **Event log:** "SCFA postbiotic surge — barrier recovery"
 
@@ -214,8 +233,10 @@ Legacy per-trigger effect tables (original 18) are preserved in git history; all
 | Effect | Value |
 | --- | --- |
 | Spawn | 16 L. rhamnosus |
-| inflammation | −0.18 (floor 0) |
 | integrity | +0.1 |
+| immuneActivity | −0.06 |
+
+**Emergent:** competition + barrier support → inflammation eases over ticks (not instant).
 
 **Event log:** "L. rhamnosus inoculated — competing for attachment"
 
@@ -242,8 +263,9 @@ Legacy per-trigger effect tables (original 18) are preserved in git history; all
 | Effect | Value |
 | --- | --- |
 | Spawn | 16 L. plantarum |
-| inflammation | −0.18 |
 | integrity | +0.1 |
+
+**Emergent:** pathogen competition and barrier recovery lower inflammation indirectly.
 
 **Event log:** "L. plantarum seeded — competing for attachment"
 
@@ -271,7 +293,8 @@ Legacy per-trigger effect tables (original 18) are preserved in git history; all
 | --- | --- |
 | Spawn | 14 S. boulardii |
 | yeast vitality | −0.25 |
-| inflammation | −0.12 |
+
+**Emergent:** yeast load drop → lower emergent inflammation.
 
 **Event log:** "S. boulardii seeded — antifungal competition active"
 
@@ -284,10 +307,11 @@ Legacy per-trigger effect tables (original 18) are preserved in git history; all
 | Effect | Value |
 | --- | --- |
 | moisture | +0.15 |
-| inflammation | −0.1 |
 | allergenAdhesion | −0.2 (floor 0) |
 
-**Event log:** "Saline mist — moisture restored, inflammation easing"
+**Emergent:** moisture + reduced allergen adhesion → inflammation eases as immune signal decays.
+
+**Event log:** "Saline mist — moisture restored, allergen adhesion reduced"
 
 ---
 
@@ -351,28 +375,28 @@ Strain and product shortcuts per region live in [`regionSuggestions.ts`](../../s
 
 Available via **Interventions → Strain library** tab. Source: [`src/data/strains.ts`](../../src/data/strains.ts), `inoculateStrain()`.
 
-| Action ID | Strain | Spawn | Primary effects |
-| --- | --- | --- | --- |
-| `lrham` | L. rhamnosus | 16 | inflammation −0.18, integrity +0.1 |
-| `lacid` | L. acidophilus | 18 | pH −0.5, biofilm −0.2 |
-| `lcasei` | L. casei | 14 | inflammation −0.12, integrity +0.08 |
-| `lparacasei` | L. paracasei | 14 | inflammation −0.14, integrity +0.09, postbiotic +0.03 |
-| `lsaliv` | L. salivarius | 18 | pH −0.2, biofilm −0.15 |
-| `lreuteri` | L. reuteri | 12 | inflammation −0.14, integrity +0.09, pH −0.15 |
-| `lgasseri` | L. gasseri | 14 | inflammation −0.16, integrity +0.10, pH −0.12 |
-| `lferment` | L. fermentum | 12 | pH −0.18, postbiotic +0.05, inflammation −0.10 |
-| `blactis` | B. lactis | 14 | commensal +0.15, postbiotic +0.04 |
-| `blongum` | B. longum | 12 | commensal +0.12, postbiotic +0.05 |
-| `bbifidum` | B. bifidum | 12 | commensal +0.14, postbiotic +0.04 |
-| `bbreve` | B. breve | 13 | commensal +0.16, postbiotic +0.05 |
-| `binf` | B. infantis | 14 | commensal +0.2, integrity +0.08 |
-| `lplant` | L. plantarum | 16 | inflammation −0.18, integrity +0.1 |
-| `lbulgaricus` | L. bulgaricus | 10 | pH −0.25, biofilm −0.1 |
-| `sthermo` | S. thermophilus | 10 | pH −0.15 |
-| `sboul` | S. boulardii | 14 | yeast −0.25, inflammation −0.12 |
-| `ssaliv_k12` | S. salivarius K12 | 16 | biofilm −0.18, inflammation −0.1, moisture +0.08 |
-| `ssaliv_m18` | S. salivarius M18 | 16 | biofilm −0.22, integrity +0.06 |
-| `sepidermidis` | S. epidermidis (commensal) | 20 | biofilm −0.15 |
+| Action ID | Strain | Spawn | Primary apply effects | Inflammation |
+| --- | --- | --- | --- | --- |
+| `lrham` | L. rhamnosus | 16 | integrity +0.1, immuneActivity −0.06 | Emergent ↓ |
+| `lacid` | L. acidophilus | 18 | pH −0.5, biofilm −0.2 | Emergent ↓ (pH / competition) |
+| `lcasei` | L. casei | 14 | integrity +0.08, immuneActivity −0.05 | Emergent ↓ |
+| `lparacasei` | L. paracasei | 14 | integrity +0.09, postbiotic +0.03, immuneActivity −0.07 | Emergent ↓ |
+| `lsaliv` | L. salivarius | 18 | pH −0.2, biofilm −0.15 | Emergent ↓ |
+| `lreuteri` | L. reuteri | 12 | integrity +0.09, pH −0.15 | Emergent ↓ |
+| `lgasseri` | L. gasseri | 14 | integrity +0.10, pH −0.12 | Emergent ↓ |
+| `lferment` | L. fermentum | 12 | pH −0.18, postbiotic +0.05 | Emergent ↓ |
+| `blactis` | B. lactis | 14 | commensal +0.15, postbiotic +0.04 | Emergent ↓ (gut-brain via SCFA) |
+| `blongum` | B. longum | 12 | commensal +0.12, postbiotic +0.05 | Emergent ↓ (gut-brain via SCFA) |
+| `bbifidum` | B. bifidum | 12 | commensal +0.14, postbiotic +0.04 | Emergent ↓ |
+| `bbreve` | B. breve | 13 | commensal +0.16, postbiotic +0.05 | Emergent ↓ |
+| `binf` | B. infantis | 14 | commensal +0.2, integrity +0.08 | Emergent ↓ |
+| `lplant` | L. plantarum | 16 | integrity +0.1 | Emergent ↓ |
+| `lbulgaricus` | L. bulgaricus | 10 | pH −0.25, biofilm −0.1 | Emergent ↓ |
+| `sthermo` | S. thermophilus | 10 | pH −0.15 | Emergent ↓ |
+| `sboul` | S. boulardii | 14 | yeast −0.25 | Emergent ↓ |
+| `ssaliv_k12` | S. salivarius K12 | 16 | biofilm −0.18, moisture +0.08, pH −0.12 | Emergent ↓ |
+| `ssaliv_m18` | S. salivarius M18 | 16 | biofilm −0.22, integrity +0.06 | Emergent ↓ |
+| `sepidermidis` | S. epidermidis (commensal) | 20 | biofilm −0.15 | — |
 
 Commensal strains spawn as `commensal` nodes, not probiotics. Click any strain to preview in the **Action Preview** panel.
 
@@ -401,9 +425,9 @@ Source: [`src/data/postbiotics.ts`](../../src/data/postbiotics.ts), `applyPostbi
 
 | Action ID | Label | Preferred regions | Primary effects (scaled) |
 | --- | --- | --- | --- |
-| `scfa_mix` | SCFA mix | gut | postbiotic +0.3, integrity +0.12, inflammation −0.15 |
-| `butyrate` | Butyrate | gut | postbiotic +0.25, integrity +0.18, inflammation −0.12 |
-| `propionate` | Propionate | gut | postbiotic +0.15, inflammation −0.08, commensal +0.10 |
+| `scfa_mix` | SCFA mix | gut | postbiotic +0.3, integrity +0.12, immuneActivity −0.05 |
+| `butyrate` | Butyrate | gut | postbiotic +0.25, integrity +0.18, immuneActivity −0.04 |
+| `propionate` | Propionate | gut | postbiotic +0.15, immuneActivity −0.03, commensal +0.10 |
 | `acetate` | Acetate | gut, oral | postbiotic +0.12, pH −0.08, integrity +0.06 |
 
 Gut regional care **RELEASE SCFA BOOST** (`scfa`) delegates to `scfa_mix`. Use the **Postbiotics** catalog tab for individual metabolites.

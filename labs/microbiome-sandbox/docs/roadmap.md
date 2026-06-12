@@ -58,6 +58,8 @@ Core educational lab features implemented and documented.
 | SIM-06 | P3 | **Done** — region-specific sugarLoad decay | `sugarLoadDecay.ts` — oral fastest, gut slowest |
 | SIM-07 | P2 | **Done** — B. infantis aligned with nose/gut | Baseline spawns + strain panel on both regions; labels match residents |
 | SIM-08 | P1 | **Done** — per-strain effects on product apply | See Next up |
+| SIM-09 | P1 | **Done** — emergent inflammation model | `inflammationDynamics.ts` — inflammation from pathogen/allergen/barrier/biofilm/immuneActivity; stressors use `immuneActivity` not flat inflammation |
+| SIM-10 | P2 | **Done** — gut-brain tryptophan proxy | `gutBrainDynamics.ts`, `tryptophanSupport` on gut + lifecycle UI; article links on key gut strains |
 
 ---
 
@@ -124,8 +126,9 @@ Core educational lab features implemented and documented.
 | ID | Priority | Current state | Target / gap |
 | --- | --- | --- | --- |
 | SCI-01 | P3 | **Done** — advanced mode cited pH bands | Optional toggle shows literature ranges per tissue (`phReference.ts`, env panel) |
-| SCI-02 | P3 | **Done** — immune activity proxy | `immuneActivity` scalar lags inflammation; shown in advanced stats |
+| SCI-02 | P3 | **Done** — immune activity proxy | `immuneActivity` for acute immune signaling; drives emergent inflammation; advanced stats meter |
 | SCI-03 | P3 | **Done** — day simulation meals | Breakfast→snack timeline raises `sugarLoad` on gut/oral (`dayMeals.ts`, `engine.applyMeal()`) |
+| SCI-04 | P3 | **Done** — gut-brain tryptophan proxy | `tryptophanSupport` on gut; linked to SCFA + low inflammation (not mood prediction) |
 
 Items in this section must preserve [Assumptions and limits](../simulation/assumptions-and-limits.md) disclaimers — avoid implying clinical precision.
 
@@ -176,8 +179,11 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 | ENG-01 | June 2026 | Data-driven inoculation defs (`inoculations.ts`) replace engine switch branches |
 | ENG-02 | June 2026 | Dashboard shell split into `ui/dashboard/*` template partials |
 | SCI-01 | June 2026 | Advanced mode pH reference bands with citations (`phReference.ts`, env panel) |
-| SCI-02 | June 2026 | `immuneActivity` cytokine/macrophage proxy in advanced stats (`engine.ts`, `types.ts`) |
+| SCI-02 | June 2026 | `immuneActivity` acute immune signaling; drives emergent inflammation (`inflammationDynamics.ts`) |
 | SCI-03 | June 2026 | Day meal simulation for gut/oral sugar load (`dayMeals.ts`, `engine.applyMeal()`) |
+| SCI-04 | June 2026 | Gut `tryptophanSupport` proxy + lifecycle UI (`gutBrainDynamics.ts`, `articles.ts` gutBrain) |
+| SIM-09 | June 2026 | Emergent inflammation + mechanism-based stressor/probiotic effects |
+| SIM-10 | June 2026 | Gut-brain tryptophan support stat and strain article links |
 | UX-01 | June 2026 | Keyboard region shortcuts 1–7, Esc to body map, focusable action buttons |
 | UX-02 | June 2026 | ARIA live announcer + stat threshold announcements (`Dashboard.ts`) |
 | UX-03 | June 2026 | Auto micro-view zoom animation + tissue banner (`App.ts`, `Dashboard.ts`) |

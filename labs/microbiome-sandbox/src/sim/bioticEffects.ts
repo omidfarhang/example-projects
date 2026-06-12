@@ -11,6 +11,7 @@ export interface BiomeMutable {
   moisture: number;
   integrity: number;
   inflammation: number;
+  immuneActivity: number;
   biofilm: number;
   postbioticLevel: number;
 }
@@ -27,8 +28,8 @@ export function applyBiomeEffects(b: BiomeMutable, effects: BiomeEffect) {
   if (effects.integrity !== undefined) {
     b.integrity = clamp(b.integrity + effects.integrity, 0, 1);
   }
-  if (effects.inflammation !== undefined) {
-    b.inflammation = clamp(b.inflammation + effects.inflammation, 0, 1);
+  if (effects.immuneActivity !== undefined) {
+    b.immuneActivity = clamp(b.immuneActivity + effects.immuneActivity, 0, 1);
   }
   if (effects.biofilm !== undefined) {
     b.biofilm = clamp(b.biofilm + effects.biofilm, 0, 1);
@@ -48,7 +49,9 @@ export function scaleBiomeEffect(effects: BiomeEffect, multiplier: number): Biom
   if (effects.ph !== undefined) scaled.ph = effects.ph * multiplier;
   if (effects.phMin !== undefined) scaled.phMin = effects.phMin;
   if (effects.phMax !== undefined) scaled.phMax = effects.phMax;
-  if (effects.inflammation !== undefined) scaled.inflammation = effects.inflammation * multiplier;
+  if (effects.immuneActivity !== undefined) {
+    scaled.immuneActivity = effects.immuneActivity * multiplier;
+  }
   if (effects.integrity !== undefined) scaled.integrity = effects.integrity * multiplier;
   if (effects.biofilm !== undefined) scaled.biofilm = effects.biofilm * multiplier;
   if (effects.postbioticLevel !== undefined) scaled.postbioticLevel = effects.postbioticLevel * multiplier;
@@ -68,7 +71,9 @@ export function mergeBiomeEffects(...effects: (BiomeEffect | undefined)[]): Biom
     if (e.ph !== undefined) out.ph = (out.ph ?? 0) + e.ph;
     if (e.phMin !== undefined) out.phMin = e.phMin;
     if (e.phMax !== undefined) out.phMax = e.phMax;
-    if (e.inflammation !== undefined) out.inflammation = (out.inflammation ?? 0) + e.inflammation;
+    if (e.immuneActivity !== undefined) {
+      out.immuneActivity = (out.immuneActivity ?? 0) + e.immuneActivity;
+    }
     if (e.integrity !== undefined) out.integrity = (out.integrity ?? 0) + e.integrity;
     if (e.biofilm !== undefined) out.biofilm = (out.biofilm ?? 0) + e.biofilm;
     if (e.postbioticLevel !== undefined) {

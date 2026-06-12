@@ -102,9 +102,9 @@ Maximum simulation rate: ~120 ticks/s (4 substeps at 60 FPS). Typical: 30–60 t
 `trigger(id)` and `inoculate(actionId)`:
 
 1. Check `isActionAllowed()` against region config
-2. Apply immediate biome mutations and/or spawn batches
+2. Apply immediate biome mutations and/or spawn batches (`immuneActivity`, pH, integrity, etc.)
 3. Push event log messages
-4. Call `updateCounts()`
+4. Call `syncEmergentInflammation()` — recalculates **`inflammation`** (and **`tryptophanSupport`** on gut) toward emergent targets
 
 No cooldowns or action queues.
 

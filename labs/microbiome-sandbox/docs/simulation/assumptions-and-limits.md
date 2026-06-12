@@ -9,8 +9,9 @@ What Bio-Dynamics simplifies, omits, and must not be interpreted as. Read this b
 Bio-Dynamics teaches **qualitative intuition**:
 
 - Environmental shifts change microbial growth conditions
-- Probiotics can compete with pathogens and support barrier recovery
-- Prebiotics feed probiotics; postbiotics (SCFA) support epithelial integrity
+- Probiotics compete with pathogens and support barrier recovery through mechanisms (pH, competition, SCFA) — not instant “inflammation −X” buttons
+- Prebiotics feed probiotics; postbiotics (SCFA) support epithelial integrity and calm immune signaling
+- On gut tissue, **`tryptophanSupport`** illustrates how a calmer mucosa + SCFA may relate to tryptophan / gut-brain signaling — not mood prediction
 
 It does **not** predict real-world outcomes for any individual, strain, dose, or tissue.
 
@@ -56,7 +57,8 @@ It does **not** predict real-world outcomes for any individual, strain, dose, or
 | --- | --- |
 | pH range 4–8 on a single slider | Tissue pH varies by micro-niche; slider is regional average |
 | Temperature 0–1 maps to 34–38°C | Body temperature regulation not modeled |
-| Nine env variables capture tissue state | Omits detailed immune signaling, IgA, bile acids, peristalsis, hormones (advanced mode adds simplified `immuneActivity` proxy only) |
+| Nine env variables capture tissue state | Omits detailed immune signaling, IgA, bile acids, peristalsis, hormones (advanced mode adds `immuneActivity`; inflammation is emergent) |
+| `tryptophanSupport` is a gut-only scalar | Does not model serotonin synthesis, blood-brain transport, or psychiatric outcomes |
 | Slider changes apply instantly | No gradual equilibration or homeostatic response |
 
 ---
@@ -65,7 +67,7 @@ It does **not** predict real-world outcomes for any individual, strain, dose, or
 
 | Assumption | Reality gap |
 | --- | --- |
-| Triggers/inoculations have immediate effect | Real interventions have onset, duration, and clearance |
+| Triggers/inoculations apply mechanism deltas then sync emergent inflammation | Real interventions have onset, duration, clearance, and systemic effects |
 | Antibiotics use route-specific spectra (otic, topical, gut, vaginal) | No resistance, dose-response, or pharmacokinetics |
 | Same probiotic action spawns fixed node count everywhere | No colonization probability or mucosal adhesion model |
 | Region gating is binary | Real interventions may be systemic, not tissue-local |
@@ -80,7 +82,7 @@ It does **not** predict real-world outcomes for any individual, strain, dose, or
 | Fixed 30 Hz tick, max 4 substeps | Time acceleration varies with frame rate |
 | No persistence between sessions | Refresh resets all state |
 | No save/load or URL-encoded state | Cannot share mid-simulation snapshots |
-| No test suite | Behavior verified manually only |
+| Golden snapshot tests (`engine.golden.test.ts`) | Not exhaustive coverage of all 82 stressors |
 
 ---
 

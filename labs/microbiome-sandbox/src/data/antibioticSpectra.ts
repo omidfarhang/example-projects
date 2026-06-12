@@ -62,7 +62,7 @@ export const ANTIBIOTIC_SPECTRA: Record<AntibioticRoute, AntibioticSpectrum> = {
       postbioticMin: 0,
       integrity: -0.1,
       integrityMin: 0.2,
-      inflammation: 0.12,
+      immuneActivity: 0.08,
     },
   },
   vaginal_systemic: {
@@ -75,7 +75,7 @@ export const ANTIBIOTIC_SPECTRA: Record<AntibioticRoute, AntibioticSpectrum> = {
       pathogenVitality: -0.18,
       yeastVitality: -0.1,
     },
-    biome: { ph: 0.45, phMax: 6.5, integrity: -0.14, integrityMin: 0.2, inflammation: 0.15 },
+    biome: { ph: 0.45, phMax: 6.5, integrity: -0.14, integrityMin: 0.2, immuneActivity: 0.1 },
   },
 };
 

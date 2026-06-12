@@ -35,27 +35,29 @@ Pathogen count in the UI includes both `pathogen` and `yeast` node types.
 
 ## Probiotic strains
 
-| Strain | Action ID | Available regions | Primary effects |
+Most probiotics do **not** apply instant inflammation changes. They acidify pH, compete with pathogens, support barrier integrity, raise SCFA, or mildly reduce **`immuneActivity`**. Tissue **inflammation** then eases **emergently** as microbial pressure falls. See [Simulation dynamics](../simulation/dynamics.md#inflammation-and-immune-signaling).
+
+| Strain | Action ID | Available regions | Primary apply effects |
 | --- | --- | --- | --- |
-| L. rhamnosus | `lrham` | ear, scalp, nose, vaginal (+ all via strain panel) | Spawn 16; inflammation −0.18; integrity +0.1 |
+| L. rhamnosus | `lrham` | ear, scalp, nose, vaginal (+ all via strain panel) | Spawn 16; integrity +0.1; immuneActivity −0.06 |
 | L. acidophilus | `lacid` | oral, skin, vaginal (+ strain panel) | Spawn 18; pH −0.5; biofilm −0.2 |
-| L. casei | `lcasei` | gut, oral (+ strain panel) | Spawn 14; inflammation −0.12; integrity +0.08 |
-| L. paracasei | `lparacasei` | gut, oral, nose (+ strain panel) | Spawn 14; inflammation −0.14; postbiotic +0.03 |
+| L. casei | `lcasei` | gut, oral (+ strain panel) | Spawn 14; integrity +0.08; immuneActivity −0.05 |
+| L. paracasei | `lparacasei` | gut, oral, nose (+ strain panel) | Spawn 14; integrity +0.09; postbiotic +0.03; immuneActivity −0.07 |
 | L. salivarius | `lsaliv` | oral (+ strain panel) | Spawn 18; pH −0.2; biofilm −0.15 |
-| L. reuteri | `lreuteri` | gut, oral, vaginal (+ strain panel) | Spawn 12; inflammation −0.14; pH −0.15 |
-| L. gasseri | `lgasseri` | vaginal, oral, gut (+ strain panel) | Spawn 14; inflammation −0.16; pH −0.12 |
+| L. reuteri | `lreuteri` | gut, oral, vaginal (+ strain panel) | Spawn 12; integrity +0.09; pH −0.15 |
+| L. gasseri | `lgasseri` | vaginal, oral, gut (+ strain panel) | Spawn 14; integrity +0.10; pH −0.12 |
 | L. fermentum | `lferment` | gut, oral (+ strain panel) | Spawn 12; pH −0.18; postbiotic +0.05 |
-| B. lactis | `blactis` | gut (+ strain panel) | Spawn 14; commensal +0.15; postbiotic +0.04 |
-| B. longum | `blongum` | gut (+ strain panel) | Spawn 12; commensal +0.12; postbiotic +0.05 |
+| B. lactis | `blactis` | gut (+ strain panel) | Spawn 14; commensal +0.15; postbiotic +0.04; gut-brain article link |
+| B. longum | `blongum` | gut (+ strain panel) | Spawn 12; commensal +0.12; postbiotic +0.05; gut-brain article link |
 | B. bifidum | `bbifidum` | gut (+ strain panel) | Spawn 12; commensal +0.14; postbiotic +0.04 |
 | B. breve | `bbreve` | gut (+ strain panel) | Spawn 13; commensal +0.16; postbiotic +0.05 |
 | B. infantis | `binf` | nose, gut (+ strain panel) | Spawn 14; commensal +0.2; integrity +0.08 |
-| L. plantarum | `lplant` | gut (+ strain panel) | Spawn 16; inflammation −0.18; integrity +0.1 |
+| L. plantarum | `lplant` | gut (+ strain panel) | Spawn 16; integrity +0.1; gut-brain article link |
 | L. bulgaricus | `lbulgaricus` | strain panel (all regions) | Spawn 10; pH −0.25; biofilm −0.1 |
 | S. thermophilus | `sthermo` | strain panel (all regions) | Spawn 10; pH −0.15 |
-| S. boulardii | `sboul` | oral (+ strain panel) | Spawn 14; yeast −0.25; inflammation −0.12 |
-| S. salivarius K12 | `ssaliv_k12` | oral, nose, ear (+ strain panel) | Spawn 16; biofilm −0.18; oral BLIS niche |
-| S. salivarius M18 | `ssaliv_m18` | oral, nose, ear (+ strain panel) | Spawn 16; biofilm −0.22; dental/gum niche |
+| S. boulardii | `sboul` | oral (+ strain panel) | Spawn 14; yeast −0.25 |
+| S. salivarius K12 | `ssaliv_k12` | oral, nose, ear (+ strain panel) | Spawn 16; biofilm −0.18; moisture +0.08; pH −0.12 |
+| S. salivarius M18 | `ssaliv_m18` | oral, nose, ear (+ strain panel) | Spawn 16; biofilm −0.22; integrity +0.06 |
 
 Note: **L. salivarius** (`lsaliv`) and **S. salivarius K12/M18** are different organisms — the oral lozenge product uses *Streptococcus* salivarius strains.
 
@@ -101,11 +103,11 @@ Postbiotics are modeled as **`postbioticLevel`** on `BiomeState` (0–1), not as
 
 Source: [`src/data/postbiotics.ts`](../../src/data/postbiotics.ts)
 
-| Metabolite | Action ID | Preferred regions | Primary effects |
+| Metabolite | Action ID | Preferred regions | Primary apply effects |
 | --- | --- | --- | --- |
-| SCFA mix | `scfa_mix` | gut | postbiotic +0.3, integrity +0.12, inflammation −0.15 |
-| Butyrate | `butyrate` | gut | postbiotic +0.25, integrity +0.18, inflammation −0.12 |
-| Propionate | `propionate` | gut | postbiotic +0.15, commensal +0.10, inflammation −0.08 |
+| SCFA mix | `scfa_mix` | gut | postbiotic +0.3, integrity +0.12, immuneActivity −0.05 |
+| Butyrate | `butyrate` | gut | postbiotic +0.25, integrity +0.18, immuneActivity −0.04 |
+| Propionate | `propionate` | gut | postbiotic +0.15, commensal +0.10, immuneActivity −0.03 |
 | Acetate | `acetate` | gut, oral | postbiotic +0.12, pH −0.08, integrity +0.06 |
 
 ### Sources
@@ -119,11 +121,13 @@ Source: [`src/data/postbiotics.ts`](../../src/data/postbiotics.ts)
 When `postbioticLevel > 0.2`:
 
 - Integrity +0.001/tick
-- Inflammation −0.0005/tick
+- Inflammation target lowered via emergent dynamics (calm mucosa + SCFA)
+
+On **gut** tissue, strong postbiotics also raise **`tryptophanSupport`** — an educational gut-brain / serotonin-precursor proxy (see [Dynamics](../simulation/dynamics.md#gut-brain-tryptophan-support-gut-only)).
 
 ### UI
 
-SCFA stat row visible only when preset is `lifecycle`.
+SCFA stat row visible when preset is `lifecycle`. **Tryptophan support** row visible when preset is `lifecycle` **and** region is `gut`.
 
 ### Visualization
 
@@ -184,7 +188,7 @@ Allergens spawn from above (y ∈ [0.55, 1.25]), fall toward epithelium, and gai
 
 | Action ID | Label strain | Regions | Effect |
 | --- | --- | --- | --- |
-| `saline_mist` | saline_mist | ear, nose | moisture +0.15; inflammation −0.1; allergen adhesion −0.2 |
+| `saline_mist` | saline_mist | ear, nose | moisture +0.15; allergen adhesion −0.2 (inflammation eases emergently) |
 | `ph_serum` | ph_serum | scalp, skin, vaginal | pH −0.35; moisture +0.05 |
 
 These do not spawn microbe nodes; they modify biome scalars directly.
@@ -198,7 +202,9 @@ flowchart LR
   PrebioticFiber[Prebiotic inulin] -->|"near probiotic r=0.4"| ProbioticGrowth[Probiotic growth]
   ProbioticGrowth --> PostbioticSCFA[postbioticLevel SCFA]
   PostbioticSCFA --> BarrierHeal[Integrity recovery]
+  PostbioticSCFA --> Tryptophan[Gut tryptophanSupport]
   ProbioticGrowth --> Competition["Suppress pathogen allergen yeast r=0.35"]
+  LowInflamm[Low emergent inflammation] --> Tryptophan
 ```
 
 ---

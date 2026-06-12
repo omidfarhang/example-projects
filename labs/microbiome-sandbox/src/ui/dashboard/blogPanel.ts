@@ -70,6 +70,7 @@ export function blogPanelPartial(): string {
               <strong data-prebiotic-stat title="Fiber particles in the lumen; % remaining drops as probiotics convert substrate to SCFA">0 →</strong>
             </div>
             <div class="bd-stat" data-postbiotic-row hidden><span>${t('stats.postbiotic')}</span><strong data-postbiotic>0%</strong></div>
+            <div class="bd-stat bd-stat--tryptophan" data-tryptophan-row hidden title="${t('stats.tryptophanSupportTitle')}"><span>${t('stats.tryptophanSupport')}</span><strong data-tryptophan>0%</strong></div>
             <p class="bd-scale-footnote" data-population-scale-note title="${t('stats.populationScaleTitle', { scale: POPULATION_SCALE })}">
               ${t('stats.populationScaleNote', { scale: POPULATION_SCALE })}
             </p>

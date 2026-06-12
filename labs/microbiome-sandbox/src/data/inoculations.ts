@@ -37,10 +37,10 @@ export const INOCULATIONS: Record<string, InoculationDef> = {
   },
   saline_mist: {
     id: 'saline_mist',
-    biome: { moisture: 0.15, moistureMax: 1, inflammation: -0.1 },
+    biome: { moisture: 0.15, moistureMax: 1 },
     allergenAdhesionDelta: -0.2,
-    eventLog: 'Saline mist — moisture restored, inflammation easing',
-    why: 'Saline mist — moisture restored, allergen adhesion reduced, inflammation easing',
+    eventLog: 'Saline mist — moisture restored, allergen adhesion reduced',
+    why: 'Saline mist — restores moisture and clears allergen adhesion; inflammation eases as barrier and allergen load improve.',
   },
   ph_serum: {
     id: 'ph_serum',
@@ -60,7 +60,7 @@ export const INOCULATIONS: Record<string, InoculationDef> = {
     id: 'lrham',
     strain: 'lrham',
     eventLog: 'L. rhamnosus inoculated — competing for attachment',
-    why: 'Barrier-supporting strain that calms mucosal inflammation and strengthens epithelial integrity.',
+    why: 'Barrier-supporting strain — competes with pathogens and supports epithelial integrity.',
   },
   lacid: {
     id: 'lacid',
@@ -90,7 +90,7 @@ export const INOCULATIONS: Record<string, InoculationDef> = {
     id: 'sboul',
     strain: 'sboul',
     eventLog: 'S. boulardii seeded — antifungal competition active',
-    why: 'Probiotic yeast competitor — suppresses Candida overgrowth and lowers inflammation.',
+    why: 'Probiotic yeast competitor — suppresses Candida overgrowth; inflammation falls as yeast load drops.',
   },
   lcasei: {
     id: 'lcasei',

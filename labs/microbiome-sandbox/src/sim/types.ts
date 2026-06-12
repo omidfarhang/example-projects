@@ -23,8 +23,9 @@ export interface BiomeState {
   sweatRate: number;
   oxygenTension: number;
   integrity: number;
+  /** Tissue inflammation — emergent from pathogen load, allergens, barrier, biofilm, and immune signaling. */
   inflammation: number;
-  /** Simplified cytokine / macrophage proxy — lags inflammation; advanced mode only. */
+  /** Acute immune signaling (histamine, cytokines) — drives inflammation indirectly over time. */
   immuneActivity: number;
   biofilm: number;
   sugarLoad: number;
@@ -36,6 +37,8 @@ export interface BiomeState {
   /** Mean vitality of live prebiotic nodes (0–1); drops as probiotics convert substrate. */
   prebioticSubstrateLevel: number;
   postbioticLevel: number;
+  /** Gut-only proxy for tryptophan (serotonin precursor) availability — emergent from calm mucosa + SCFA. */
+  tryptophanSupport: number;
 }
 
 export interface SimSnapshot {

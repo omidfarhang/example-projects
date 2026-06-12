@@ -47,8 +47,8 @@ Tissue environment and aggregate metrics.
 | `sweatRate` | number | 0–1 | Slider |
 | `oxygenTension` | number | 0–1 | Slider |
 | `integrity` | number | 0–1 | Dynamics + actions |
-| `inflammation` | number | 0–1 | Dynamics + actions |
-| `immuneActivity` | number | 0–1 | Advanced mode — cytokine/macrophage proxy (lags inflammation) |
+| `inflammation` | number | 0–1 | **Emergent** — target from pathogen/allergen load, barrier, biofilm, immuneActivity ([`inflammationDynamics.ts`](../../src/sim/inflammationDynamics.ts)) |
+| `immuneActivity` | number | 0–1 | Acute immune signaling (histamine/cytokine proxy); stressors ↑, decay + postbiotics ↓; advanced stats meter |
 | `biofilm` | number | 0–1 | Dynamics + actions |
 | `sugarLoad` | number | 0–1 | Triggers + region-specific decay + advanced day meals |
 | `probioticCount` | number | ≥ 0 | Computed from nodes |
@@ -58,6 +58,7 @@ Tissue environment and aggregate metrics.
 | `prebioticCount` | number | ≥ 0 | Prebiotic fiber nodes in lumen |
 | `prebioticSubstrateLevel` | number | 0–1 | Mean vitality of prebiotic nodes; drops during conversion |
 | `postbioticLevel` | number | 0–1 | Conversion + scfa action |
+| `tryptophanSupport` | number | 0–1 | Gut only — emergent tryptophan/serotonin-precursor proxy ([`gutBrainDynamics.ts`](../../src/sim/gutBrainDynamics.ts)); lifecycle + gut UI |
 
 ### `SimSnapshot`
 

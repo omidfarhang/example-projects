@@ -39,7 +39,7 @@ export const PRESETS: Record<PresetId, PresetDef> = {
     id: 'lifecycle',
     title: 'Biotic Lifecycle Sandbox',
     scenario:
-      'Free-play across unlocked regions. Select gut tissue to add prebiotic fiber, watch probiotics consume it, and observe postbiotic SCFA particles healing epithelial integrity.',
+      'Free-play across unlocked regions. On gut tissue, add prebiotic fiber and watch probiotics ferment it into SCFA — as gut inflammation eases, tryptophan availability rises, supporting serotonin production along the gut-brain axis.',
     articleKey: 'lifecycle',
     defaultRegion: 'gut',
     env: buildRegionEnv({ ph: 6.2, moisture: 0.65, temperature: 0.6, oxygenTension: 0.12 }),

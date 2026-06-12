@@ -18,6 +18,7 @@ export type ImpactSourceKind = 'strain' | 'prebiotic' | 'postbiotic' | 'product'
 export type ImpactMetric =
   | 'integrity'
   | 'inflammation'
+  | 'immune'
   | 'biofilm'
   | 'ph'
   | 'moisture'
@@ -54,6 +55,7 @@ export interface ActionImpact {
 const METRIC_LABELS: Record<ImpactMetric, string> = {
   integrity: 'integrity',
   inflammation: 'inflammation',
+  immune: 'immune signal',
   biofilm: 'biofilm',
   ph: 'pH',
   moisture: 'moisture',
@@ -64,7 +66,7 @@ const METRIC_LABELS: Record<ImpactMetric, string> = {
 
 function directionFor(metric: ImpactMetric, delta: number): 'up' | 'down' {
   if (delta === 0) return 'up';
-  const harmfulWhenUp = metric === 'inflammation' || metric === 'biofilm' || metric === 'ph' || metric === 'yeast';
+  const harmfulWhenUp = metric === 'inflammation' || metric === 'immune' || metric === 'biofilm' || metric === 'ph' || metric === 'yeast';
   if (harmfulWhenUp) return delta > 0 ? 'up' : 'down';
   return delta > 0 ? 'up' : 'down';
 }
@@ -78,7 +80,7 @@ function biomeToDeltas(effects: BiomeEffect, source: ImpactDelta['source']): Imp
   push('ph', effects.ph);
   push('moisture', effects.moisture);
   push('integrity', effects.integrity);
-  push('inflammation', effects.inflammation);
+  push('immune', effects.immuneActivity);
   push('biofilm', effects.biofilm);
   push('postbiotic', effects.postbioticLevel);
   push('commensal', effects.commensalVitality);
@@ -259,7 +261,7 @@ function stressorBiomeToDeltas(e: StressorBiomeDelta): ImpactDelta[] {
   push('ph', e.ph);
   push('moisture', e.moisture);
   push('integrity', e.integrity);
-  push('inflammation', e.inflammation);
+  push('immune', e.immuneActivity);
   push('biofilm', e.biofilm);
   push('postbiotic', e.postbioticLevel);
   push('commensal', e.commensalVitality);
@@ -356,7 +358,7 @@ export function buildImpactForSource(kind: ImpactSourceKind, id: string, regionI
 export function deltasForMeters(deltas: ImpactDelta[]): ImpactMetric[] {
   const metrics = new Set<ImpactMetric>();
   for (const d of deltas) {
-    if (d.metric === 'integrity' || d.metric === 'inflammation') {
+    if (d.metric === 'integrity' || d.metric === 'inflammation' || d.metric === 'immune') {
       metrics.add(d.metric);
     }
   }
