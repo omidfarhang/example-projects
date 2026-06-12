@@ -4,6 +4,19 @@ import path from 'node:path';
 import { copyDir, dirExists, emptyDir, ensureDir, fileExists } from './fs-utils.mjs';
 import { PLAYGROUND_ROOT, REPO_ROOT, distDemoDir } from './paths.mjs';
 
+const IGNORED_DIR_NAMES = new Set([
+  'node_modules',
+  'dist',
+  '.git',
+  '.angular',
+  '.vite',
+  '.nx',
+  'coverage',
+  '.cache',
+  'build',
+  'target',
+]);
+
 function hashFile(filePath) {
   if (!fileExists(filePath)) {
     return 'missing';
@@ -12,12 +25,41 @@ function hashFile(filePath) {
   return crypto.createHash('sha256').update(content).digest('hex').slice(0, 16);
 }
 
+function hashProjectTree(projectPath) {
+  if (!dirExists(projectPath)) {
+    return 'missing';
+  }
+
+  const fileHashes = [];
+  function walk(dir) {
+    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (IGNORED_DIR_NAMES.has(ent.name)) {
+        continue;
+      }
+      const full = path.join(dir, ent.name);
+      if (ent.isDirectory()) {
+        walk(full);
+      } else if (ent.isFile()) {
+        const rel = path.relative(projectPath, full).replace(/\\/g, '/');
+        fileHashes.push(`${rel}:${hashFile(full)}`);
+      }
+    }
+  }
+
+  walk(projectPath);
+  fileHashes.sort();
+  return crypto.createHash('sha256').update(fileHashes.join('\n')).digest('hex').slice(0, 16);
+}
+
 /**
- * Hash lockfiles for a build target to detect when rebuild is needed.
+ * Hash project inputs for a build target to detect when rebuild is needed.
  */
 export function computeLockHash(target) {
   const projectPath = path.join(REPO_ROOT, target.projectDir);
-  const parts = [hashFile(path.join(projectPath, 'package-lock.json'))];
+  const parts = [
+    hashFile(path.join(projectPath, 'package-lock.json')),
+    hashProjectTree(projectPath),
+  ];
 
   // Multi-package projects (qwik-mfe, stencil-angular)
   if (target.type === 'qwik-mfe') {
