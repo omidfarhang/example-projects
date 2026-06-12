@@ -65,9 +65,9 @@ Core educational lab features implemented and documented.
 
 | ID | Priority | Current state | Target / gap |
 | --- | --- | --- | --- |
-| STATE-01 | P2 | No session persistence | URL-encoded state (`?integrity=0.6&...`) or localStorage restore |
-| STATE-02 | P3 | No mid-simulation share link | "Copy lab state" button serializing preset, region, biome, tick |
-| STATE-03 | P3 | Refresh loses all progress | Optional "Resume last session" prompt |
+| STATE-01 | P2 | **Done** — URL + localStorage persistence | `?lab=` checkpoint restore; autosave to `localStorage` (`labState.ts`) |
+| STATE-02 | P3 | **Done** — Copy lab state link | “Copy lab link” button — preset, region, biome, tick, nodes |
+| STATE-03 | P3 | **Done** — Resume last session | Banner on refresh when autosaved snapshot exists |
 
 ---
 
@@ -135,9 +135,9 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 
 | ID | Priority | Current state | Target / gap |
 | --- | --- | --- | --- |
-| DOC-01 | P3 | Plain Markdown in repo | MkDocs or Docusaurus site from `docs/` |
-| DOC-02 | P2 | No changelog | CHANGELOG.md when app changes ship |
-| DOC-03 | P3 | No diagram of tissue model layers | Per-region anatomy diagrams in regions.md |
+| DOC-01 | P3 | **Done** — MkDocs site | `mkdocs.yml` + `npm run docs:serve` / `docs:build` |
+| DOC-02 | P2 | **Done** — CHANGELOG | [`CHANGELOG.md`](../../CHANGELOG.md) at lab root |
+| DOC-03 | P3 | **Done** — tissue layer diagrams | Mermaid layer models per region in `domain/regions.md` |
 
 ---
 
@@ -151,7 +151,7 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 6. ~~**ENG-01** (data-driven actions)~~ — shipped
 7. ~~**UX-01, UX-02** (accessibility)~~ — shipped
 8. ~~**SIM-03, VIZ-01** (postbiotic visualization)~~ — shipped
-9. **STATE-01** (shareable state) — classroom sharing
+9. ~~**STATE-01** (shareable state)~~ — shipped
 
 ---
 
@@ -188,6 +188,12 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 | SIM-05 | June 2026 | Strain-specific probiotic competition radius/strength (`strains.ts`, `engine.ts`) |
 | SIM-06 | June 2026 | Region-specific sugarLoad decay rates (`sugarLoadDecay.ts`, `engine.ts`) |
 | SIM-07 | June 2026 | B. infantis baseline on nose/gut + aligned labels (`regions.ts`, `strains.ts`) |
+| STATE-01 | June 2026 | URL `?lab=` checkpoint + localStorage autosave (`labState.ts`, `App.ts`) |
+| STATE-02 | June 2026 | Copy lab link button in stats panel (`Dashboard.ts`, `blogPanel.ts`) |
+| STATE-03 | June 2026 | Resume session banner on refresh (`labState.ts`, `App.ts`) |
+| DOC-01 | June 2026 | MkDocs Material config + docs site guide |
+| DOC-02 | June 2026 | CHANGELOG.md |
+| DOC-03 | June 2026 | Per-region tissue layer mermaid diagrams in `domain/regions.md` |
 
 ---
 

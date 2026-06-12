@@ -12,11 +12,11 @@ Source: [`src/data/regions.ts`](../src/data/regions.ts)
 | --- | --- | --- | --- | --- | --- | --- |
 | `ear` | Ear Canal | `ear` | 80× | 40 | L. rhamnosus (8) | S. aureus (5) |
 | `scalp` | Scalp | `scalp` | 200× | 30 | L. rhamnosus (6) | C. albicans (8), S. aureus (4) |
-| `nose` | Nose / Sinus | `sinus` | 400× | 50 | L. rhamnosus (8) | S. aureus (6), H. influenzae (4) |
+| `nose` | Nose / Sinus | `sinus` | 400× | 50 | L. rhamnosus (8), B. infantis (4) | S. aureus (6), H. influenzae (4) |
 | `oral` | Oral / Mouth | `oral` | 350× | 45 | L. salivarius (10) | C. albicans (4, yeast) |
 | `skin` | Skin | `skin` | 300× | 30 | L. acidophilus (6) | C. albicans (10), S. aureus (4) |
 | `vaginal` | Vaginal | `vaginal` | 280× | 38 | L. acidophilus (12), L. rhamnosus (6) | C. albicans (3, yeast) |
-| `gut` | Gut | `gut` | 250× | 35 | L. plantarum (10) | — (no baseline pathogens) |
+| `gut` | Gut | `gut` | 250× | 35 | L. plantarum (10), B. infantis (6) | — (no baseline pathogens) |
 
 Baseline integrity/inflammation/biofilm defaults:
 
@@ -32,11 +32,36 @@ Baseline integrity/inflammation/biofilm defaults:
 
 ---
 
+## Tissue layer models (DOC-03)
+
+Each micro view is a simplified **longitudinal cross-section** built in [`src/scene/epithelium/tissue/`](../src/scene/epithelium/tissue/). Lumen (top) is where microbes swim; epithelial bands (bottom) anchor commensals and pathogens. Diagrams below match the 3D builders — not anatomical scale.
+
+---
+
 ## Ear Canal (`ear`)
 
 **Anatomical context:** External ear canal epithelium with cerumen layer, sensitive to moisture loss, allergen exposure, and swim-related salinity spikes.
 
 **Zoom title:** EAR CANAL EPITHELIUM
+
+**Layer model** (lumen → deep):
+
+```mermaid
+flowchart BT
+  subgraph lumen [Lumen]
+    M[Mucus / cerumen film]
+    Microbes[Microbe agents]
+  end
+  subgraph epi [Squamous epithelium]
+    C[Stratum corneum]
+    G[Granulosum]
+    S[Spinous]
+    B[Basale]
+  end
+  Cart[Cartilage ring]
+  M --> C --> G --> S --> B --> Cart
+  Microbes -.->|fall / attach| M
+```
 
 **Default strains:** L. rhamnosus (probiotic), S. aureus, P. aeruginosa (pathogens), Dust (allergen label)
 
@@ -65,6 +90,26 @@ Baseline integrity/inflammation/biofilm defaults:
 
 **Zoom title:** SCALP BARRIER CROSS-SECTION
 
+**Layer model:**
+
+```mermaid
+flowchart BT
+  subgraph lumen [Surface / sebum film]
+    Seb[Sebaceous lipids]
+    Follicles[Dense hair follicles]
+  end
+  subgraph epidermis [Epidermis]
+    Cor[Corneum]
+    Gran[Granulosum]
+    Spin[Spinous]
+    Bas[Basale]
+  end
+  Derm[Dermis + collagen]
+  Sub[Subcutis]
+  Seb --> Cor --> Gran --> Spin --> Bas --> Derm --> Sub
+  Follicles --> Bas
+```
+
 **Default strains:** L. rhamnosus, C. albicans, S. aureus, Malassezia, Dust
 
 **Default environment:**
@@ -90,6 +135,24 @@ Baseline integrity/inflammation/biofilm defaults:
 **Anatomical context:** Nasal/respiratory epithelium — primary site for allergen exposure, histamine response, and airway oxygenation effects.
 
 **Zoom title:** NASAL/RESPIRATORY EPITHELIUM
+
+**Layer model:**
+
+```mermaid
+flowchart BT
+  subgraph airway [Airway lumen]
+    Pollen[Allergen particles]
+    Mucus[Mucus + cilia brush]
+  end
+  subgraph wall [Respiratory wall]
+    Cilia[Pseudostratified columns + cilia]
+    BM[Basement membrane]
+    Lam[Lamina propria]
+  end
+  Bone[Turbinate / bone hint]
+  Pollen -.-> Mucus
+  Mucus --> Cilia --> BM --> Lam --> Bone
+```
 
 **Default strains:** L. rhamnosus, B. infantis (labels), S. aureus, H. influenzae, Pollen/Dust
 
@@ -118,6 +181,24 @@ Baseline integrity/inflammation/biofilm defaults:
 
 **Zoom title:** ORAL MUCOSA CROSS-SECTION
 
+**Layer model:**
+
+```mermaid
+flowchart BT
+  subgraph oral [Oral lumen]
+    Saliva[Saliva film + papillae]
+    Bio[Biofilm-prone patches]
+  end
+  subgraph mucosa [Non-keratinized mucosa]
+    Sup[Superficial / papillae]
+    Sp[Spinous]
+    Ba[Basale]
+  end
+  Sub[Submucosa]
+  Saliva --> Sup --> Sp --> Ba --> Sub
+  Bio --> Sup
+```
+
 **Default strains:** L. salivarius, L. acidophilus, S. boulardii (labels), C. albicans, S. mutans, Irritant
 
 **Default environment:**
@@ -144,6 +225,25 @@ Baseline integrity/inflammation/biofilm defaults:
 
 **Zoom title:** SKIN BARRIER CROSS-SECTION
 
+**Layer model:**
+
+```mermaid
+flowchart BT
+  subgraph surface [Surface]
+    Sebum[Acid mantle / sebum]
+    Fol[Single hair follicle + sebaceous unit]
+  end
+  subgraph epidermis [Epidermis — rete ridges]
+    Corneum[Corneum]
+    Granulosum[Granulosum]
+    Spinous[Spinous]
+    Basale[Basale]
+  end
+  Dermis[Dermis]
+  Sebum --> Corneum --> Granulosum --> Spinous --> Basale --> Dermis
+  Fol --> Basale
+```
+
 **Default strains:** L. acidophilus, C. albicans, S. aureus, Irritant
 
 **Default environment:**
@@ -169,6 +269,23 @@ Baseline integrity/inflammation/biofilm defaults:
 
 **Zoom title:** VAGINAL EPITHELIUM / MUCOSA
 
+**Layer model:**
+
+```mermaid
+flowchart BT
+  subgraph canal [Lumen]
+    Gly[Glycogen-rich mucus]
+    LowO2[Low O₂ niche]
+  end
+  subgraph wall [Stratified squamous wall]
+    Rugae[Rugae columns]
+    Epi[Squamous epithelium]
+  end
+  Lamina[Lamina propria]
+  Gly --> Rugae --> Epi --> Lamina
+  LowO2 -.-> Gly
+```
+
 **Default strains:** L. acidophilus, L. rhamnosus, C. albicans, Gardnerella, Irritant
 
 **Default environment:**
@@ -193,6 +310,26 @@ Baseline integrity/inflammation/biofilm defaults:
 **Anatomical context:** Gut mucosa with villi — primary site for prebiotic fiber, probiotic colonization, and SCFA postbiotic production.
 
 **Zoom title:** GUT MUCOSA / VILLI
+
+**Layer model:**
+
+```mermaid
+flowchart BT
+  subgraph lumen [Intestinal lumen]
+    Villi[Villi + crypt mouths]
+    Fiber[Prebiotic substrate particles]
+    SCFA[SCFA / postbiotic glow]
+  end
+  subgraph wall [Mucosa — deep to lumen]
+    LP[Lamina propria + capillaries]
+    MM[Muscularis mucosae]
+    Sub[Submucosa]
+    Mus[Muscularis externa]
+  end
+  Fiber --> Villi
+  SCFA -.-> Villi
+  Villi --> LP --> MM --> Sub --> Mus
+```
 
 **Default strains:** L. plantarum, B. infantis (labels), Enteropathogen, Food antigen
 

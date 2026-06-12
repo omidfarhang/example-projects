@@ -20,6 +20,17 @@ export function blogPanelPartial(): string {
           <h2 data-preset-title>Preset</h2>
           <p class="bd-scenario" data-scenario></p>
           <a class="bd-cta" data-blog-cta href="#" target="_blank" rel="noopener">${t('preset.readArticle', { title: '…' })}</a>
+          <div class="bd-resume-banner" data-resume-banner hidden role="status">
+            <p data-resume-text></p>
+            <div class="bd-resume-banner__actions">
+              <button type="button" class="bd-btn bd-btn--action bd-btn--tiny" data-resume-accept>${t('session.resume')}</button>
+              <button type="button" class="bd-btn bd-btn--ghost bd-btn--tiny" data-resume-dismiss>${t('session.dismiss')}</button>
+            </div>
+          </div>
+          <div class="bd-session-row">
+            <button type="button" class="bd-btn bd-btn--ghost bd-btn--tiny" data-copy-lab-state title="${t('session.copyTitle')}">${t('session.copyLink')}</button>
+            <span class="bd-share-feedback" data-share-feedback hidden aria-live="polite"></span>
+          </div>
           <div class="bd-stats" aria-label="${t('stats.title')}">
             <h3>${t('stats.title')}</h3>
             <div class="bd-meter">

@@ -82,8 +82,10 @@ Use these when changing simulation behavior, adding regions, or closing document
 | Document | Description |
 | --- | --- |
 | [development/setup-and-build.md](development/setup-and-build.md) | Local dev, Vite, playground deploy |
+| [development/docs-site.md](development/docs-site.md) | MkDocs Material documentation site |
 | [development/extending.md](development/extending.md) | Adding regions, actions, presets |
 | [roadmap.md](roadmap.md) | Known gaps and future app work |
+| [CHANGELOG](../CHANGELOG.md) | Shipped changes by release |
 
 ---
 

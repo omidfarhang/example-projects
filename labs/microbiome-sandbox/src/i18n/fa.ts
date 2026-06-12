@@ -126,4 +126,14 @@ export const fa: I18nStrings = {
     inoculated: '{name} تلقیح شد — کلونی در حال شکل‌گیری',
     dayBegins: 'روز {day} آغاز شد — کاهش شبانه بار قند ادامه دارد',
   },
+  session: {
+    copyLink: 'کپی لینک آزمایشگاه',
+    copyTitle: 'URL قابل اشتراک با preset، ناحیه، biome و tick',
+    linkCopied: 'لینک در کلیپ‌بورد کپی شد',
+    linkManual: 'لینک را از پنجره کپی کنید',
+    resume: 'ادامه جلسه',
+    dismiss: 'شروع تازه',
+    resumePrompt:
+      'ادامه {preset} روی {region}؟ (~{tick}ثانیه · سد {integrity}%)',
+  },
 };

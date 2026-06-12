@@ -124,6 +124,16 @@ export const en = {
     inoculated: '{name} inoculated — strain colony forming',
     dayBegins: 'Day {day} begins — overnight sugar load decay continues',
   },
+  session: {
+    copyLink: 'Copy lab link',
+    copyTitle: 'Copy shareable URL with preset, region, biome, tick, and microbe positions',
+    linkCopied: 'Lab link copied to clipboard',
+    linkManual: 'Copy the link from the dialog',
+    resume: 'Resume session',
+    dismiss: 'Start fresh',
+    resumePrompt:
+      'Resume {preset} on {region}? (~{tick}s sim · barrier {integrity}%)',
+  },
 } as const;
 
 export type I18nStrings = typeof en;

@@ -126,4 +126,14 @@ export const de: I18nStrings = {
     inoculated: '{name} inokuliert — Stammkolonie bildet sich',
     dayBegins: 'Tag {day} beginnt — nächtlicher Zuckerabbau setzt sich fort',
   },
+  session: {
+    copyLink: 'Lab-Link kopieren',
+    copyTitle: 'Teilbare URL mit Preset, Region, Biom und Tick kopieren',
+    linkCopied: 'Lab-Link in Zwischenablage kopiert',
+    linkManual: 'Link aus dem Dialog kopieren',
+    resume: 'Sitzung fortsetzen',
+    dismiss: 'Neu starten',
+    resumePrompt:
+      '{preset} auf {region} fortsetzen? (~{tick}s Sim · Barriere {integrity}%)',
+  },
 };

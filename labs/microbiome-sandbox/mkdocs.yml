@@ -1,0 +1,65 @@
+site_name: Bio-Dynamics Documentation
+site_description: Interactive microbiome sandbox — user guide, simulation spec, and developer docs
+site_url: https://playground.omid.dev/labs/microbiome-sandbox/docs/
+repo_url: https://github.com/omidfarhang/example-projects
+repo_name: example-projects
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: cyan
+      accent: amber
+  features:
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - content.code.copy
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+  - tables
+
+nav:
+  - Home: README.md
+  - Overview: overview.md
+  - User guide: user-guide.md
+  - Scenarios: scenarios.md
+  - Roadmap: roadmap.md
+  - Domain:
+      - Body regions: domain/regions.md
+      - Biotics: domain/biotics.md
+      - Environment: domain/environment.md
+      - Actions: domain/actions-reference.md
+      - Products: domain/products.md
+  - Simulation:
+      - Model overview: simulation/model-overview.md
+      - Dynamics: simulation/dynamics.md
+      - Data model: simulation/data-model.md
+      - Assumptions: simulation/assumptions-and-limits.md
+  - Architecture:
+      - System overview: architecture/system-overview.md
+      - Visualization: architecture/visualization.md
+      - UI dashboard: architecture/ui-dashboard.md
+  - Development:
+      - Setup & build: development/setup-and-build.md
+      - Extending: development/extending.md
+      - Documentation site: development/docs-site.md
+
+extra:
+  generator: false

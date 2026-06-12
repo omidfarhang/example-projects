@@ -33,6 +33,8 @@ Vite dev server starts (default `http://localhost:5173`) with hot module replace
 | `dev` | `vite` | Development server |
 | `build` | `vite build` | Production build → `dist/` |
 | `preview` | `vite preview` | Preview production build locally |
+| `docs:serve` | `mkdocs serve` | Documentation site with live reload |
+| `docs:build` | `mkdocs build` | Static docs → `site/` |
 
 ---
 
@@ -99,13 +101,15 @@ npx serve playground/dist
 
 ## URL parameters
 
-Parsed on load by [`parseUrlState()`](../src/data/presets.ts):
+Parsed on load by [`parseUrlState()`](../src/data/presets.ts) and [`parseLabFromUrl()`](../src/state/labState.ts):
 
 | Parameter | Values | Default |
 | --- | --- | --- |
 | `preset` | `allergy`, `candida`, `lifecycle` | `allergy` |
 | `region` | `ear`, `scalp`, `nose`, `oral`, `skin`, `vaginal`, `gut` | Preset's `defaultRegion` |
 | `context` | `lifestage` (allergy preset) | — |
+| `lab` | Full checkpoint (share link) | — |
+| `integrity`, `inflammation`, `tick` | Human-readable hints alongside `lab` | — |
 
 Examples:
 
@@ -152,5 +156,7 @@ Listed in [`playground/manifest.json`](../../../playground/manifest.json):
 ## Related docs
 
 - [Extending the lab](extending.md)
+- [Documentation site](docs-site.md)
 - [System overview](../architecture/system-overview.md)
 - [User guide](../user-guide.md)
+- [CHANGELOG](../../CHANGELOG.md)

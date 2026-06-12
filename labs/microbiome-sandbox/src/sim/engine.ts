@@ -1,4 +1,5 @@
 import type { EnvVarId } from '../data/envVars';
+import { REGION_ENV_CONTROLS } from '../data/envVars';
 import { DAY_MEALS, MEAL_ORDER, type MealId } from '../data/dayMeals';
 import { getProduct, type ProductId } from '../data/products';
 import { getPostbiotic, postbioticRegionMultiplier, type PostbioticId } from '../data/postbiotics';
@@ -20,6 +21,8 @@ import { getStressor, type StressorBiomeDelta } from '../data/stressors';
 import { buildProductImpact, formatImpactEvent } from '../ui/actionImpact';
 import { applyBiomeEffects, scaleBiomeEffect, scaleCount } from './bioticEffects';
 import type { BiomeState, MicrobeNode, MicrobeType, SimSnapshot } from './types';
+import type { LabStateV1 } from '../state/labState';
+import { MAX_STORED_EVENTS } from '../state/labState';
 
 const FIXED_DT = 1 / 30;
 const MAX_NODES = 400;
@@ -678,6 +681,61 @@ export class SimEngine {
       return `${last} · barrier ${Math.round(b.integrity * 100)}% · inflammation ${Math.round(b.inflammation * 100)}%`;
     }
     return '';
+  }
+
+  getTick(): number {
+    return this.tick;
+  }
+
+  /** Serialize sim checkpoint for URL / localStorage persistence (STATE-01). */
+  exportCheckpoint(): Omit<LabStateV1, 'v' | 'savedAt' | 'preset' | 'context'> {
+    const env: Partial<Record<EnvVarId, number>> = {};
+    for (const id of REGION_ENV_CONTROLS[this.region]) {
+      env[id] = this.biome[id] as number;
+    }
+
+    return {
+      region: this.region,
+      tick: this.tick,
+      nextId: this.nextId,
+      allergenAdhesion: this.allergenAdhesion,
+      dayNumber: this.dayNumber,
+      nextMealIndex: this.nextMealIndex,
+      env,
+      biome: {
+        integrity: this.biome.integrity,
+        inflammation: this.biome.inflammation,
+        immuneActivity: this.biome.immuneActivity,
+        biofilm: this.biome.biofilm,
+        sugarLoad: this.biome.sugarLoad,
+        postbioticLevel: this.biome.postbioticLevel,
+      },
+      nodes: this.nodes.map((n) => ({ ...n })),
+      events: [...this.events].slice(-MAX_STORED_EVENTS),
+    };
+  }
+
+  /** Restore mid-simulation checkpoint without re-seeding baseline (STATE-01). */
+  restoreCheckpoint(state: Omit<LabStateV1, 'v' | 'savedAt' | 'preset' | 'context'>): void {
+    this.region = state.region;
+    this.tick = state.tick;
+    this.nextId = state.nextId;
+    this.allergenAdhesion = state.allergenAdhesion;
+    this.dayNumber = state.dayNumber;
+    this.nextMealIndex = state.nextMealIndex;
+    this.nodes = state.nodes.map((n) => ({ ...n }));
+    this.events = [...state.events];
+    this.applyEnv(state.env);
+    Object.assign(this.biome, state.biome);
+    this.updateCounts();
+    this.prevCounts = {
+      probiotic: this.biome.probioticCount,
+      pathogen: this.biome.pathogenCount,
+      allergen: this.biome.allergenCount,
+      commensal: this.biome.commensalCount,
+      prebiotic: this.biome.prebioticCount,
+    };
+    this.trends = { probiotic: 0, pathogen: 0, allergen: 0, commensal: 0, prebiotic: 0 };
   }
 
   snapshot(): SimSnapshot {

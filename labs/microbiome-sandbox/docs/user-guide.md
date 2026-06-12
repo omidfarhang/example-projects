@@ -77,6 +77,15 @@ Describes the current preset narrative. A link opens the related omid.dev articl
 
 Population numbers use `POPULATION_SCALE = 1000`: the UI displays raw node counts multiplied by 1000 (e.g. 8 nodes → 8k).
 
+### Session sharing (STATE-01 / STATE-02 / STATE-03)
+
+Below the blog CTA:
+
+- **Copy lab link** — copies a shareable URL with preset, region, biome scalars, simulation tick, and microbe positions encoded in the `lab` query parameter (plus readable `integrity`, `inflammation`, `tick` hints).
+- **Resume session** — after a refresh, if you had meaningful progress, a banner offers to restore the last autosaved snapshot from browser `localStorage` (dismiss with **Start fresh**).
+
+The lab autosaves every ~12 seconds once the simulation has run for a few seconds. Opening a shared `?lab=` link restores mid-simulation state directly.
+
 ### Event log
 
 Shows the last eight simulation events (trigger/inoculation messages and emergent notes). Updates in real time.
@@ -143,6 +152,11 @@ Share scenarios with query parameters:
 | `preset` | `allergy`, `candida`, `lifecycle` | `allergy` |
 | `region` | `ear`, `scalp`, `nose`, `oral`, `skin`, `vaginal`, `gut` | Preset default region |
 | `context` | `lifestage` (allergy only) | — |
+| `lab` | Base64url-encoded checkpoint (from **Copy lab link**) | — |
+| `tick` | Simulation tick (readable hint when sharing) | — |
+| `integrity` | Barrier integrity 0–1 (readable hint) | — |
+| `inflammation` | Inflammation 0–1 (readable hint) | — |
+| `lang` | `en`, `de`, `fa` | browser default |
 
 Example full URL:
 

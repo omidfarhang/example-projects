@@ -30,6 +30,7 @@ import { TISSUE_PICTOGRAMS } from '../scene/tissueCallouts';
 import { POPULATION_SCALE, type SimEngine } from '../sim/engine';
 import { formatStrainList, summarizeLiveStrains, totalCells } from '../sim/strainSummary';
 import type { BiomeState, MicrobeNode } from '../sim/types';
+import type { LabStateV1 } from '../state/labState';
 import { dismissPresetTip, isPresetTipDismissed, PRESET_TIPS } from '../data/presetTips';
 import { getLocale, t, translateEvent } from '../i18n';
 import { initTouchGestureHints } from './touchGestureHints';
@@ -60,6 +61,9 @@ export interface DashboardCallbacks {
   onApplyProduct: (id: ProductId) => void;
   onEnvChange: (env: Partial<Record<EnvVarId, number>>) => void;
   onApplyMeal: (id: MealId) => void;
+  onCopyLabState: () => void;
+  onResumeSession: () => void;
+  onDismissResume: () => void;
 }
 
 export class Dashboard {
@@ -126,6 +130,12 @@ export class Dashboard {
   private eventLogExpandBtn!: HTMLButtonElement;
   private eventLogExportBtn!: HTMLButtonElement;
   private eventLogCount!: HTMLElement;
+  private copyLabStateBtn!: HTMLButtonElement;
+  private shareFeedback!: HTMLElement;
+  private resumeBanner!: HTMLElement;
+  private resumeText!: HTMLElement;
+  private resumeAcceptBtn!: HTMLButtonElement;
+  private resumeDismissBtn!: HTMLButtonElement;
   private hotspotLayer!: HTMLElement;
   private tissueCalloutLayer!: HTMLElement;
   private tissuePictogram!: HTMLElement;
@@ -230,6 +240,12 @@ export class Dashboard {
     this.eventLogExpandBtn = this.root.querySelector('[data-event-log-expand]')!;
     this.eventLogExportBtn = this.root.querySelector('[data-event-log-export]')!;
     this.eventLogCount = this.root.querySelector('[data-event-log-count]')!;
+    this.copyLabStateBtn = this.root.querySelector('[data-copy-lab-state]')!;
+    this.shareFeedback = this.root.querySelector('[data-share-feedback]')!;
+    this.resumeBanner = this.root.querySelector('[data-resume-banner]')!;
+    this.resumeText = this.root.querySelector('[data-resume-text]')!;
+    this.resumeAcceptBtn = this.root.querySelector('[data-resume-accept]')!;
+    this.resumeDismissBtn = this.root.querySelector('[data-resume-dismiss]')!;
     this.hotspotLayer = this.root.querySelector('[data-hotspot-layer]')!;
     this.tissueCalloutLayer = this.root.querySelector('[data-tissue-callouts]')!;
     this.tissuePictogram = this.root.querySelector('[data-tissue-pictogram]')!;
@@ -271,6 +287,9 @@ export class Dashboard {
     });
     document.addEventListener('keydown', this.boundKeyboardHandler);
     this.eventLogExportBtn.addEventListener('click', () => this.exportEventLog());
+    this.copyLabStateBtn.addEventListener('click', () => this.callbacks.onCopyLabState());
+    this.resumeAcceptBtn.addEventListener('click', () => this.callbacks.onResumeSession());
+    this.resumeDismissBtn.addEventListener('click', () => this.callbacks.onDismissResume());
     this.renderEnvControls(this.currentRegion);
     this.renderMealButtons();
     this.advancedModeToggle.checked = this.advancedMode;
@@ -1247,5 +1266,29 @@ export class Dashboard {
     anchor.download = `microbiome-lab-${this.currentPreset}-${this.currentRegion}.txt`;
     anchor.click();
     URL.revokeObjectURL(url);
+  }
+
+  showResumePrompt(state: LabStateV1) {
+    const region = getRegion(state.region);
+    const simSec = (state.tick / 30).toFixed(0);
+    this.resumeText.textContent = t('session.resumePrompt', {
+      preset: PRESETS[state.preset].title,
+      region: region.label,
+      tick: simSec,
+      integrity: Math.round(state.biome.integrity * 100),
+    });
+    this.resumeBanner.hidden = false;
+  }
+
+  hideResumePrompt() {
+    this.resumeBanner.hidden = true;
+  }
+
+  showShareFeedback(kind: 'copied' | 'manual') {
+    this.shareFeedback.textContent = t(kind === 'copied' ? 'session.linkCopied' : 'session.linkManual');
+    this.shareFeedback.hidden = false;
+    window.setTimeout(() => {
+      this.shareFeedback.hidden = true;
+    }, 2800);
   }
 }

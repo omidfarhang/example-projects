@@ -18,6 +18,7 @@ Full documentation lives in **[docs/README.md](docs/README.md)**:
 - [Architecture](docs/architecture/) — code structure, 3D, UI
 - [Development](docs/development/) — setup, build, extending
 - [Roadmap](docs/roadmap.md) — known gaps and future improvements
+- [Changelog](CHANGELOG.md) — shipped changes
 
 ## Quick start
 

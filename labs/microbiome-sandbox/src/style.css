@@ -1209,6 +1209,40 @@ body.pg-has-companion-bar {
   background: linear-gradient(90deg, #a855f7, #ec4899);
 }
 
+.bd-session-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.bd-share-feedback {
+  font-size: 0.72rem;
+  color: #4ade80;
+}
+
+.bd-resume-banner {
+  margin: 0.65rem 0 0.35rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.75);
+}
+
+.bd-resume-banner p {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--bd-text-muted, #94a3b8);
+}
+
+.bd-resume-banner__actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
 .bd-event-log {
   border-top: 1px solid var(--bd-border);
   padding-top: 0.5rem;
