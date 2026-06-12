@@ -51,12 +51,12 @@ Core educational lab features implemented and documented.
 | ID | Priority | Current state | Target / gap |
 | --- | --- | --- | --- |
 | SIM-01 | P1 | No automated tests | Golden snapshot tests for deterministic engine (seed 42 + action sequence → expected biome) |
-| SIM-02 | P2 | Antibiotic effects are flat vitality deltas | Region-specific antibiotic spectra (e.g. gut vs topical vs vaginal) |
+| SIM-02 | P2 | **Done** — route-specific antibiotic spectra | `antibioticSpectra.ts` — otic, topical, gut_broad, vaginal_systemic |
 | SIM-03 | P2 | **Done** — SCFA lumen particles linked to tissue glow | Optional particle field when postbioticLevel ≥ 0.1; surge pulse syncs with epithelial SCFA overlay |
 | SIM-04 | P2 | **Done** — prebiotic substrate in stats + legend | Dashboard row (lifecycle) with particle count, % remaining, trend; legend always lists substrate on lifecycle |
-| SIM-05 | P3 | Single suppression radius (0.35) for all probiotics | Strain-specific competition strengths (L. acidophilus vs S. boulardii) |
-| SIM-06 | P3 | sugarLoad decays uniformly | Region-specific decay (oral faster, gut slower) |
-| SIM-07 | P2 | B. infantis listed in nose/gut labels but only inoculable on nose | Align default strain labels with inoculation availability or add gut inoculation |
+| SIM-05 | P3 | **Done** — strain-specific competition | `StrainDef.competition` radius/strength per strain (e.g. L. acidophilus vs S. boulardii) |
+| SIM-06 | P3 | **Done** — region-specific sugarLoad decay | `sugarLoadDecay.ts` — oral fastest, gut slowest |
+| SIM-07 | P2 | **Done** — B. infantis aligned with nose/gut | Baseline spawns + strain panel on both regions; labels match residents |
 | SIM-08 | P1 | **Done** — per-strain effects on product apply | See Next up |
 
 ---
@@ -184,6 +184,10 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 | UX-04 | June 2026 | Per-preset contextual tips with session dismiss (`presetTips.ts`) |
 | UX-05 | June 2026 | English/German/Persian i18n via `?lang=` and header selector (`src/i18n/*`) |
 | UX-06 | June 2026 | Population ×1000 footnote and stat tooltips (`blogPanel.ts`, `Dashboard.ts`) |
+| SIM-02 | June 2026 | Route-specific antibiotic spectra (`antibioticSpectra.ts`, `stressors.ts`, `engine.ts`) |
+| SIM-05 | June 2026 | Strain-specific probiotic competition radius/strength (`strains.ts`, `engine.ts`) |
+| SIM-06 | June 2026 | Region-specific sugarLoad decay rates (`sugarLoadDecay.ts`, `engine.ts`) |
+| SIM-07 | June 2026 | B. infantis baseline on nose/gut + aligned labels (`regions.ts`, `strains.ts`) |
 
 ---
 

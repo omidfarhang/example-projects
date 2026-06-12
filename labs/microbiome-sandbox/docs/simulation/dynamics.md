@@ -10,11 +10,11 @@ Source: [`src/sim/engine.ts`](../src/sim/engine.ts) — `simulateTick()`, growth
 
 Each `simulateTick()` executes in this order:
 
-1. Decay `sugarLoad` (−0.001, floor 0)
+1. Decay `sugarLoad` (region-specific rate — oral fastest, gut slowest; see `sugarLoadDecay.ts`)
 2. Compute temperature multiplier
 3. Region-specific env drift (scalp moisture, ear oxygenation)
 4. For each node: movement, boundary reflection, type-specific vitality update
-5. Probiotic suppression pass (radius 0.35)
+5. Probiotic suppression pass (strain-specific radius and strength — see `strains.ts` `competition`)
 6. Prune nodes with vitality ≤ 0.05
 7. Emergent biome updates (integrity, inflammation, biofilm)
 8. Region-specific integrity decay from low moisture / high vaginal pH
@@ -132,14 +132,17 @@ If probiotic within distance 0.4:
 
 ## Competition
 
-Probiotics with vitality > 0.4 suppress nearby targets:
+Probiotics with vitality > 0.4 suppress nearby targets using **strain-specific** radius and per-tick strength (`StrainDef.competition` in `strains.ts`; defaults: radius 0.35, strength 0.006):
 
 ```text
 for each probiotic p:
+  { radius, strength } = getStrainCompetition(p.strain)
   for each node target where type in (pathogen, allergen, yeast):
-    if distance(p, target) < 0.35:
-      target.vitality -= 0.006
+    if distance(p, target) < radius:
+      target.vitality -= strength
 ```
+
+Examples: L. acidophilus (0.40 / 0.008), S. boulardii (0.30 / 0.010 — tight, aggressive yeast competitor).
 
 No suppression of commensals or other probiotics.
 
@@ -183,7 +186,17 @@ All integrity decay floors at 0.15.
 
 ### Sugar load
 
-Decays −0.001/tick (also increased by triggers).
+Per-tick decay by region (`sugarLoadDecay.ts`):
+
+| Region | Decay/tick | Rationale |
+| --- | --- | --- |
+| oral | 0.0015 | Saliva washout |
+| skin, scalp | 0.0018 | Epidermal turnover / sweat |
+| nose, ear | 0.0012 | Mucociliary clearance |
+| vaginal | 0.0010 | Mucosal turnover |
+| gut | 0.0006 | Lumen buffering / fermentation |
+
+Also increased by diet triggers and day-meal simulation on gut/oral.
 
 ### Scalp moisture drift
 

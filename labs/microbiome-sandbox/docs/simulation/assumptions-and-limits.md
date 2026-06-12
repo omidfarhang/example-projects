@@ -21,7 +21,7 @@ It does **not** predict real-world outcomes for any individual, strain, dose, or
 | Assumption | Reality gap |
 | --- | --- |
 | Microbes occupy random x/y/z positions in a unit box | Real microbiota have structured niches ( crypts, follicles, mucus layers) |
-| Suppression uses fixed 2D distance radius | Real competition involves bacteriocins, immune cells, receptor binding |
+| Suppression uses strain-specific 2D radius and strength | Real competition involves bacteriocins, immune cells, receptor binding |
 | Allergens "fall from above" | Simplified particle model for visual clarity |
 | Positions map to 3D visuals via coordinate transform | Visual placement is illustrative, not measured |
 
@@ -66,7 +66,7 @@ It does **not** predict real-world outcomes for any individual, strain, dose, or
 | Assumption | Reality gap |
 | --- | --- |
 | Triggers/inoculations have immediate effect | Real interventions have onset, duration, and clearance |
-| Antibiotics reduce vitality by flat deltas | No spectrum, resistance, or dose-response |
+| Antibiotics use route-specific spectra (otic, topical, gut, vaginal) | No resistance, dose-response, or pharmacokinetics |
 | Same probiotic action spawns fixed node count everywhere | No colonization probability or mucosal adhesion model |
 | Region gating is binary | Real interventions may be systemic, not tissue-local |
 

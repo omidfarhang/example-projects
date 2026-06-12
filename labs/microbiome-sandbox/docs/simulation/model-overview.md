@@ -47,7 +47,7 @@ flowchart TD
 | `MAX_NODES` | 400 | Maximum live microbe agents |
 | PRNG seed | 42 (default) | Reproducible spawn positions/vitality |
 | `POPULATION_SCALE` | 1000 | UI display multiplier for counts |
-| Probiotic suppression radius | 0.35 | Distance for competition effect |
+| Probiotic suppression | strain-specific (default radius 0.35, strength 0.006) | `StrainDef.competition` in `strains.ts` |
 | Prebiotic conversion radius | 0.4 | Distance to probiotic for SCFA conversion |
 | Vitality prune threshold | 0.05 | Nodes at or below removed |
 

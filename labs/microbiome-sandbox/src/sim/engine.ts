@@ -5,15 +5,18 @@ import { getPostbiotic, postbioticRegionMultiplier, type PostbioticId } from '..
 import { getInoculation, strainInoculationEventLog, type InoculationDef } from '../data/inoculations';
 import type { PresetId } from '../data/presets';
 import { getRegion, type RegionId } from '../data/regions';
-import { getStressor, type StressorBiomeDelta } from '../data/stressors';
+import { resolveStressorBiome } from '../data/antibioticSpectra';
+import { sugarLoadDecayForRegion } from '../data/sugarLoadDecay';
 import {
   getStrain,
+  getStrainCompetition,
   PREBIOTICS,
   STRAINS,
   type PrebioticId,
   type StrainId,
   type BiomeEffect,
 } from '../data/strains';
+import { getStressor, type StressorBiomeDelta } from '../data/stressors';
 import { buildProductImpact, formatImpactEvent } from '../ui/actionImpact';
 import { applyBiomeEffects, scaleBiomeEffect, scaleCount } from './bioticEffects';
 import type { BiomeState, MicrobeNode, MicrobeType, SimSnapshot } from './types';
@@ -260,8 +263,9 @@ export class SimEngine {
       return;
     }
 
-    if (def.biome) {
-      this.applyStressorBiome(def.biome);
+    const biome = resolveStressorBiome(def, this.region);
+    if (biome && Object.keys(biome).length > 0) {
+      this.applyStressorBiome(biome);
     }
     for (const spawn of def.spawns ?? []) {
       this.spawnBatch(spawn.type, spawn.strain, spawn.count, spawn.fromAbove ? { fromAbove: true } : undefined);
@@ -400,9 +404,7 @@ export class SimEngine {
   }
 
   private sugarLoadDecay(region: RegionId): number {
-    if (region === 'oral') return 0.0015;
-    if (region === 'gut') return 0.0006;
-    return 0.001;
+    return sugarLoadDecayForRegion(region);
   }
 
   /** Advanced mode: advance diet timeline — raises sugarLoad on gut/oral tissues. */
@@ -569,11 +571,12 @@ export class SimEngine {
 
     const probiotics = this.nodes.filter((n) => n.type === 'probiotic' && n.vitality > 0.4);
     for (const p of probiotics) {
+      const { radius, strength } = getStrainCompetition(p.strain);
       for (const target of this.nodes) {
         if (target.type === 'pathogen' || target.type === 'allergen' || target.type === 'yeast') {
           const d = Math.hypot(p.x - target.x, p.y - target.y);
-          if (d < 0.35) {
-            target.vitality = Math.max(0, target.vitality - 0.006);
+          if (d < radius) {
+            target.vitality = Math.max(0, target.vitality - strength);
           }
         }
       }

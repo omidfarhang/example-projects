@@ -3,6 +3,7 @@ import type { PostbioticId } from '../data/postbiotics';
 import { POSTBIOTICS, postbioticRegionMultiplier } from '../data/postbiotics';
 import type { ProductId } from '../data/products';
 import { PRODUCTS, productRegionMultiplier } from '../data/products';
+import { antibioticSpectrumWhy, resolveStressorBiome } from '../data/antibioticSpectra';
 import { getInoculation } from '../data/inoculations';
 import type { RegionId } from '../data/regions';
 import { getRegion } from '../data/regions';
@@ -270,7 +271,7 @@ function spawnTypeLabel(type: string): 'probiotic' | 'prebiotic' {
   return type === 'prebiotic' ? 'prebiotic' : 'probiotic';
 }
 
-export function buildStressorImpact(stressorId: string, _regionId: RegionId): ActionImpact {
+export function buildStressorImpact(stressorId: string, regionId: RegionId): ActionImpact {
   const def = getStressor(stressorId);
   if (!def) {
     return {
@@ -289,12 +290,16 @@ export function buildStressorImpact(stressorId: string, _regionId: RegionId): Ac
     type: spawnTypeLabel(s.type),
   }));
 
+  const biome = resolveStressorBiome(def, regionId);
+  const spectrumNote = def.antibioticRoute ? antibioticSpectrumWhy(def.antibioticRoute) : undefined;
+  const why = spectrumNote ? `${spectrumNote} · ${def.log.join(' · ')}` : def.log.join(' · ');
+
   return {
     title: def.label,
     efficacyPct: 100,
     adds,
-    deltas: def.biome ? stressorBiomeToDeltas(def.biome) : [],
-    why: def.log.join(' · '),
+    deltas: biome ? stressorBiomeToDeltas(biome) : [],
+    why,
     category: 'stressor',
   };
 }

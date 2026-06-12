@@ -161,6 +161,8 @@ Each stressor defines biome deltas, optional microbe spawns, event-log messages,
 
 Legacy per-trigger effect tables (original 18) are preserved in git history; all effect values now live in [`stressors.ts`](../src/data/stressors.ts).
 
+**Antibiotic triggers** (`antibiotic_ear_drops`, `topical_antibiotic`, `antibiotic_course`, `antibiotic_disruption`, `c_diff_after_antibiotics`) resolve route-specific spectra from [`antibioticSpectra.ts`](../src/data/antibioticSpectra.ts): otic, topical, gut_broad, vaginal_systemic. Per-trigger `biome` fields merge as extras (e.g. C. diff adds inflammation and spawns on top of gut_broad).
+
 ---
 
 ## Inoculations
@@ -221,7 +223,7 @@ Legacy per-trigger effect tables (original 18) are preserved in git history; all
 
 ### `binf` — APPLY B. INFANTIS
 
-**Regions:** nose
+**Regions:** nose, gut (strain panel; also in baseline)
 
 | Effect | Value |
 | --- | --- |

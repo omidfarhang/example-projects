@@ -72,7 +72,7 @@ export const INOCULATIONS: Record<string, InoculationDef> = {
     id: 'binf',
     strain: 'binf',
     eventLog: 'B. infantis applied — commensal support boosted',
-    why: 'Early-life commensal booster — strengthens resident flora and barrier in airway niches.',
+    why: 'Early-life commensal booster — strengthens resident flora and barrier in airway and gut niches.',
   },
   lplant: {
     id: 'lplant',

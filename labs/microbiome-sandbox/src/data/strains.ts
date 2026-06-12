@@ -41,6 +41,13 @@ export interface BiomeEffect {
   yeastVitality?: number;
 }
 
+export interface StrainCompetition {
+  /** Suppression radius in lumen coordinates (default 0.35). */
+  radius?: number;
+  /** Vitality drain per tick on nearby pathogens/allergens/yeast (default 0.006). */
+  strength?: number;
+}
+
 export interface StrainDef {
   id: StrainId;
   name: string;
@@ -48,6 +55,8 @@ export interface StrainDef {
   kind?: StrainKind;
   spawnCount: number;
   effects?: BiomeEffect;
+  /** Spatial competition vs pathogens — strain-specific (SIM-05). */
+  competition?: StrainCompetition;
   /** Regions where this strain is commonly used (UI hint only). */
   commonRegions?: RegionId[];
   /** Plain-language causal explanation for impact preview. */
@@ -71,6 +80,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     id: 'lrham',
     name: 'L. rhamnosus',
     spawnCount: 16,
+    competition: { radius: 0.38, strength: 0.007 },
     effects: { inflammation: -0.18, integrity: 0.1 },
     commonRegions: ['ear', 'scalp', 'nose', 'vaginal'],
     why: 'Barrier-supporting strain that calms mucosal inflammation and strengthens epithelial integrity.',
@@ -81,6 +91,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     id: 'lacid',
     name: 'L. acidophilus',
     spawnCount: 18,
+    competition: { radius: 0.4, strength: 0.008 },
     effects: { ph: -0.5, phMin: 3.8, phMax: 7, biofilm: -0.2 },
     commonRegions: ['oral', 'skin', 'vaginal', 'gut'],
     why: 'Acidifies local pH and disrupts pathogen biofilm — unfavorable environment for yeast and alkaliphiles.',
@@ -109,6 +120,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     id: 'lsaliv',
     name: 'L. salivarius',
     spawnCount: 18,
+    competition: { radius: 0.36, strength: 0.007 },
     effects: { ph: -0.2, phMin: 5.5, biofilm: -0.15 },
     commonRegions: ['oral'],
     why: 'Oral lactic acid producer — lowers pH and clears biofilm in saliva film.',
@@ -179,9 +191,10 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     id: 'binf',
     name: 'B. infantis',
     spawnCount: 14,
+    competition: { radius: 0.36, strength: 0.0065 },
     effects: { commensalVitality: 0.2, integrity: 0.08 },
     commonRegions: ['nose', 'gut'],
-    why: 'Early-life commensal booster — strengthens resident flora and barrier in airway niches.',
+    why: 'Early-life commensal booster — strengthens resident flora and barrier in airway and gut niches.',
     articleKey: 'lifestage',
     articleClaim: 'Infant-associated bifidobacterium highlighted in early-life microbiome training',
   },
@@ -189,6 +202,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     id: 'lplant',
     name: 'L. plantarum',
     spawnCount: 16,
+    competition: { radius: 0.42, strength: 0.007 },
     effects: { inflammation: -0.18, integrity: 0.1 },
     commonRegions: ['gut'],
     why: 'Fermentation workhorse — anti-inflammatory and barrier-supporting in gut lumen.',
@@ -215,6 +229,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     id: 'sboul',
     name: 'S. boulardii',
     spawnCount: 14,
+    competition: { radius: 0.3, strength: 0.01 },
     effects: { yeastVitality: -0.25, inflammation: -0.12 },
     commonRegions: ['oral', 'gut'],
     why: 'Probiotic yeast competitor — suppresses Candida overgrowth and lowers inflammation.',
@@ -225,6 +240,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     id: 'ssaliv_k12',
     name: 'S. salivarius K12',
     spawnCount: 16,
+    competition: { radius: 0.34, strength: 0.0075 },
     effects: { biofilm: -0.18, ph: -0.12, phMin: 5.5, inflammation: -0.1, moisture: 0.08 },
     commonRegions: ['oral', 'nose', 'ear'],
     why: 'BLIS K12 colonizes saliva film — clears biofilm, restores moisture, and calms irritated mucosa.',
@@ -235,6 +251,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     id: 'ssaliv_m18',
     name: 'S. salivarius M18',
     spawnCount: 16,
+    competition: { radius: 0.34, strength: 0.0075 },
     effects: { biofilm: -0.22, ph: -0.1, phMin: 5.5, integrity: 0.06 },
     commonRegions: ['oral', 'nose', 'ear'],
     why: 'BLIS M18 targets dental plaque biofilm and supports gum-line barrier integrity.',
@@ -299,8 +316,26 @@ export const STRAIN_LIST = Object.values(STRAINS);
 
 export const PREBIOTIC_LIST = Object.values(PREBIOTICS);
 
+const DEFAULT_COMPETITION = { radius: 0.35, strength: 0.006 };
+
+const STRAIN_BY_NAME = new Map<string, StrainDef>(
+  Object.values(STRAINS).map((strain) => [strain.name, strain]),
+);
+
 export function getStrain(id: StrainId): StrainDef {
   return STRAINS[id];
+}
+
+export function getStrainByName(name: string): StrainDef | undefined {
+  return STRAIN_BY_NAME.get(name);
+}
+
+export function getStrainCompetition(strainName: string): { radius: number; strength: number } {
+  const def = getStrainByName(strainName);
+  return {
+    radius: def?.competition?.radius ?? DEFAULT_COMPETITION.radius,
+    strength: def?.competition?.strength ?? DEFAULT_COMPETITION.strength,
+  };
 }
 
 /** Native title tooltip — article title appended when a claim is linked (CONTENT-02). */

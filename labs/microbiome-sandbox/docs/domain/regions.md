@@ -106,7 +106,9 @@ Baseline integrity/inflammation/biofilm defaults:
 
 **Triggers:** `allergen`, `dry_air`, `histamine`
 
-**Inoculations:** `lrham`, `binf`, `saline_mist`
+**Inoculations:** `lrham`, `binf` (strain panel), `saline_mist`
+
+**Baseline probiotics:** L. rhamnosus (8), B. infantis (4)
 
 ---
 
@@ -207,9 +209,9 @@ Baseline integrity/inflammation/biofilm defaults:
 
 **Triggers:** `stress`, `enteropathogen_bloom`, `antibiotic_disruption`
 
-**Inoculations:** `prebiotic`, `lplant`, `scfa`
+**Inoculations:** `prebiotic`, `lplant`, `binf` (strain panel), `scfa`
 
-**Unique baseline:** inulin prebiotics (8 nodes) seeded at startup.
+**Unique baseline:** inulin prebiotics (8 nodes) and B. infantis (6) seeded at startup alongside L. plantarum (10).
 
 ---
 

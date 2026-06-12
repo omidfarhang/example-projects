@@ -1,3 +1,4 @@
+import type { AntibioticRoute } from './antibioticSpectra';
 import type { RegionId } from './regions';
 import type { MicrobeType } from '../sim/types';
 
@@ -53,7 +54,10 @@ export interface StressorDef {
   id: string;
   label: string;
   regions: RegionId[];
+  /** Static biome delta — merged on top when `antibioticRoute` is set (SIM-02). */
   biome?: StressorBiomeDelta;
+  /** Region-specific antibiotic spectrum (vitality + route-typical biome effects). */
+  antibioticRoute?: AntibioticRoute;
   spawns?: StressorSpawn[];
   /** Event-log lines shown when the stressor fires. */
   log: string[];
@@ -68,8 +72,9 @@ function s(
   biome?: StressorBiomeDelta,
   spawns?: StressorSpawn[],
   burst?: StressorBurst,
+  antibioticRoute?: AntibioticRoute,
 ): StressorDef {
-  return { id, label, regions, biome, spawns, log, burst };
+  return { id, label, regions, biome, spawns, log, burst, antibioticRoute };
 }
 
 /** Exhaustive catalog of body stressors that disrupt tissue microbiomes. */
@@ -168,9 +173,10 @@ export const STRESSORS: StressorDef[] = [
     'ANTIBIOTIC EAR DROPS',
     ['ear'],
     ['Antibiotic ear drops — commensal depletion in canal'],
-    { commensalVitality: -0.35, probioticVitality: -0.25, pathogenVitality: -0.12 },
+    undefined,
     undefined,
     'stress',
+    'otic',
   ),
 
   // ── Scalp ─────────────────────────────────────────────────────────────────
@@ -458,9 +464,10 @@ export const STRESSORS: StressorDef[] = [
     'TOPICAL ANTIBIOTIC',
     ['skin'],
     ['Topical antibiotic — commensal diversity reduced'],
-    { commensalVitality: -0.4, probioticVitality: -0.2, pathogenVitality: -0.1, yeastVitality: -0.1 },
+    undefined,
     undefined,
     'stress',
+    'topical',
   ),
   s(
     'occlusive_sweat',
@@ -550,9 +557,10 @@ export const STRESSORS: StressorDef[] = [
     'ANTIBIOTIC COURSE',
     ['vaginal'],
     ['Antibiotic course — Lactobacillus depleted, pH rising'],
-    { commensalVitality: -0.45, probioticVitality: -0.3, ph: 0.4, phMax: 6.5, integrity: -0.12, integrityMin: 0.2 },
+    undefined,
     undefined,
     'stress',
+    'vaginal_systemic',
   ),
   s(
     'glycogen_spike',
@@ -654,9 +662,10 @@ export const STRESSORS: StressorDef[] = [
     'ANTIBIOTIC DISRUPTION',
     ['gut'],
     ['Antibiotic disruption — commensals depleted, SCFA falling'],
-    { commensalVitality: -0.35, integrity: -0.1, integrityMin: 0.2, postbioticLevel: -0.2, postbioticMin: 0 },
+    undefined,
     undefined,
     'stress',
+    'gut_broad',
   ),
   s(
     'low_fiber_diet',
@@ -770,9 +779,18 @@ export const STRESSORS: StressorDef[] = [
     'C. DIFF AFTER ANTIBIOTICS',
     ['gut'],
     ['Post-antibiotic C. difficile — commensal niche collapse'],
-    { commensalVitality: -0.5, probioticVitality: -0.35, integrity: -0.2, integrityMin: 0.15, inflammation: 0.45, postbioticLevel: -0.3, postbioticMin: 0 },
+    {
+      commensalVitality: -0.12,
+      probioticVitality: -0.1,
+      integrity: -0.12,
+      integrityMin: 0.15,
+      inflammation: 0.33,
+      postbioticLevel: -0.12,
+      postbioticMin: 0,
+    },
     [{ type: 'pathogen', strain: 'Enteropathogen', count: 16 }],
     'stress',
+    'gut_broad',
   ),
   s(
     'food_allergen',

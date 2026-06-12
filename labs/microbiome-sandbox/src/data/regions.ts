@@ -114,7 +114,10 @@ export const REGIONS: RegionDef[] = [
     env: buildRegionEnv({ ph: 6.8, moisture: 0.72, temperature: 0.54, oxygenation: 0.82 }),
     baseline: {
       commensals: 50,
-      probiotics: [{ strain: 'L. rhamnosus', count: 8 }],
+      probiotics: [
+        { strain: 'L. rhamnosus', count: 8 },
+        { strain: 'B. infantis', count: 4 },
+      ],
       pathogens: [
         { strain: 'S. aureus', count: 6, kind: 'pathogen' },
         { strain: 'H. influenzae', count: 4, kind: 'pathogen' },
@@ -230,7 +233,10 @@ export const REGIONS: RegionDef[] = [
     env: buildRegionEnv({ ph: 6.2, moisture: 0.65, temperature: 0.6, oxygenTension: 0.12 }),
     baseline: {
       commensals: 35,
-      probiotics: [{ strain: 'L. plantarum', count: 10 }],
+      probiotics: [
+        { strain: 'L. plantarum', count: 10 },
+        { strain: 'B. infantis', count: 6 },
+      ],
       prebiotics: [{ strain: 'inulin', count: 8 }],
       integrity: 0.75,
     },
