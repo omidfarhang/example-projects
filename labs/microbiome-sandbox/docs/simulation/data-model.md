@@ -48,8 +48,9 @@ Tissue environment and aggregate metrics.
 | `oxygenTension` | number | 0–1 | Slider |
 | `integrity` | number | 0–1 | Dynamics + actions |
 | `inflammation` | number | 0–1 | Dynamics + actions |
+| `immuneActivity` | number | 0–1 | Advanced mode — cytokine/macrophage proxy (lags inflammation) |
 | `biofilm` | number | 0–1 | Dynamics + actions |
-| `sugarLoad` | number | 0–1 | Triggers + decay |
+| `sugarLoad` | number | 0–1 | Triggers + region-specific decay + advanced day meals |
 | `probioticCount` | number | ≥ 0 | Computed from nodes |
 | `pathogenCount` | number | ≥ 0 | pathogen + yeast nodes |
 | `allergenCount` | number | ≥ 0 | Computed |

@@ -1,3 +1,4 @@
+import type { MealId } from '../data/dayMeals';
 import { parseUrlState, PRESETS, type PresetId } from '../data/presets';
 import { getRegion, REGIONS, type RegionId } from '../data/regions';
 import type { ProductId } from '../data/products';
@@ -41,6 +42,7 @@ export class App {
         onApplyPostbiotic: (id) => this.handleApplyPostbiotic(id),
         onApplyProduct: (id) => this.handleApplyProduct(id),
         onEnvChange: (env) => this.engine.setEnv(env),
+        onApplyMeal: (id) => this.handleApplyMeal(id),
       },
       url.context,
     );
@@ -111,6 +113,12 @@ export class App {
     this.engine.applyProduct(id);
     this.dashboard.flashAction('action');
     this.scene.playBurst(id);
+  }
+
+  private handleApplyMeal(id: MealId) {
+    this.ensureMicroView();
+    this.engine.applyMeal(id);
+    this.dashboard.flashAction('warn');
   }
 
   private selectRegion(id: RegionId) {

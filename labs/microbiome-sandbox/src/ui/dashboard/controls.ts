@@ -2,9 +2,21 @@ export function labControlsPartial(): string {
   return `
       <div class="bd-controls bd-controls--lab">
         <div class="bd-panel bd-env">
-          <h2>ENVIRONMENTAL VARIABLES</h2>
+          <div class="bd-env-header">
+            <h2>ENVIRONMENTAL VARIABLES</h2>
+            <label class="bd-advanced-toggle" title="Show cited pH bands, immune proxy, and diet timeline">
+              <input type="checkbox" data-advanced-mode /> Advanced
+            </label>
+          </div>
           <p class="bd-env-hint" data-env-hint>Region-specific tissue conditions</p>
+          <p class="bd-advanced-disclaimer" data-advanced-disclaimer hidden></p>
           <div class="bd-env-grid" data-env-panel></div>
+          <div class="bd-advanced-day" data-day-sim-panel hidden>
+            <h3 class="bd-subheading">Day simulation</h3>
+            <p class="bd-section-hint" data-day-sim-hint>Step through meals — each adds sugar load on gut/oral tissues</p>
+            <p class="bd-day-status" data-day-status></p>
+            <div class="bd-btn-row bd-btn-row--meals" data-meals></div>
+          </div>
         </div>
         <div class="bd-panel bd-stressors">
           <h2>STRESSORS</h2>

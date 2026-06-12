@@ -24,6 +24,8 @@ export interface BiomeState {
   oxygenTension: number;
   integrity: number;
   inflammation: number;
+  /** Simplified cytokine / macrophage proxy — lags inflammation; advanced mode only. */
+  immuneActivity: number;
   biofilm: number;
   sugarLoad: number;
   probioticCount: number;

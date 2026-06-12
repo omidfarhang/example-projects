@@ -1,4 +1,6 @@
 import { ARTICLES } from '../data/articles';
+import { ADVANCED_DISCLAIMER, readAdvancedMode, writeAdvancedMode } from '../data/advancedMode';
+import { DAY_SIM_REGIONS, MEAL_LIST, type MealId } from '../data/dayMeals';
 import {
   ENV_VAR_DEFS,
   REGION_ENV_CONTROLS,
@@ -12,6 +14,7 @@ import type { ProductId } from '../data/products';
 import { PRODUCT_LIST, PRODUCTS } from '../data/products';
 import { REGION_SUGGESTIONS } from '../data/regionSuggestions';
 import { getRegion, REGIONS, type RegionDef, type RegionId } from '../data/regions';
+import { PH_REFERENCE, phBandStyle, phInReferenceBand } from '../data/phReference';
 import { PREBIOTIC_LIST, PREBIOTICS, STRAINS, STRAIN_LIST, formatStrainTooltip, type PrebioticId, type StrainId } from '../data/strains';
 
 type CatalogTab = 'products' | 'strains' | 'prebiotics' | 'postbiotics';
@@ -54,6 +57,7 @@ export interface DashboardCallbacks {
   onApplyPostbiotic: (id: PostbioticId) => void;
   onApplyProduct: (id: ProductId) => void;
   onEnvChange: (env: Partial<Record<EnvVarId, number>>) => void;
+  onApplyMeal: (id: MealId) => void;
 }
 
 export class Dashboard {
@@ -71,6 +75,18 @@ export class Dashboard {
   private postbioticStat!: HTMLElement;
   private integrityMeter!: HTMLElement;
   private inflammationMeter!: HTMLElement;
+  private immuneMeter!: HTMLElement;
+  private immuneRow!: HTMLElement;
+  private sugarRow!: HTMLElement;
+  private sugarLoadStat!: HTMLElement;
+  private advancedModeToggle!: HTMLInputElement;
+  private advancedDisclaimer!: HTMLElement;
+  private advancedFooterNote!: HTMLElement;
+  private daySimPanel!: HTMLElement;
+  private daySimHint!: HTMLElement;
+  private dayStatus!: HTMLElement;
+  private mealsRow!: HTMLElement;
+  private advancedMode = readAdvancedMode();
   private envPanel!: HTMLElement;
   private envSliders = new Map<EnvVarId, HTMLInputElement>();
   private envReadouts = new Map<EnvVarId, HTMLElement>();
@@ -152,6 +168,17 @@ export class Dashboard {
     this.postbioticStat = this.root.querySelector('[data-postbiotic]')!;
     this.integrityMeter = this.root.querySelector('[data-integrity-meter]')!;
     this.inflammationMeter = this.root.querySelector('[data-inflammation-meter]')!;
+    this.immuneMeter = this.root.querySelector('[data-immune-meter]')!;
+    this.immuneRow = this.root.querySelector('[data-immune-row]')!;
+    this.sugarRow = this.root.querySelector('[data-sugar-row]')!;
+    this.sugarLoadStat = this.root.querySelector('[data-sugar-load]')!;
+    this.advancedModeToggle = this.root.querySelector('[data-advanced-mode]') as HTMLInputElement;
+    this.advancedDisclaimer = this.root.querySelector('[data-advanced-disclaimer]')!;
+    this.advancedFooterNote = this.root.querySelector('[data-advanced-footer-note]')!;
+    this.daySimPanel = this.root.querySelector('[data-day-sim-panel]')!;
+    this.daySimHint = this.root.querySelector('[data-day-sim-hint]')!;
+    this.dayStatus = this.root.querySelector('[data-day-status]')!;
+    this.mealsRow = this.root.querySelector('[data-meals]')!;
     this.envPanel = this.root.querySelector('[data-env-panel]')!;
     this.triggerRow = this.root.querySelector('[data-triggers]')!;
     this.suggestedRow = this.root.querySelector('[data-suggested]')!;
@@ -221,6 +248,14 @@ export class Dashboard {
     });
     this.eventLogExportBtn.addEventListener('click', () => this.exportEventLog());
     this.renderEnvControls(this.currentRegion);
+    this.renderMealButtons();
+    this.advancedModeToggle.checked = this.advancedMode;
+    this.advancedModeToggle.addEventListener('change', () => {
+      this.advancedMode = this.advancedModeToggle.checked;
+      writeAdvancedMode(this.advancedMode);
+      this.syncAdvancedModeUI(this.currentRegion);
+    });
+    this.syncAdvancedModeUI(this.currentRegion);
     this.renderCatalog();
     this.setMicroView(false);
     initTouchGestureHints(this.viewport, this.getCanvas());
@@ -513,17 +548,35 @@ export class Dashboard {
   private renderEnvControls(regionId: RegionId) {
     const controls = REGION_ENV_CONTROLS[regionId];
     const region = getRegion(regionId);
+    const phBand = PH_REFERENCE[regionId];
+    const phStyle = phBandStyle(phBand);
     this.envSliders.clear();
     this.envReadouts.clear();
     this.envPanel.innerHTML = controls
       .map((id) => {
         const def = ENV_VAR_DEFS[id];
         const value = region.env[id];
+        const phAdvanced =
+          id === 'ph' && this.advancedMode
+            ? `
+          <div class="bd-ph-band" aria-hidden="true">
+            <div class="bd-ph-band__track">
+              <div class="bd-ph-band__range" style="left:${phStyle.left};width:${phStyle.width}"></div>
+            </div>
+            <p class="bd-ph-band__meta">
+              <span class="bd-ph-band__label">${phBand.label}</span>
+              <span class="bd-ph-band__range-text">${phBand.typicalMin.toFixed(1)}–${phBand.typicalMax.toFixed(1)}</span>
+            </p>
+            <p class="bd-ph-band__note">${phBand.note}</p>
+            <p class="bd-ph-band__cite">${phBand.citation}</p>
+          </div>`
+            : '';
         return `
-        <div class="bd-slider-row">
+        <div class="bd-slider-row${id === 'ph' && this.advancedMode ? ' bd-slider-row--ph-advanced' : ''}">
           <label>${def.label} <output data-env-readout="${id}">${def.format(value)}</output></label>
           <input type="range" min="${def.min}" max="${def.max}" step="${def.step}"
             value="${value}" data-env="${id}" />
+          ${phAdvanced}
         </div>`;
       })
       .join('');
@@ -539,11 +592,64 @@ export class Dashboard {
       slider.addEventListener('input', () => {
         this.envDragging = true;
         this.emitEnv();
+        if (id === 'ph' && this.advancedMode) {
+          this.updatePhBandHighlight(parseFloat(slider.value), regionId);
+        }
       });
       slider.addEventListener('change', () => {
         this.envDragging = false;
       });
     }
+  }
+
+  private updatePhBandHighlight(ph: number, regionId: RegionId) {
+    const row = this.envPanel.querySelector('.bd-slider-row--ph-advanced');
+    if (!row) return;
+    const inBand = phInReferenceBand(ph, PH_REFERENCE[regionId]);
+    row.classList.toggle('bd-slider-row--ph-in-band', inBand);
+    row.classList.toggle('bd-slider-row--ph-out-band', !inBand);
+  }
+
+  private renderMealButtons() {
+    this.mealsRow.innerHTML = MEAL_LIST.map(
+      (m) =>
+        `<button type="button" class="bd-btn bd-btn--meal" data-meal="${m.id}" title="${m.timeLabel} · +${Math.round(m.sugarLoad * 100)}% sugar load">${m.label}</button>`,
+    ).join('');
+    this.mealsRow.querySelectorAll('[data-meal]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.meal as MealId;
+        this.flashButton(btn as HTMLButtonElement);
+        this.callbacks.onApplyMeal(id);
+      });
+    });
+  }
+
+  private syncAdvancedModeUI(regionId: RegionId) {
+    const on = this.advancedMode;
+    this.root.classList.toggle('bd-dashboard--advanced', on);
+    this.advancedDisclaimer.hidden = !on;
+    this.advancedDisclaimer.textContent = ADVANCED_DISCLAIMER;
+    this.advancedFooterNote.hidden = !on;
+    this.immuneRow.hidden = !on;
+    this.sugarRow.hidden = !on;
+    this.daySimPanel.hidden = !on || !DAY_SIM_REGIONS.includes(regionId);
+    if (on && DAY_SIM_REGIONS.includes(regionId)) {
+      this.daySimHint.textContent =
+        regionId === 'oral'
+          ? 'Oral meals briefly dip pH and raise sugar load — watch yeast/pathogen response'
+          : 'Gut meals raise lumen sugar load — slower decay than oral saliva clearance';
+    }
+    this.renderEnvControls(regionId);
+  }
+
+  private updateDaySimUI(engine: SimEngine) {
+    if (!this.advancedMode || !DAY_SIM_REGIONS.includes(this.currentRegion)) return;
+    const state = engine.getDaySimState();
+    this.dayStatus.textContent = `Day ${state.dayNumber} · next: ${state.nextMealLabel} (${state.stepIndex + 1}/${state.stepCount})`;
+    this.mealsRow.querySelectorAll('[data-meal]').forEach((btn) => {
+      const id = (btn as HTMLElement).dataset.meal;
+      btn.classList.toggle('bd-btn--meal-next', id === state.nextMealId);
+    });
   }
 
   private renderRegions() {
@@ -685,6 +791,9 @@ export class Dashboard {
         if (readout) readout.textContent = ENV_VAR_DEFS[id].format(value);
       }
     }
+    if (this.advancedMode && REGION_ENV_CONTROLS[regionId].includes('ph')) {
+      this.updatePhBandHighlight(biome.ph, regionId);
+    }
   }
 
   private bindRegionButtons() {
@@ -779,7 +888,7 @@ export class Dashboard {
     });
     const region = getRegion(id);
     this.refreshPresetNarrative(id);
-    this.renderEnvControls(id);
+    this.syncAdvancedModeUI(id);
     this.updateLegend(region);
     this.refreshImpactIfVisible();
   }
@@ -928,6 +1037,14 @@ export class Dashboard {
     this.inflammationMeter.style.width = `${inflamePct}%`;
     this.root.querySelector('[data-integrity-val]')!.textContent = `${integrityPct}%`;
     this.root.querySelector('[data-inflammation-val]')!.textContent = `${inflamePct}%`;
+
+    if (this.advancedMode) {
+      const immunePct = Math.round(b.immuneActivity * 100);
+      this.immuneMeter.style.width = `${immunePct}%`;
+      this.root.querySelector('[data-immune-val]')!.textContent = `${immunePct}%`;
+      this.sugarLoadStat.textContent = `${Math.round(b.sugarLoad * 100)}%`;
+      this.updateDaySimUI(engine);
+    }
 
     const dynamic = engine.getDynamicScenario();
     if (dynamic) this.scenarioText.textContent = dynamic;

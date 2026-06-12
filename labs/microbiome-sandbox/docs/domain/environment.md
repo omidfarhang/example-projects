@@ -60,8 +60,9 @@ These fields are simulated, not directly slider-controlled:
 | --- | --- | --- |
 | `integrity` | 0–1 | Epithelial barrier strength |
 | `inflammation` | 0–1 | Local inflammatory load |
+| `immuneActivity` | 0–1 | Advanced mode only — simplified cytokine/macrophage proxy (lags `inflammation`) |
 | `biofilm` | 0–1 | Microbial biofilm accumulation |
-| `sugarLoad` | 0–1 | Available sugar substrate (decays 0.001/tick) |
+| `sugarLoad` | 0–1 | Available sugar substrate (region-specific decay; day meals add load in advanced mode) |
 | `postbioticLevel` | 0–1 | SCFA postbiotic concentration |
 | `probioticCount` | integer | Live probiotic nodes |
 | `pathogenCount` | integer | Pathogen + yeast nodes |

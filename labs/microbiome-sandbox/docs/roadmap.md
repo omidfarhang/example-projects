@@ -123,9 +123,9 @@ Core educational lab features implemented and documented.
 
 | ID | Priority | Current state | Target / gap |
 | --- | --- | --- | --- |
-| SCI-01 | P3 | Illustrative pH bands | Optional "advanced mode" showing cited pH ranges per tissue |
-| SCI-02 | P3 | No immune layer | Simplified macrophage/cytokine scalar (inflammation already partial proxy) |
-| SCI-03 | P3 | No diet timeline | Multi-step "day simulation" with meals affecting sugarLoad |
+| SCI-01 | P3 | **Done** — advanced mode cited pH bands | Optional toggle shows literature ranges per tissue (`phReference.ts`, env panel) |
+| SCI-02 | P3 | **Done** — immune activity proxy | `immuneActivity` scalar lags inflammation; shown in advanced stats |
+| SCI-03 | P3 | **Done** — day simulation meals | Breakfast→snack timeline raises `sugarLoad` on gut/oral (`dayMeals.ts`, `engine.applyMeal()`) |
 
 Items in this section must preserve [Assumptions and limits](../simulation/assumptions-and-limits.md) disclaimers — avoid implying clinical precision.
 
@@ -175,6 +175,9 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 | ENG-04 | June 2026 | Split `tissueModels.ts` into `epithelium/tissue/*` per-region builders |
 | ENG-01 | June 2026 | Data-driven inoculation defs (`inoculations.ts`) replace engine switch branches |
 | ENG-02 | June 2026 | Dashboard shell split into `ui/dashboard/*` template partials |
+| SCI-01 | June 2026 | Advanced mode pH reference bands with citations (`phReference.ts`, env panel) |
+| SCI-02 | June 2026 | `immuneActivity` cytokine/macrophage proxy in advanced stats (`engine.ts`, `types.ts`) |
+| SCI-03 | June 2026 | Day meal simulation for gut/oral sugar load (`dayMeals.ts`, `engine.applyMeal()`) |
 
 ---
 

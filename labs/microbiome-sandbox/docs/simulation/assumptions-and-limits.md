@@ -56,7 +56,7 @@ It does **not** predict real-world outcomes for any individual, strain, dose, or
 | --- | --- |
 | pH range 4–8 on a single slider | Tissue pH varies by micro-niche; slider is regional average |
 | Temperature 0–1 maps to 34–38°C | Body temperature regulation not modeled |
-| Nine env variables capture tissue state | Omits immune cells, IgA, bile acids, peristalsis, hormones, diet timeline |
+| Nine env variables capture tissue state | Omits detailed immune signaling, IgA, bile acids, peristalsis, hormones (advanced mode adds simplified `immuneActivity` proxy only) |
 | Slider changes apply instantly | No gradual equilibration or homeostatic response |
 
 ---

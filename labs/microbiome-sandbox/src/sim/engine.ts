@@ -1,4 +1,5 @@
 import type { EnvVarId } from '../data/envVars';
+import { DAY_MEALS, MEAL_ORDER, type MealId } from '../data/dayMeals';
 import { getProduct, type ProductId } from '../data/products';
 import { getPostbiotic, postbioticRegionMultiplier, type PostbioticId } from '../data/postbiotics';
 import { getInoculation, strainInoculationEventLog, type InoculationDef } from '../data/inoculations';
@@ -42,6 +43,8 @@ export class SimEngine {
   private prevCounts = { probiotic: 0, pathogen: 0, allergen: 0, commensal: 0, prebiotic: 0 };
   private trends = { probiotic: 0, pathogen: 0, allergen: 0, commensal: 0, prebiotic: 0 };
   private allergenAdhesion = 0;
+  private dayNumber = 1;
+  private nextMealIndex = 0;
 
   region: RegionId = 'nose';
 
@@ -57,6 +60,7 @@ export class SimEngine {
     oxygenTension: 0.15,
     integrity: 0.85,
     inflammation: 0.1,
+    immuneActivity: 0.08,
     biofilm: 0.05,
     sugarLoad: 0,
     probioticCount: 0,
@@ -94,11 +98,14 @@ export class SimEngine {
 
     this.biome.integrity = b.integrity ?? 0.85;
     this.biome.inflammation = b.inflammation ?? 0.1;
+    this.biome.immuneActivity = (b.inflammation ?? 0.1) * 0.75;
     this.biome.biofilm = b.biofilm ?? 0.05;
     this.applyEnv(def.env);
     this.biome.sugarLoad = 0;
     this.biome.postbioticLevel = 0;
     this.allergenAdhesion = 0;
+    this.dayNumber = 1;
+    this.nextMealIndex = 0;
     this.updateCounts();
   }
 
@@ -392,6 +399,67 @@ export class SimEngine {
     return Math.max(0.35, 1 - dist * 1.4);
   }
 
+  private sugarLoadDecay(region: RegionId): number {
+    if (region === 'oral') return 0.0015;
+    if (region === 'gut') return 0.0006;
+    return 0.001;
+  }
+
+  /** Advanced mode: advance diet timeline — raises sugarLoad on gut/oral tissues. */
+  applyMeal(mealId: MealId) {
+    const meal = DAY_MEALS[mealId];
+    const expected = MEAL_ORDER[this.nextMealIndex];
+
+    if (mealId !== expected) {
+      this.events.push(
+        `Day ${this.dayNumber} — ${meal.label} (out of sequence; expected ${DAY_MEALS[expected].label})`,
+      );
+    }
+
+    if (meal.activeRegions.includes(this.region)) {
+      this.biome.sugarLoad = clamp(this.biome.sugarLoad + meal.sugarLoad, 0, 1);
+      if (this.region === 'oral' && meal.oralPhDelta) {
+        this.biome.ph = clamp(this.biome.ph + meal.oralPhDelta, 4, 8);
+      }
+      this.events.push(meal.eventLog);
+    } else {
+      this.events.push(
+        `${meal.label} — minimal local sugar effect on ${this.region} tissue (diet modeled on gut/oral)`,
+      );
+    }
+
+    this.nextMealIndex += 1;
+    if (this.nextMealIndex >= MEAL_ORDER.length) {
+      this.nextMealIndex = 0;
+      this.dayNumber += 1;
+      this.events.push(`Day ${this.dayNumber} begins — overnight sugar load decay continues`);
+    }
+  }
+
+  getDaySimState() {
+    const nextMeal = MEAL_ORDER[this.nextMealIndex];
+    return {
+      dayNumber: this.dayNumber,
+      nextMealId: nextMeal,
+      nextMealLabel: DAY_MEALS[nextMeal].label,
+      stepIndex: this.nextMealIndex,
+      stepCount: MEAL_ORDER.length,
+    };
+  }
+
+  private updateImmuneActivity() {
+    const b = this.biome;
+    const pathogenPressure = Math.min(1, b.pathogenCount / 35);
+    const target = clamp(b.inflammation * 0.85 + pathogenPressure * 0.22, 0, 1);
+    b.immuneActivity = clamp(b.immuneActivity + (target - b.immuneActivity) * 0.018, 0, 1);
+    if (b.postbioticLevel > 0.25) {
+      b.immuneActivity = Math.max(0, b.immuneActivity - 0.00035);
+    }
+    if (b.inflammation < 0.15 && b.pathogenCount < 8) {
+      b.immuneActivity = Math.max(0, b.immuneActivity - 0.0002);
+    }
+  }
+
   private pathogenGrowthRate(ph: number, moisture: number, sugarLoad: number): number {
     let rate = ph > 7.2 ? 0.004 : ph > 7 ? 0.003 : 0.001;
     if (moisture > 0.75 && ph > 7) rate += 0.002;
@@ -403,7 +471,7 @@ export class SimEngine {
     const b = this.biome;
     const region = this.region;
 
-    b.sugarLoad = Math.max(0, b.sugarLoad - 0.001);
+    b.sugarLoad = Math.max(0, b.sugarLoad - this.sugarLoadDecay(region));
     const tempMul = this.tempMultiplier(b.temperature);
 
     if (region === 'scalp') {
@@ -558,6 +626,7 @@ export class SimEngine {
       }
     }
 
+    this.updateImmuneActivity();
     this.updateCounts();
   }
 

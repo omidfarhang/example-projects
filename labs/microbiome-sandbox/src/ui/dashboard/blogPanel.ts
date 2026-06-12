@@ -27,6 +27,13 @@ export function blogPanelPartial(): string {
               <label>Inflammation <span data-inflammation-val>10%</span></label>
               <div class="bd-meter__track"><div class="bd-meter__fill bd-meter__fill--inflammation" data-inflammation-meter></div></div>
             </div>
+            <div class="bd-meter bd-meter--advanced" data-immune-row hidden>
+              <label>Immune activity <span data-immune-val title="Simplified cytokine / macrophage proxy — lags inflammation">8%</span></label>
+              <div class="bd-meter__track"><div class="bd-meter__fill bd-meter__fill--immune" data-immune-meter></div></div>
+            </div>
+            <div class="bd-stat bd-stat--advanced" data-sugar-row hidden>
+              <span>Sugar load</span><strong data-sugar-load title="Dietary substrate — decays over time; meals add load in day simulation">0%</strong>
+            </div>
             <div class="bd-stat"><span>Probiotic strains</span><strong data-probiotic>0 →</strong></div>
             <div class="bd-stat"><span>Pathogen strains</span><strong data-pathogen>0 →</strong></div>
             <div class="bd-stat"><span>Allergen particles</span><strong data-allergen>0 →</strong></div>

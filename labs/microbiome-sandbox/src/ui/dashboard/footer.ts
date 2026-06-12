@@ -6,5 +6,6 @@ export function dashboardFooterPartial(): string {
         <a href="https://omid.dev/posts/" target="_blank" rel="noopener">Tech Blog</a>
         <a href="https://github.com/omidfarhang/example-projects/tree/master/labs/microbiome-sandbox" target="_blank" rel="noopener">Source Code</a>
         <span class="bd-disclaimer">Educational model — not medical advice</span>
+        <span class="bd-disclaimer bd-disclaimer--advanced" data-advanced-footer-note hidden>Advanced panels: illustrative only</span>
       </footer>`;
 }
