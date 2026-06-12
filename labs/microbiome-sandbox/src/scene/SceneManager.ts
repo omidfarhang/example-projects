@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { RegionDef, RegionId } from '../data/regions';
+import { stressorBurstKind } from '../data/stressors';
 import type { SimSnapshot } from '../sim/types';
 import { createBodyMesh, createHotspots } from './BodyMesh';
 import { CameraRig } from './CameraRig';
@@ -169,16 +170,7 @@ export class SceneManager {
       'synbiotic_supplement', 'oral_probiotic_lozenge', 'kefir_drink', 'probiotic_yogurt', 'kimchi',
       'ssaliv_k12', 'ssaliv_m18',
     ]);
-    const burstKind =
-      kind === 'allergen' || kind === 'histamine' || kind === 'friction_irritant'
-        ? 'allergen'
-        : kind === 'alkaline'
-          ? 'alkaline'
-          : kind === 'stress' || kind === 'enteropathogen_bloom' || kind === 'antibiotic_disruption'
-            ? 'stress'
-            : probioticIds.has(kind)
-              ? 'probiotic'
-              : 'default';
+    const burstKind = probioticIds.has(kind) ? 'probiotic' : stressorBurstKind(kind);
     this.tissue.playBurst(burstKind);
     this.burst.play(kind);
   }

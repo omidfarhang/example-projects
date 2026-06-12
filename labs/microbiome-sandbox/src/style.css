@@ -255,25 +255,118 @@ body.pg-has-companion-bar {
 
 .bd-controls {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: 0.6rem;
 }
 
-.bd-actions-row {
+.bd-controls--lab {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.bd-controls--lab .bd-env {
   grid-column: 1 / -1;
+}
+
+.bd-controls--lab .bd-catalog-row {
+  grid-column: 1 / -1;
+}
+
+.bd-catalog-row {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.4fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   gap: 0.6rem;
   align-items: stretch;
 }
 
-.bd-actions-row .bd-products {
+.bd-catalog-row .bd-catalog,
+.bd-catalog-row .bd-impact--inline {
   min-width: 0;
 }
 
-.bd-actions-row .bd-impact--inline {
-  min-width: 0;
-  min-height: 12rem;
+.bd-catalog-row .bd-impact--inline {
+  min-height: 11rem;
+}
+
+.bd-btn-row--stressors {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.35rem;
+}
+
+.bd-btn-row--stressors .bd-btn {
+  text-align: left;
+  white-space: normal;
+  line-height: 1.25;
+  min-height: 2.25rem;
+}
+
+.bd-catalog-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.bd-catalog-tab {
+  font-family: var(--bd-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--bd-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--bd-muted);
+  cursor: pointer;
+}
+
+.bd-catalog-tab:hover {
+  color: var(--bd-text);
+  border-color: var(--bd-accent-dim);
+}
+
+.bd-catalog-tab--active {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: var(--bd-accent);
+  color: var(--bd-accent);
+}
+
+.bd-catalog-pane {
+  min-height: 5rem;
+}
+
+.bd-btn-row--suggested {
+  margin-bottom: 0.45rem;
+}
+
+.bd-btn--suggested {
+  font-size: 0.58rem;
+  padding: 0.3rem 0.5rem;
+  border-style: dashed;
+}
+
+.bd-btn--suggested-strain {
+  border-color: #0e7490;
+  background: rgba(34, 211, 238, 0.08);
+  color: #67e8f9;
+}
+
+.bd-btn--suggested-prebiotic {
+  border-color: #4d7c0f;
+  background: rgba(163, 230, 53, 0.08);
+  color: #bef264;
+}
+
+.bd-btn--suggested-product {
+  border-color: #6d28d9;
+  background: rgba(167, 139, 250, 0.1);
+  color: #c4b5fd;
+}
+
+.bd-regional-care {
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--bd-border);
 }
 
 .bd-section-hint {
@@ -298,7 +391,9 @@ body.pg-has-companion-bar {
 }
 
 .bd-btn-row--products {
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
   align-items: stretch;
 }
 
@@ -951,12 +1046,12 @@ body.pg-has-companion-bar {
 }
 
 @media (max-width: 1100px) {
-  .bd-actions-row {
+  .bd-controls--lab {
     grid-template-columns: 1fr;
   }
 
-  .bd-actions-row .bd-impact--inline {
-    min-height: 10rem;
+  .bd-catalog-row {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -966,7 +1061,11 @@ body.pg-has-companion-bar {
     grid-template-rows: auto 1fr auto;
   }
 
-  .bd-controls {
+  .bd-controls--lab {
+    grid-template-columns: 1fr;
+  }
+
+  .bd-btn-row--stressors {
     grid-template-columns: 1fr;
   }
 

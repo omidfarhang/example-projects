@@ -1,6 +1,7 @@
 import type { EnvVarId } from '../data/envVars';
 import { getProduct, type ProductId } from '../data/products';
 import { getRegion, type RegionId } from '../data/regions';
+import { getStressor, type StressorBiomeDelta } from '../data/stressors';
 import type { PresetId } from '../data/presets';
 import {
   getStrain,
@@ -146,7 +147,7 @@ export class SimEngine {
 
   private isActionAllowed(actionId: string, kind: 'trigger' | 'inoculation'): boolean {
     const def = getRegion(this.region);
-    const list = kind === 'trigger' ? def.triggers : def.inoculations;
+    const list = kind === 'trigger' ? def.triggers : def.regionalCare;
     return list.some((a) => a.id === actionId);
   }
 
@@ -225,109 +226,65 @@ export class SimEngine {
       return;
     }
 
-    const b = this.biome;
+    const def = getStressor(id);
+    if (!def) {
+      this.events.push(`Unknown trigger "${id}"`);
+      return;
+    }
 
-    if (id === 'allergen') {
-      this.spawnBatch('allergen', 'pollen', 35, { fromAbove: true });
-      b.inflammation = clamp(b.inflammation + 0.45, 0, 1);
-      b.integrity = Math.max(0.2, b.integrity - 0.25);
-      this.adjustVitality(['commensal'], -0.25);
-      this.events.push('Allergen spike detected — epithelial stress rising');
-      this.events.push('Commensals retreating from tight junctions');
-    } else if (id === 'dry_air') {
-      b.moisture = Math.max(0.1, b.moisture - 0.25);
-      b.integrity = Math.max(0.2, b.integrity - 0.12);
-      this.allergenAdhesion = Math.min(1, this.allergenAdhesion + 0.3);
-      this.events.push('Dry air exposure — mucus layer thinning');
-    } else if (id === 'histamine') {
-      b.inflammation = clamp(b.inflammation + 0.35, 0, 1);
-      this.adjustVitality(['commensal'], -0.15);
-      this.events.push('Histamine surge — nasal inflammation rising');
-    } else if (id === 'alkaline') {
-      b.ph = Math.min(8, b.ph + 0.6);
-      b.sugarLoad = Math.min(1, b.sugarLoad + 0.6);
-      this.spawnBatch('yeast', 'C. albicans', 28);
-      this.spawnBatch('pathogen', 'S. aureus', 8);
-      b.biofilm = clamp(b.biofilm + 0.35, 0, 1);
-      this.events.push('Alkaline shift + sugar load — C. albicans expansion');
-    } else if (id === 'topical_antibiotic') {
-      this.adjustVitality(['commensal'], -0.4);
-      this.adjustVitality(['probiotic'], -0.2);
-      this.adjustVitality(['pathogen', 'yeast'], -0.1);
-      this.events.push('Topical antibiotic — commensal diversity reduced');
-    } else if (id === 'friction_irritant') {
-      b.integrity = Math.max(0.2, b.integrity - 0.2);
-      b.inflammation = clamp(b.inflammation + 0.25, 0, 1);
-      this.spawnBatch('allergen', 'irritant', 18, { fromAbove: true });
-      this.events.push('Friction/irritant — barrier micro-tears forming');
-    } else if (id === 'stress') {
-      b.integrity = Math.max(0.3, b.integrity - 0.15);
-      b.inflammation = clamp(b.inflammation + 0.2, 0, 1);
-      this.events.push('Mild stress applied to epithelium');
-    } else if (id === 'enteropathogen_bloom') {
-      this.spawnBatch('pathogen', 'Enteropathogen', 12);
-      b.inflammation = clamp(b.inflammation + 0.3, 0, 1);
-      this.events.push('Enteropathogen bloom — gut inflammation rising');
-    } else if (id === 'antibiotic_disruption') {
-      this.adjustVitality(['commensal'], -0.35);
-      b.integrity = Math.max(0.2, b.integrity - 0.1);
-      b.postbioticLevel = Math.max(0, b.postbioticLevel - 0.2);
-      this.events.push('Antibiotic disruption — commensals depleted, SCFA falling');
-    } else if (id === 'cerumen_impaction') {
-      b.cerumen = clamp(b.cerumen + 0.35, 0, 1);
-      b.oxygenation = Math.max(0.15, b.oxygenation - 0.3);
-      b.integrity = Math.max(0.2, b.integrity - 0.15);
-      this.events.push('Cerumen impaction — canal narrowed, oxygenation falling');
-    } else if (id === 'swim_exposure') {
-      b.moisture = clamp(b.moisture + 0.22, 0, 1);
-      b.salinity = clamp(b.salinity + 0.18, 0, 1);
-      this.spawnBatch('pathogen', 'P. aeruginosa', 6);
-      this.events.push('Swim exposure — moisture and salinity spike');
-    } else if (id === 'sebum_surge') {
-      b.sebum = clamp(b.sebum + 0.35, 0, 1);
-      b.biofilm = clamp(b.biofilm + 0.2, 0, 1);
-      this.spawnBatch('yeast', 'Malassezia', 14);
-      this.events.push('Sebum surge — lipid film thickens, Malassezia bloom');
-    } else if (id === 'harsh_shampoo') {
-      b.ph = Math.min(8, b.ph + 0.8);
-      b.sebum = Math.max(0.05, b.sebum - 0.25);
-      this.adjustVitality(['commensal'], -0.2);
-      this.events.push('Harsh shampoo — alkaline wash strips sebum film');
-    } else if (id === 'thrush_bloom') {
-      this.spawnBatch('yeast', 'C. albicans', 22);
-      b.biofilm = clamp(b.biofilm + 0.3, 0, 1);
-      b.inflammation = clamp(b.inflammation + 0.2, 0, 1);
-      this.events.push('Oral thrush bloom — C. albicans patches spreading');
-    } else if (id === 'dry_mouth') {
-      b.moisture = Math.max(0.12, b.moisture - 0.35);
-      b.salinity = clamp(b.salinity + 0.1, 0, 1);
-      this.spawnBatch('yeast', 'C. albicans', 10);
-      this.events.push('Dry mouth — saliva film depleted, yeast adhesion rising');
-    } else if (id === 'sugar_exposure') {
-      b.sugarLoad = Math.min(1, b.sugarLoad + 0.7);
-      b.ph = Math.min(7.5, b.ph + 0.3);
-      this.spawnBatch('pathogen', 'S. mutans', 8);
-      this.events.push('Sugar exposure — acid-tolerant pathogens mobilizing');
-    } else if (id === 'alkaline_flush') {
-      b.ph = Math.min(7.5, b.ph + 1.2);
-      b.integrity = Math.max(0.2, b.integrity - 0.18);
-      this.spawnBatch('yeast', 'C. albicans', 16);
-      this.spawnBatch('pathogen', 'Gardnerella', 6);
-      this.events.push('Alkaline flush — vaginal pH disrupted, Candida bloom risk');
-    } else if (id === 'antibiotic_course') {
-      this.adjustVitality(['commensal'], -0.45);
-      this.adjustVitality(['probiotic'], -0.3);
-      b.ph = Math.min(6.5, b.ph + 0.4);
-      b.integrity = Math.max(0.2, b.integrity - 0.12);
-      this.events.push('Antibiotic course — Lactobacillus depleted, pH rising');
-    } else if (id === 'glycogen_spike') {
-      b.sugarLoad = Math.min(1, b.sugarLoad + 0.55);
-      b.moisture = clamp(b.moisture + 0.12, 0, 1);
-      this.spawnBatch('yeast', 'C. albicans', 12);
-      this.events.push('Glycogen spike — yeast substrate surge in mucosa');
+    if (def.biome) {
+      this.applyStressorBiome(def.biome);
+    }
+    for (const spawn of def.spawns ?? []) {
+      this.spawnBatch(spawn.type, spawn.strain, spawn.count, spawn.fromAbove ? { fromAbove: true } : undefined);
+    }
+    for (const line of def.log) {
+      this.events.push(line);
     }
 
     this.updateCounts();
+  }
+
+  private applyStressorBiome(e: StressorBiomeDelta) {
+    const b = this.biome;
+
+    const add = (field: keyof BiomeState, delta: number | undefined, min?: number, max?: number) => {
+      if (delta === undefined) return;
+      let next = (b[field] as number) + delta;
+      if (min !== undefined) next = Math.max(min, next);
+      if (max !== undefined) next = Math.min(max, next);
+      (b[field] as number) = next;
+    };
+
+    add('ph', e.ph, e.phMin, e.phMax);
+    add('moisture', e.moisture, e.moistureMin, e.moistureMax);
+    add('temperature', e.temperature, e.temperatureMin, e.temperatureMax);
+    add('sebum', e.sebum, e.sebumMin, e.sebumMax);
+    add('cerumen', e.cerumen, undefined, e.cerumenMax);
+    add('salinity', e.salinity, undefined, e.salinityMax);
+    add('oxygenation', e.oxygenation, e.oxygenationMin, undefined);
+    add('oxygenTension', e.oxygenTension);
+    add('sweatRate', e.sweatRate, undefined, e.sweatRateMax);
+    add('integrity', e.integrity, e.integrityMin, 1);
+    if (e.inflammation !== undefined) {
+      b.inflammation = clamp(b.inflammation + e.inflammation, 0, 1);
+    }
+    if (e.biofilm !== undefined) {
+      b.biofilm = clamp(b.biofilm + e.biofilm, 0, 1);
+    }
+    add('sugarLoad', e.sugarLoad, undefined, e.sugarLoadMax);
+    add('postbioticLevel', e.postbioticLevel, e.postbioticMin, 1);
+
+    if (e.allergenAdhesion !== undefined) {
+      this.allergenAdhesion = e.allergenAdhesionMax !== undefined
+        ? Math.min(e.allergenAdhesionMax, this.allergenAdhesion + e.allergenAdhesion)
+        : this.allergenAdhesion + e.allergenAdhesion;
+    }
+
+    if (e.commensalVitality !== undefined) this.adjustVitality(['commensal'], e.commensalVitality);
+    if (e.probioticVitality !== undefined) this.adjustVitality(['probiotic'], e.probioticVitality);
+    if (e.pathogenVitality !== undefined) this.adjustVitality(['pathogen', 'yeast'], e.pathogenVitality);
+    if (e.yeastVitality !== undefined) this.adjustVitality(['yeast'], e.yeastVitality);
   }
 
   inoculate(actionId: string) {

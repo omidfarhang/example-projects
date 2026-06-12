@@ -2,280 +2,164 @@
 
 Exhaustive catalog of every trigger (stressor) and inoculation (intervention) in Bio-Dynamics.
 
-Source: [`src/sim/engine.ts`](../src/sim/engine.ts) (`trigger()`, `inoculate()`), region availability from [`src/data/regions.ts`](../src/data/regions.ts).
+**Stressor source of truth:** [`src/data/stressors.ts`](../src/data/stressors.ts) — 82 stressors across 7 body regions (region-gated). Engine applies them via data-driven `applyStressorBiome()`.
+
+**Inoculation source:** [`src/sim/engine.ts`](../src/sim/engine.ts) (`inoculate()`), region availability from [`src/data/regions.ts`](../src/data/regions.ts).
 
 Actions are **region-gated**: calling a disallowed action logs `"Trigger/Inoculation \"{id}\" not available for {region} tissue"` and has no effect.
 
 ---
 
-## Triggers
+## Triggers (stressors)
 
-### `allergen` — TRIGGER ALLERGEN SPIKE
+Each stressor defines biome deltas, optional microbe spawns, event-log messages, and a visual burst category (`allergen`, `alkaline`, `stress`, or `default`). See `StressorDef` in [`stressors.ts`](../src/data/stressors.ts) for the full schema.
 
-**Regions:** ear, nose
+### Ear canal (12)
 
-| Effect | Value |
+| ID | Label |
 | --- | --- |
-| Spawn | 35 pollen allergens (from above) |
-| inflammation | +0.45 (clamp 0–1) |
-| integrity | −0.25 (floor 0.2) |
-| commensal vitality | −0.25 |
+| `allergen` | TRIGGER ALLERGEN SPIKE |
+| `dry_air` | DRY AIR EXPOSURE |
+| `cerumen_impaction` | CERUMEN IMPACTION |
+| `swim_exposure` | SWIM / WATER EXPOSURE |
+| `bacterial_ear_infection` | BACTERIAL OTITIS EXTERNA |
+| `fungal_otitis` | FUNGAL OTITIS EXTERNA |
+| `hearing_aid_occlusion` | HEARING AID OCCLUSION |
+| `qtip_trauma` | Q-TIP / MICROTRAUMA |
+| `chlorinated_pool_ear` | CHLORINATED POOL WATER |
+| `smoke_pollution` | SMOKE / AIR POLLUTION |
+| `contact_allergen` | CONTACT ALLERGEN (METAL) |
+| `antibiotic_ear_drops` | ANTIBIOTIC EAR DROPS |
 
-**Event log:**
+### Scalp (11)
 
-- "Allergen spike detected — epithelial stress rising"
-- "Commensals retreating from tight junctions"
-
----
-
-### `dry_air` — DRY AIR EXPOSURE
-
-**Regions:** ear, nose
-
-| Effect | Value |
+| ID | Label |
 | --- | --- |
-| moisture | −0.25 (floor 0.1) |
-| integrity | −0.12 (floor 0.2) |
-| allergenAdhesion | +0.3 (clamp 0–1) |
+| `sebum_surge` | SEBUM SURGE |
+| `harsh_shampoo` | HARSH SHAMPOO (ALKALINE) |
+| `friction_irritant` | FRICTION / IRRITANT |
+| `heat_sweat_surge` | HEAT / SWEAT SURGE |
+| `stress_cortisol` | PSYCHOSOCIAL STRESS (CORTISOL) |
+| `chemical_hair_dye` | CHEMICAL HAIR DYE |
+| `uv_sun_exposure` | UV / SUN EXPOSURE |
+| `hard_water_wash` | HARD WATER / MINERAL BUILDUP |
+| `hat_occlusion` | HAT / HELMET OCCLUSION |
+| `dandruff_flare` | DANDRUFF / SEBORRHEIC FLARE |
+| `chlorinated_pool_scalp` | CHLORINATED POOL (SCALP) |
 
-**Event log:** "Dry air exposure — mucus layer thinning"
+### Nose / sinus (12)
 
----
-
-### `histamine` — HISTAMINE SURGE
-
-**Regions:** nose
-
-| Effect | Value |
+| ID | Label |
 | --- | --- |
-| inflammation | +0.35 |
-| commensal vitality | −0.15 |
+| `allergen` | TRIGGER ALLERGEN SPIKE |
+| `dry_air` | DRY AIR EXPOSURE |
+| `smoke_pollution` | SMOKE / AIR POLLUTION |
+| `histamine` | HISTAMINE SURGE |
+| `viral_uri` | VIRAL UPPER RESPIRATORY INFECTION |
+| `bacterial_sinusitis` | BACTERIAL SINUSITIS |
+| `cigarette_smoke` | CIGARETTE SMOKE |
+| `cold_air_burst` | COLD DRY AIR BURST |
+| `pollution_pm25` | FINE PARTICULATE POLLUTION (PM2.5) |
+| `mold_spore_exposure` | MOLD SPORE EXPOSURE |
+| `occupational_dust` | OCCUPATIONAL DUST EXPOSURE |
+| `decongestant_overuse` | DECONGESTANT OVERUSE (RHINITIS MEDICAMENTOSA) |
 
-**Event log:** "Histamine surge — nasal inflammation rising"
+### Oral (13)
 
----
-
-### `cerumen_impaction` — CERUMEN IMPACTION
-
-**Regions:** ear
-
-| Effect | Value |
+| ID | Label |
 | --- | --- |
-| cerumen | +0.35 |
-| oxygenation | −0.3 (floor 0.15) |
-| integrity | −0.15 (floor 0.2) |
+| `stress_cortisol` | PSYCHOSOCIAL STRESS (CORTISOL) |
+| `cigarette_smoke` | CIGARETTE SMOKE |
+| `thrush_bloom` | ORAL THRUSH BLOOM |
+| `dry_mouth` | DRY MOUTH (XEROSTOMIA) |
+| `sugar_exposure` | SUGAR / CARB EXPOSURE |
+| `acid_reflux_lpr` | ACID REFLUX / LPR |
+| `alcohol_exposure` | ALCOHOL EXPOSURE |
+| `chlorhexidine_rinse` | CHLORHEXIDINE / ANTISEPTIC RINSE |
+| `poor_oral_hygiene` | POOR ORAL HYGIENE / PLAQUE |
+| `acidic_beverage` | ACIDIC BEVERAGE (SODA / CITRUS) |
+| `mouth_breathing` | MOUTH BREATHING (NASAL OBSTRUCTION) |
+| `immunosuppression` | IMMUNOSUPPRESSION |
+| `radiation_xerostomia` | RADIATION-INDUCED XEROSTOMIA |
 
-**Event log:** "Cerumen impaction — canal narrowed, oxygenation falling"
+### Skin (15)
 
----
-
-### `swim_exposure` — SWIM / WATER EXPOSURE
-
-**Regions:** ear
-
-| Effect | Value |
+| ID | Label |
 | --- | --- |
-| moisture | +0.22 |
-| salinity | +0.18 |
-| Spawn | 6 P. aeruginosa |
+| `contact_allergen` | CONTACT ALLERGEN (METAL) |
+| `friction_irritant` | FRICTION / IRRITANT |
+| `heat_sweat_surge` | HEAT / SWEAT SURGE |
+| `uv_sun_exposure` | UV / SUN EXPOSURE |
+| `hard_water_wash` | HARD WATER / MINERAL BUILDUP |
+| `alkaline` | RAISE pH + SUGAR LOAD |
+| `topical_antibiotic` | TOPICAL ANTIBIOTIC |
+| `occlusive_sweat` | OCCLUSIVE SWEAT / TIGHT CLOTHING |
+| `detergent_residue` | HARSH DETERGENT / SOAP RESIDUE |
+| `eczema_flare` | ECZEMA / ATOPIC FLARE |
+| `hot_shower_soap` | HOT SHOWER + ALKALINE SOAP |
+| `staph_colonization` | S. AUREUS COLONIZATION |
+| `fungal_intertrigo` | FUNGAL INTERTRIGO |
+| `dehydration` | DEHYDRATION / LOW TEWL RECOVERY |
+| `hormonal_fluctuation` | HORMONAL FLUCTUATION |
 
-**Event log:** "Swim exposure — moisture and salinity spike"
+### Vaginal (13)
 
----
-
-### `sebum_surge` — SEBUM SURGE
-
-**Regions:** scalp
-
-| Effect | Value |
+| ID | Label |
 | --- | --- |
-| sebum | +0.35 |
-| biofilm | +0.2 |
-| Spawn | 14 Malassezia (yeast) |
+| `immunosuppression` | IMMUNOSUPPRESSION |
+| `hormonal_fluctuation` | HORMONAL FLUCTUATION |
+| `alkaline_flush` | ALKALINE FLUSH (pH DISRUPTION) |
+| `antibiotic_course` | ANTIBIOTIC COURSE |
+| `glycogen_spike` | GLYCOGEN / SUGAR SPIKE |
+| `douching` | DOUCHING / VAGINAL WASH |
+| `menstrual_flow` | MENSTRUAL FLOW |
+| `hormonal_contraceptive` | HORMONAL CONTRACEPTIVE SHIFT |
+| `perfumed_products` | SCENTED / PERFUMED PRODUCTS |
+| `synthetic_clothing` | SYNTHETIC / NON-BREATHABLE CLOTHING |
+| `semen_exposure` | SEMEN EXPOSURE (pH ALKALINIZATION) |
+| `heat_humidity` | HEAT / HUMIDITY EXPOSURE |
+| `spermicide_irritant` | SPERMICIDE / CHEMICAL IRRITANT |
 
-**Event log:** "Sebum surge — lipid film thickens, Malassezia bloom"
+### Gut (21)
 
----
-
-### `harsh_shampoo` — HARSH SHAMPOO (ALKALINE)
-
-**Regions:** scalp
-
-| Effect | Value |
+| ID | Label |
 | --- | --- |
-| ph | +0.8 (cap 8) |
-| sebum | −0.25 (floor 0.05) |
-| commensal vitality | −0.2 |
+| `stress_cortisol` | PSYCHOSOCIAL STRESS (CORTISOL) |
+| `alcohol_exposure` | ALCOHOL EXPOSURE |
+| `immunosuppression` | IMMUNOSUPPRESSION |
+| `stress` | SIMULATE MILD STRESS |
+| `enteropathogen_bloom` | ENTEROPATHOGEN BLOOM |
+| `antibiotic_disruption` | ANTIBIOTIC DISRUPTION |
+| `low_fiber_diet` | LOW-FIBER / WESTERN DIET |
+| `high_fat_meal` | HIGH-FAT / FATTY MEAL |
+| `food_poisoning` | FOOD POISONING |
+| `alcohol_binge` | ALCOHOL BINGE |
+| `nsaid_exposure` | NSAID / ASPIRIN EXPOSURE |
+| `gluten_challenge` | GLUTEN / FOOD SENSITIVITY CHALLENGE |
+| `emulsifier_load` | EMULSIFIER / ULTRA-PROCESSED FOOD |
+| `sleep_deprivation` | SLEEP DEPRIVATION |
+| `viral_gastroenteritis` | VIRAL GASTROENTERITIS |
+| `ppi_antacid` | PPI / ANTACID USE |
+| `processed_food_load` | PROCESSED FOOD / ADDED SUGAR LOAD |
+| `intense_exercise` | INTENSE EXERCISE (GUT ISCHEMIA) |
+| `travelers_diarrhea` | TRAVELER'S DIARRHEA |
+| `c_diff_after_antibiotics` | C. DIFF AFTER ANTIBIOTICS |
+| `food_allergen` | FOOD ALLERGEN EXPOSURE |
 
-**Event log:** "Harsh shampoo — alkaline wash strips sebum film"
+### Stressor categories covered
 
----
-
-### `friction_irritant` — FRICTION / IRRITANT
-
-**Regions:** scalp, skin
-
-| Effect | Value |
+| Category | Examples |
 | --- | --- |
-| integrity | −0.2 (floor 0.2) |
-| inflammation | +0.25 |
-| Spawn | 18 irritant allergens (from above) |
+| **Environmental** | dry air, cold air, heat/humidity, UV, pollution, smoke, chlorinated water |
+| **Hygiene / chemical** | harsh shampoo, detergent, douching, chlorhexidine, spermicide, hair dye |
+| **Barrier / mechanical** | friction, Q-tip trauma, occlusion (hat, hearing aid, synthetic clothing) |
+| **Diet / substrate** | sugar, glycogen, low fiber, processed food, emulsifiers, high-fat meal |
+| **Infectious** | bacterial otitis/sinusitis, viral URI/gastroenteritis, enteropathogen bloom, C. diff |
+| **Pharmacologic** | antibiotics (topical/systemic), NSAIDs, PPI/antacid, decongestant overuse |
+| **Immune / hormonal** | histamine, allergens, immunosuppression, menstrual/hormonal shifts |
+| **Psychophysiological** | cortisol stress, sleep deprivation, intense exercise |
 
-**Event log:** "Friction/irritant — barrier micro-tears forming"
-
----
-
-### `thrush_bloom` — ORAL THRUSH BLOOM
-
-**Regions:** oral
-
-| Effect | Value |
-| --- | --- |
-| Spawn | 22 C. albicans (yeast) |
-| biofilm | +0.3 |
-| inflammation | +0.2 |
-
-**Event log:** "Oral thrush bloom — C. albicans patches spreading"
-
----
-
-### `dry_mouth` — DRY MOUTH (XEROSTOMIA)
-
-**Regions:** oral
-
-| Effect | Value |
-| --- | --- |
-| moisture | −0.35 (floor 0.12) |
-| salinity | +0.1 |
-| Spawn | 10 C. albicans (yeast) |
-
-**Event log:** "Dry mouth — saliva film depleted, yeast adhesion rising"
-
----
-
-### `sugar_exposure` — SUGAR / CARB EXPOSURE
-
-**Regions:** oral
-
-| Effect | Value |
-| --- | --- |
-| sugarLoad | +0.7 |
-| ph | +0.3 (cap 7.5) |
-| Spawn | 8 S. mutans |
-
-**Event log:** "Sugar exposure — acid-tolerant pathogens mobilizing"
-
----
-
-### `alkaline` — RAISE pH + SUGAR LOAD
-
-**Regions:** skin
-
-| Effect | Value |
-| --- | --- |
-| ph | +0.6 (cap 8) |
-| sugarLoad | +0.6 |
-| Spawn | 28 C. albicans, 8 S. aureus |
-| biofilm | +0.35 |
-
-**Event log:** "Alkaline shift + sugar load — C. albicans expansion"
-
----
-
-### `topical_antibiotic` — TOPICAL ANTIBIOTIC
-
-**Regions:** skin
-
-| Effect | Value |
-| --- | --- |
-| commensal vitality | −0.4 |
-| probiotic vitality | −0.2 |
-| pathogen/yeast vitality | −0.1 |
-
-**Event log:** "Topical antibiotic — commensal diversity reduced"
-
----
-
-### `alkaline_flush` — ALKALINE FLUSH (pH DISRUPTION)
-
-**Regions:** vaginal
-
-| Effect | Value |
-| --- | --- |
-| ph | +1.2 (cap 7.5) |
-| integrity | −0.18 (floor 0.2) |
-| Spawn | 16 C. albicans, 6 Gardnerella |
-
-**Event log:** "Alkaline flush — vaginal pH disrupted, Candida bloom risk"
-
----
-
-### `antibiotic_course` — ANTIBIOTIC COURSE
-
-**Regions:** vaginal
-
-| Effect | Value |
-| --- | --- |
-| commensal vitality | −0.45 |
-| probiotic vitality | −0.3 |
-| ph | +0.4 (cap 6.5) |
-| integrity | −0.12 (floor 0.2) |
-
-**Event log:** "Antibiotic course — Lactobacillus depleted, pH rising"
-
----
-
-### `glycogen_spike` — GLYCOGEN / SUGAR SPIKE
-
-**Regions:** vaginal
-
-| Effect | Value |
-| --- | --- |
-| sugarLoad | +0.55 |
-| moisture | +0.12 |
-| Spawn | 12 C. albicans (yeast) |
-
-**Event log:** "Glycogen spike — yeast substrate surge in mucosa"
-
----
-
-### `stress` — SIMULATE MILD STRESS
-
-**Regions:** gut
-
-| Effect | Value |
-| --- | --- |
-| integrity | −0.15 (floor 0.3) |
-| inflammation | +0.2 |
-
-**Event log:** "Mild stress applied to epithelium"
-
----
-
-### `enteropathogen_bloom` — ENTEROPATHOGEN BLOOM
-
-**Regions:** gut
-
-| Effect | Value |
-| --- | --- |
-| Spawn | 12 Enteropathogen |
-| inflammation | +0.3 |
-
-**Event log:** "Enteropathogen bloom — gut inflammation rising"
-
----
-
-### `antibiotic_disruption` — ANTIBIOTIC DISRUPTION
-
-**Regions:** gut
-
-| Effect | Value |
-| --- | --- |
-| commensal vitality | −0.35 |
-| integrity | −0.1 (floor 0.2) |
-| postbioticLevel | −0.2 (floor 0) |
-
-**Event log:** "Antibiotic disruption — commensals depleted, SCFA falling"
+Legacy per-trigger effect tables (original 18) are preserved in git history; all effect values now live in [`stressors.ts`](../src/data/stressors.ts).
 
 ---
 
@@ -435,33 +319,35 @@ Actions are **region-gated**: calling a disallowed action logs `"Trigger/Inocula
 
 ### Triggers by region
 
-| Region | Triggers |
-| --- | --- |
-| ear | allergen, dry_air, cerumen_impaction, swim_exposure |
-| scalp | sebum_surge, harsh_shampoo, friction_irritant |
-| nose | allergen, dry_air, histamine |
-| oral | thrush_bloom, dry_mouth, sugar_exposure |
-| skin | alkaline, topical_antibiotic, friction_irritant |
-| vaginal | alkaline_flush, antibiotic_course, glycogen_spike |
-| gut | stress, enteropathogen_bloom, antibiotic_disruption |
+| Region | Count | Triggers |
+| --- | --- | --- |
+| ear | 12 | allergen, dry_air, cerumen_impaction, swim_exposure, bacterial_ear_infection, fungal_otitis, hearing_aid_occlusion, qtip_trauma, chlorinated_pool_ear, smoke_pollution, contact_allergen, antibiotic_ear_drops |
+| scalp | 11 | sebum_surge, harsh_shampoo, friction_irritant, heat_sweat_surge, stress_cortisol, chemical_hair_dye, uv_sun_exposure, hard_water_wash, hat_occlusion, dandruff_flare, chlorinated_pool_scalp |
+| nose | 12 | allergen, dry_air, smoke_pollution, histamine, viral_uri, bacterial_sinusitis, cigarette_smoke, cold_air_burst, pollution_pm25, mold_spore_exposure, occupational_dust, decongestant_overuse |
+| oral | 13 | stress_cortisol, cigarette_smoke, thrush_bloom, dry_mouth, sugar_exposure, acid_reflux_lpr, alcohol_exposure, chlorhexidine_rinse, poor_oral_hygiene, acidic_beverage, mouth_breathing, immunosuppression, radiation_xerostomia |
+| skin | 15 | contact_allergen, friction_irritant, heat_sweat_surge, uv_sun_exposure, hard_water_wash, alkaline, topical_antibiotic, occlusive_sweat, detergent_residue, eczema_flare, hot_shower_soap, staph_colonization, fungal_intertrigo, dehydration, hormonal_fluctuation |
+| vaginal | 13 | immunosuppression, hormonal_fluctuation, alkaline_flush, antibiotic_course, glycogen_spike, douching, menstrual_flow, hormonal_contraceptive, perfumed_products, synthetic_clothing, semen_exposure, heat_humidity, spermicide_irritant |
+| gut | 21 | stress_cortisol, alcohol_exposure, immunosuppression, stress, enteropathogen_bloom, antibiotic_disruption, low_fiber_diet, high_fat_meal, food_poisoning, alcohol_binge, nsaid_exposure, gluten_challenge, emulsifier_load, sleep_deprivation, viral_gastroenteritis, ppi_antacid, processed_food_load, intense_exercise, travelers_diarrhea, c_diff_after_antibiotics, food_allergen |
 
-### Inoculations by region
+### Regional care by region (non-strain only)
 
-| Region | Inoculations |
+| Region | Regional care |
 | --- | --- |
-| ear | lrham, saline_mist |
-| scalp | lrham, s_epidermidis, ph_serum |
-| nose | lrham, binf, saline_mist |
-| oral | lsaliv, lacid, sboul |
-| skin | lacid, s_epidermidis, ph_serum |
-| vaginal | lacid, lrham, ph_serum |
-| gut | prebiotic, lplant, scfa |
+| ear | saline_mist |
+| scalp | s_epidermidis, ph_serum |
+| nose | saline_mist |
+| oral | — |
+| skin | s_epidermidis, ph_serum |
+| vaginal | ph_serum |
+| gut | scfa |
+
+Strain and product shortcuts per region live in [`regionSuggestions.ts`](../../src/data/regionSuggestions.ts) (dashboard **Suggested for [tissue]** chips).
 
 ---
 
-## Individual strain panel (all regions)
+## Strain library (all regions)
 
-Available via dashboard **Individual Strains** row. Source: [`src/data/strains.ts`](../../src/data/strains.ts), `inoculateStrain()`.
+Available via **Interventions → Strain library** tab. Source: [`src/data/strains.ts`](../../src/data/strains.ts), `inoculateStrain()`.
 
 | Action ID | Strain | Spawn | Primary effects |
 | --- | --- | --- | --- |
@@ -481,18 +367,18 @@ Available via dashboard **Individual Strains** row. Source: [`src/data/strains.t
 | `ssaliv_k12` | S. salivarius K12 | 16 | biofilm −0.18, inflammation −0.1, moisture +0.08 |
 | `ssaliv_m18` | S. salivarius M18 | 16 | biofilm −0.22, integrity +0.06 |
 
-Hover any strain button to preview effects in the **Action Preview** panel.
+Click any strain to preview in the **Action Preview** panel (catalog row).
 
 ---
 
-## Prebiotic panel (all regions)
+## Prebiotics (all regions)
 
 | Action ID | Substrate | Spawn | Effect |
 | --- | --- | --- | --- |
 | `inulin` | Inulin | 20 | Prebiotic nodes; convert to SCFA near probiotics (r=0.4) |
 | `fos` | FOS | 18 | Prebiotic nodes; convert to SCFA near probiotics (r=0.4) |
 
-Gut region also exposes `prebiotic` (inulin) and `prebiotic_fos` (FOS) as quick inoculations.
+Gut **Suggested** chips include inulin and FOS; full catalog under **Interventions → Prebiotics**.
 
 ---
 

@@ -6,9 +6,12 @@ import {
 } from '../data/envVars';
 import { PRESETS, type PresetId } from '../data/presets';
 import type { ProductId } from '../data/products';
-import { PRODUCT_LIST } from '../data/products';
+import { PRODUCT_LIST, PRODUCTS } from '../data/products';
+import { REGION_SUGGESTIONS } from '../data/regionSuggestions';
 import { getRegion, REGIONS, type RegionDef, type RegionId } from '../data/regions';
-import { PREBIOTICS, STRAIN_LIST, type PrebioticId, type StrainId } from '../data/strains';
+import { PREBIOTICS, STRAINS, STRAIN_LIST, type PrebioticId, type StrainId } from '../data/strains';
+
+type CatalogTab = 'products' | 'strains' | 'prebiotics';
 import {
   buildPrebioticImpact,
   buildProductImpact,
@@ -63,11 +66,16 @@ export class Dashboard {
   private envPanel!: HTMLElement;
   private envSliders = new Map<EnvVarId, HTMLInputElement>();
   private envReadouts = new Map<EnvVarId, HTMLElement>();
-  private inoculationRow!: HTMLElement;
   private triggerRow!: HTMLElement;
+  private suggestedRow!: HTMLElement;
+  private regionalCareRow!: HTMLElement;
+  private regionalCareSection!: HTMLElement;
+  private suggestedHint!: HTMLElement;
   private strainRow!: HTMLElement;
   private prebioticRow!: HTMLElement;
   private productRow!: HTMLElement;
+  private catalogPanes = new Map<CatalogTab, HTMLElement>();
+  private activeCatalogTab: CatalogTab = 'products';
   private engineBadge!: HTMLElement;
   private fpsBadge!: HTMLElement;
   private callout!: HTMLElement;
@@ -170,30 +178,44 @@ export class Dashboard {
           </div>
         </aside>
       </div>
-      <div class="bd-controls">
+      <div class="bd-controls bd-controls--lab">
         <div class="bd-panel bd-env">
           <h2>ENVIRONMENTAL VARIABLES</h2>
           <p class="bd-env-hint" data-env-hint>Region-specific tissue conditions</p>
           <div class="bd-env-grid" data-env-panel></div>
         </div>
-        <div class="bd-panel bd-inoc">
-          <h2>STRESSORS &amp; REGION ACTIONS</h2>
-          <p class="bd-section-hint">Region-specific triggers and quick inoculations</p>
-          <div class="bd-btn-row" data-triggers></div>
-          <div class="bd-btn-row" data-inoculations></div>
+        <div class="bd-panel bd-stressors">
+          <h2>STRESSORS</h2>
+          <p class="bd-section-hint">Region-specific challenges — apply in tissue view</p>
+          <div class="bd-btn-row bd-btn-row--stressors" data-triggers></div>
         </div>
-        <div class="bd-panel bd-strains">
-          <h2>INDIVIDUAL STRAINS</h2>
-          <p class="bd-section-hint">Apply a single strain — preview appears in the products row below</p>
-          <div class="bd-btn-row bd-btn-row--dense" data-strains></div>
-          <h3 class="bd-subheading">Prebiotics</h3>
-          <div class="bd-btn-row" data-prebiotics></div>
+        <div class="bd-panel bd-regional">
+          <h2>REGIONAL CARE</h2>
+          <p class="bd-section-hint" data-suggested-hint>Suggested for this tissue</p>
+          <div class="bd-btn-row bd-btn-row--suggested" data-suggested></div>
+          <div class="bd-regional-care" data-regional-care-section>
+            <h3 class="bd-subheading">Tissue-specific treatments</h3>
+            <div class="bd-btn-row" data-regional-care></div>
+          </div>
         </div>
-        <div class="bd-actions-row">
-          <div class="bd-panel bd-products">
-            <h2>PRODUCTS &amp; FERMENTED FOODS</h2>
-            <p class="bd-section-hint">Click a supplement or food — preview appears alongside</p>
-            <div class="bd-btn-row bd-btn-row--products" data-products></div>
+        <div class="bd-catalog-row">
+          <div class="bd-panel bd-catalog">
+            <h2>INTERVENTIONS</h2>
+            <p class="bd-section-hint">Full catalog — click to preview and apply</p>
+            <div class="bd-catalog-tabs" role="tablist">
+              <button type="button" class="bd-catalog-tab bd-catalog-tab--active" role="tab" data-catalog-tab="products" aria-selected="true">Products &amp; foods</button>
+              <button type="button" class="bd-catalog-tab" role="tab" data-catalog-tab="strains" aria-selected="false">Strain library</button>
+              <button type="button" class="bd-catalog-tab" role="tab" data-catalog-tab="prebiotics" aria-selected="false">Prebiotics</button>
+            </div>
+            <div class="bd-catalog-pane" data-catalog-pane="products">
+              <div class="bd-btn-row bd-btn-row--products" data-products></div>
+            </div>
+            <div class="bd-catalog-pane" data-catalog-pane="strains" hidden>
+              <div class="bd-btn-row bd-btn-row--dense" data-strains></div>
+            </div>
+            <div class="bd-catalog-pane" data-catalog-pane="prebiotics" hidden>
+              <div class="bd-btn-row" data-prebiotics></div>
+            </div>
           </div>
           <div class="bd-panel bd-impact bd-impact--inline bd-impact--empty" data-impact-panel>
             <div class="bd-impact-toolbar">
@@ -201,7 +223,7 @@ export class Dashboard {
               <button type="button" class="bd-impact-close" data-impact-close aria-label="Close preview" hidden>×</button>
             </div>
             <p class="bd-impact-placeholder" data-impact-placeholder>
-              Click a product, strain, or prebiotic to see what it adds and how tissue metrics shift.
+              Click a suggested shortcut or catalog item to see what it adds and how tissue metrics shift.
             </p>
             <div class="bd-impact-body" data-impact-body hidden></div>
           </div>
@@ -231,11 +253,23 @@ export class Dashboard {
     this.integrityMeter = this.root.querySelector('[data-integrity-meter]')!;
     this.inflammationMeter = this.root.querySelector('[data-inflammation-meter]')!;
     this.envPanel = this.root.querySelector('[data-env-panel]')!;
-    this.inoculationRow = this.root.querySelector('[data-inoculations]')!;
     this.triggerRow = this.root.querySelector('[data-triggers]')!;
+    this.suggestedRow = this.root.querySelector('[data-suggested]')!;
+    this.regionalCareRow = this.root.querySelector('[data-regional-care]')!;
+    this.regionalCareSection = this.root.querySelector('[data-regional-care-section]')!;
+    this.suggestedHint = this.root.querySelector('[data-suggested-hint]')!;
     this.strainRow = this.root.querySelector('[data-strains]')!;
     this.prebioticRow = this.root.querySelector('[data-prebiotics]')!;
     this.productRow = this.root.querySelector('[data-products]')!;
+    for (const tab of ['products', 'strains', 'prebiotics'] as CatalogTab[]) {
+      const pane = this.root.querySelector(`[data-catalog-pane="${tab}"]`) as HTMLElement;
+      this.catalogPanes.set(tab, pane);
+    }
+    this.root.querySelectorAll('[data-catalog-tab]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.setCatalogTab((btn as HTMLElement).dataset.catalogTab as CatalogTab);
+      });
+    });
     this.engineBadge = this.root.querySelector('[data-engine]')!;
     this.fpsBadge = this.root.querySelector('[data-fps]')!;
     this.callout = this.root.querySelector('[data-callout]')!;
@@ -266,11 +300,24 @@ export class Dashboard {
       this.callbacks.onPresetChange(this.presetSelect.value as PresetId);
     });
     this.renderEnvControls(this.currentRegion);
-    this.renderStrainAndProductPanels();
+    this.renderCatalog();
     this.setMicroView(false);
   }
 
-  private renderStrainAndProductPanels() {
+  private setCatalogTab(tab: CatalogTab) {
+    this.activeCatalogTab = tab;
+    this.root.querySelectorAll('[data-catalog-tab]').forEach((btn) => {
+      const el = btn as HTMLElement;
+      const active = el.dataset.catalogTab === tab;
+      el.classList.toggle('bd-catalog-tab--active', active);
+      el.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    for (const [id, pane] of this.catalogPanes) {
+      pane.hidden = id !== tab;
+    }
+  }
+
+  private renderCatalog() {
     this.strainRow.innerHTML = STRAIN_LIST.map(
       (s) =>
         `<button type="button" class="bd-btn bd-btn--strain" data-strain="${s.id}" title="${s.commonRegions ? 'Common: ' + s.commonRegions.join(', ') : ''}">${s.name}</button>`,
@@ -558,13 +605,40 @@ export class Dashboard {
 
   setRegionActions(regionId: RegionId) {
     const region = getRegion(regionId);
+    const suggestions = REGION_SUGGESTIONS[regionId];
+
     this.triggerRow.innerHTML = region.triggers
       .map((t) => `<button type="button" class="bd-btn bd-btn--warn" data-trigger="${t.id}">${t.label}</button>`)
       .join('');
-    this.inoculationRow.innerHTML = region.inoculations
-      .map((i) => `<button type="button" class="bd-btn bd-btn--action" data-inoc="${i.id}">${i.label}</button>`)
+
+    this.suggestedHint.textContent = `Suggested for ${region.label}`;
+
+    const chips: string[] = [];
+    for (const id of suggestions.strains ?? []) {
+      chips.push(
+        `<button type="button" class="bd-btn bd-btn--suggested bd-btn--suggested-strain" data-suggest-strain="${id}">${STRAINS[id].name}</button>`,
+      );
+    }
+    for (const id of suggestions.prebiotics ?? []) {
+      const pre = PREBIOTICS[id];
+      chips.push(
+        `<button type="button" class="bd-btn bd-btn--suggested bd-btn--suggested-prebiotic" data-suggest-prebiotic="${id}">+ ${pre.name.toUpperCase()}</button>`,
+      );
+    }
+    for (const id of suggestions.products ?? []) {
+      const short = PRODUCTS[id].label.replace(' (FERMENTED)', '').split(' ').slice(0, 2).join(' ');
+      chips.push(
+        `<button type="button" class="bd-btn bd-btn--suggested bd-btn--suggested-product" data-suggest-product="${id}" title="${PRODUCTS[id].label}">${short}</button>`,
+      );
+    }
+    this.suggestedRow.innerHTML = chips.join('');
+
+    this.regionalCareRow.innerHTML = region.regionalCare
+      .map((a) => `<button type="button" class="bd-btn bd-btn--action" data-regional-care="${a.id}">${a.label}</button>`)
       .join('');
-    this.bindActionButtons();
+    this.regionalCareSection.hidden = region.regionalCare.length === 0;
+
+    this.bindRegionButtons();
   }
 
   syncEnvSliders(biome: BiomeState, regionId: RegionId) {
@@ -587,21 +661,53 @@ export class Dashboard {
     }
   }
 
-  private bindActionButtons() {
+  private bindRegionButtons() {
     this.triggerRow.querySelectorAll('[data-trigger]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const el = btn as HTMLButtonElement;
-        const id = el.dataset.trigger!;
         this.flashButton(el);
-        this.callbacks.onTrigger(id);
+        this.callbacks.onTrigger(el.dataset.trigger!);
       });
     });
-    this.inoculationRow.querySelectorAll('[data-inoc]').forEach((btn) => {
+
+    this.regionalCareRow.querySelectorAll('[data-regional-care]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const el = btn as HTMLButtonElement;
-        const id = el.dataset.inoc!;
         this.flashButton(el);
-        this.callbacks.onInoculate(id);
+        this.callbacks.onInoculate(el.dataset.regionalCare!);
+      });
+    });
+
+    this.suggestedRow.querySelectorAll('[data-suggest-strain]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLButtonElement;
+        const id = el.dataset.suggestStrain as StrainId;
+        this.flashButton(el);
+        this.setCatalogTab('strains');
+        this.openImpactPreview('strain', id, true);
+        this.callbacks.onApplyStrain(id);
+      });
+    });
+
+    this.suggestedRow.querySelectorAll('[data-suggest-prebiotic]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLButtonElement;
+        const id = el.dataset.suggestPrebiotic as PrebioticId;
+        this.flashButton(el);
+        this.setCatalogTab('prebiotics');
+        this.openImpactPreview('prebiotic', id, true);
+        this.callbacks.onApplyPrebiotic(id);
+      });
+    });
+
+    this.suggestedRow.querySelectorAll('[data-suggest-product]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLButtonElement;
+        const id = el.dataset.suggestProduct as ProductId;
+        this.flashButton(el);
+        this.setCatalogTab('products');
+        this.openImpactPreview('product', id, true);
+        this.callbacks.onApplyProduct(id);
       });
     });
   }

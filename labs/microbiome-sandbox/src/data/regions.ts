@@ -1,4 +1,5 @@
 import { buildRegionEnv, type RegionEnv } from './envVars';
+import { stressorActionsForRegion } from './stressors';
 import type { EpitheliumKind } from '../scene/epithelium/types';
 
 export type RegionId = 'ear' | 'scalp' | 'nose' | 'oral' | 'skin' | 'vaginal' | 'gut';
@@ -18,10 +19,6 @@ export interface RegionAction {
   label: string;
 }
 
-export interface RegionInoculation extends RegionAction {
-  strain: string;
-}
-
 export interface RegionDef {
   id: RegionId;
   label: string;
@@ -34,7 +31,8 @@ export interface RegionDef {
   env: RegionEnv;
   baseline: RegionBaseline;
   triggers: RegionAction[];
-  inoculations: RegionInoculation[];
+  /** Non-strain tissue treatments (saline, serum, SCFA, commensal seeding). */
+  regionalCare: RegionAction[];
 }
 
 export const REGIONS: RegionDef[] = [
@@ -62,16 +60,8 @@ export const REGIONS: RegionDef[] = [
       inflammation: 0.06,
       biofilm: 0.08,
     },
-    triggers: [
-      { id: 'allergen', label: 'TRIGGER ALLERGEN SPIKE' },
-      { id: 'dry_air', label: 'DRY AIR EXPOSURE' },
-      { id: 'cerumen_impaction', label: 'CERUMEN IMPACTION' },
-      { id: 'swim_exposure', label: 'SWIM / WATER EXPOSURE' },
-    ],
-    inoculations: [
-      { id: 'lrham', label: 'SPRAY L. RHAMNOSUS', strain: 'L. rhamnosus' },
-      { id: 'saline_mist', label: 'SALINE MIST', strain: 'saline_mist' },
-    ],
+    triggers: stressorActionsForRegion('ear'),
+    regionalCare: [{ id: 'saline_mist', label: 'SALINE MIST' }],
   },
   {
     id: 'scalp',
@@ -102,15 +92,10 @@ export const REGIONS: RegionDef[] = [
       ],
       biofilm: 0.12,
     },
-    triggers: [
-      { id: 'sebum_surge', label: 'SEBUM SURGE' },
-      { id: 'harsh_shampoo', label: 'HARSH SHAMPOO (ALKALINE)' },
-      { id: 'friction_irritant', label: 'FRICTION / IRRITANT' },
-    ],
-    inoculations: [
-      { id: 'lrham', label: 'APPLY L. RHAMNOSUS', strain: 'L. rhamnosus' },
-      { id: 's_epidermidis', label: 'APPLY S. EPIDERMIDIS', strain: 'S. epidermidis' },
-      { id: 'ph_serum', label: 'pH BALANCING SERUM', strain: 'ph_serum' },
+    triggers: stressorActionsForRegion('scalp'),
+    regionalCare: [
+      { id: 's_epidermidis', label: 'APPLY S. EPIDERMIDIS' },
+      { id: 'ph_serum', label: 'pH BALANCING SERUM' },
     ],
   },
   {
@@ -136,16 +121,8 @@ export const REGIONS: RegionDef[] = [
       ],
       inflammation: 0.08,
     },
-    triggers: [
-      { id: 'allergen', label: 'TRIGGER ALLERGEN SPIKE' },
-      { id: 'dry_air', label: 'DRY AIR EXPOSURE' },
-      { id: 'histamine', label: 'HISTAMINE SURGE' },
-    ],
-    inoculations: [
-      { id: 'lrham', label: 'SPRAY L. RHAMNOSUS', strain: 'L. rhamnosus' },
-      { id: 'binf', label: 'APPLY B. INFANTIS', strain: 'B. infantis' },
-      { id: 'saline_mist', label: 'SALINE MIST', strain: 'saline_mist' },
-    ],
+    triggers: stressorActionsForRegion('nose'),
+    regionalCare: [{ id: 'saline_mist', label: 'SALINE MIST' }],
   },
   {
     id: 'oral',
@@ -173,16 +150,8 @@ export const REGIONS: RegionDef[] = [
       pathogens: [{ strain: 'C. albicans', count: 4, kind: 'yeast' }],
       biofilm: 0.06,
     },
-    triggers: [
-      { id: 'thrush_bloom', label: 'ORAL THRUSH BLOOM' },
-      { id: 'dry_mouth', label: 'DRY MOUTH (XEROSTOMIA)' },
-      { id: 'sugar_exposure', label: 'SUGAR / CARB EXPOSURE' },
-    ],
-    inoculations: [
-      { id: 'lsaliv', label: 'APPLY L. SALIVARIUS', strain: 'L. salivarius' },
-      { id: 'lacid', label: 'INOCULATE L. ACIDOPHILUS', strain: 'L. acidophilus' },
-      { id: 'sboul', label: 'SEED S. BOULARDII', strain: 'S. boulardii' },
-    ],
+    triggers: stressorActionsForRegion('oral'),
+    regionalCare: [],
   },
   {
     id: 'skin',
@@ -207,15 +176,10 @@ export const REGIONS: RegionDef[] = [
       ],
       biofilm: 0.15,
     },
-    triggers: [
-      { id: 'alkaline', label: 'RAISE pH + SUGAR LOAD' },
-      { id: 'topical_antibiotic', label: 'TOPICAL ANTIBIOTIC' },
-      { id: 'friction_irritant', label: 'FRICTION / IRRITANT' },
-    ],
-    inoculations: [
-      { id: 'lacid', label: 'INOCULATE L. ACIDOPHILUS', strain: 'L. acidophilus' },
-      { id: 's_epidermidis', label: 'APPLY S. EPIDERMIDIS', strain: 'S. epidermidis' },
-      { id: 'ph_serum', label: 'pH BALANCING SERUM', strain: 'ph_serum' },
+    triggers: stressorActionsForRegion('skin'),
+    regionalCare: [
+      { id: 's_epidermidis', label: 'APPLY S. EPIDERMIDIS' },
+      { id: 'ph_serum', label: 'pH BALANCING SERUM' },
     ],
   },
   {
@@ -247,16 +211,8 @@ export const REGIONS: RegionDef[] = [
       integrity: 0.88,
       biofilm: 0.05,
     },
-    triggers: [
-      { id: 'alkaline_flush', label: 'ALKALINE FLUSH (pH DISRUPTION)' },
-      { id: 'antibiotic_course', label: 'ANTIBIOTIC COURSE' },
-      { id: 'glycogen_spike', label: 'GLYCOGEN / SUGAR SPIKE' },
-    ],
-    inoculations: [
-      { id: 'lacid', label: 'APPLY L. ACIDOPHILUS', strain: 'L. acidophilus' },
-      { id: 'lrham', label: 'SEED L. RHAMNOSUS', strain: 'L. rhamnosus' },
-      { id: 'ph_serum', label: 'pH RESTORING SERUM', strain: 'ph_serum' },
-    ],
+    triggers: stressorActionsForRegion('vaginal'),
+    regionalCare: [{ id: 'ph_serum', label: 'pH RESTORING SERUM' }],
   },
   {
     id: 'gut',
@@ -278,17 +234,8 @@ export const REGIONS: RegionDef[] = [
       prebiotics: [{ strain: 'inulin', count: 8 }],
       integrity: 0.75,
     },
-    triggers: [
-      { id: 'stress', label: 'SIMULATE MILD STRESS' },
-      { id: 'enteropathogen_bloom', label: 'ENTEROPATHOGEN BLOOM' },
-      { id: 'antibiotic_disruption', label: 'ANTIBIOTIC DISRUPTION' },
-    ],
-    inoculations: [
-      { id: 'prebiotic', label: 'ADD INULIN FIBER', strain: 'inulin' },
-      { id: 'prebiotic_fos', label: 'ADD FOS PREBIOTIC', strain: 'FOS' },
-      { id: 'lplant', label: 'SEED L. PLANTARUM', strain: 'L. plantarum' },
-      { id: 'scfa', label: 'RELEASE SCFA BOOST', strain: 'postbiotic' },
-    ],
+    triggers: stressorActionsForRegion('gut'),
+    regionalCare: [{ id: 'scfa', label: 'RELEASE SCFA BOOST' }],
   },
 ];
 

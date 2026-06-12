@@ -24,7 +24,7 @@ Core educational lab features implemented and documented.
 | --- | --- | --- |
 | **CORE-01** | 7 active body regions, macro/micro 3D views, tissue callouts | `regions.ts`, `SceneManager.ts`, `tissueCallouts.ts` |
 | **CORE-02** | 3 educational presets + URL params (`preset`, `region`, `context`) | `presets.ts`, `user-guide.md` |
-| **CORE-03** | 18 stressor triggers + region-gated inoculations | `regions.ts`, `engine.ts` |
+| **CORE-03** | 82 stressor triggers + region-gated inoculations | `stressors.ts`, `regions.ts`, `engine.ts` |
 | **CORE-04** | Individual strains panel — 15 strains, all regions | `strains.ts`, `Dashboard.ts` |
 | **CORE-05** | Prebiotics panel — inulin + FOS spawn + conversion loop | `strains.ts`, `engine.ts` |
 | **CORE-06** | Products & fermented foods — 5 products with region multipliers | `products.ts`, `engine.ts` |

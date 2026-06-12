@@ -8,7 +8,7 @@ Practical guide for adding regions, actions, environment variables, presets, and
 
 When changing simulation behavior, update:
 
-- [ ] [`docs/domain/actions-reference.md`](../domain/actions-reference.md) — trigger/inoculation effects
+- [ ] [`docs/domain/actions-reference.md`](../domain/actions-reference.md) — trigger/inoculation catalog (stressors: `stressors.ts`)
 - [ ] [`docs/simulation/dynamics.md`](../simulation/dynamics.md) — tick rules if changed
 - [ ] [`docs/domain/regions.md`](../domain/regions.md) — if region config changes
 - [ ] [`docs/domain/environment.md`](../domain/environment.md) — if env vars change
@@ -35,7 +35,7 @@ Edit [`src/data/regions.ts`](../src/data/regions.ts):
   env: buildRegionEnv({ /* overrides */ }),
   baseline: { commensals: 30, probiotics: [...], ... },
   triggers: [{ id: 'trigger_id', label: 'BUTTON LABEL' }],
-  inoculations: [{ id: 'inoc_id', label: 'LABEL', strain: 'Strain' }],
+  regionalCare: [{ id: 'care_id', label: 'LABEL' }],
 }
 ```
 
@@ -68,24 +68,31 @@ Update [`docs/domain/regions.md`](../domain/regions.md).
 
 ## Add a trigger or inoculation
 
-### 1. Register in region config
+### 1. Define stressor (triggers)
 
-Add to `triggers` or `inoculations` array in [`regions.ts`](../src/data/regions.ts) for each region that supports it.
-
-### 2. Implement engine logic
-
-Edit [`src/sim/engine.ts`](../src/sim/engine.ts):
-
-**Trigger** — add branch in `trigger(id)`:
+Add an entry to [`src/data/stressors.ts`](../src/data/stressors.ts):
 
 ```typescript
-} else if (id === 'my_trigger') {
-  // mutate biome, spawnBatch, adjustVitality
-  this.events.push('Human-readable log message');
-}
+s(
+  'my_trigger',
+  'MY TRIGGER LABEL',
+  ['gut'],  // regions where available
+  ['Human-readable event log line'],
+  { inflammation: 0.2, integrity: -0.1, integrityMin: 0.2 },  // biome deltas
+  [{ type: 'pathogen', strain: 'Enteropathogen', count: 8 }], // optional spawns
+  'stress',  // optional burst: allergen | alkaline | stress | default
+),
 ```
 
-**Inoculation** — add branch in `inoculate(actionId)`.
+Region buttons are built automatically via `stressorActionsForRegion()` — no manual `triggers` array edits needed unless adding a new region.
+
+### 2. Register in region config (inoculations only)
+
+Add to `regionalCare` in [`regions.ts`](../src/data/regions.ts). For strain/product shortcuts, update [`regionSuggestions.ts`](../src/data/regionSuggestions.ts).
+
+### 3. Implement engine logic (inoculations)
+
+Edit [`src/sim/engine.ts`](../src/sim/engine.ts) — triggers are data-driven; add branches in `inoculate(actionId)` for new interventions.
 
 Use existing helpers:
 
@@ -185,7 +192,7 @@ See [Roadmap](../roadmap.md) — "Engine test suite".
 
 ```text
 regions.ts ──────┬──► engine.ts ──► types.ts
-                 │         │
+stressors.ts ────┤         │
 envVars.ts ──────┤         └──► snapshot ──► TissueLayer / Dashboard
                  │
 presets.ts ──────┘

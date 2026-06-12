@@ -86,20 +86,20 @@ Region-specific subset of sliders (see [Environment](domain/environment.md)). Dr
 
 ### Action buttons
 
-Two rows per region under **Stressors & Region Actions**:
+**Stressors** — region-specific challenges spanning environmental, infectious, dietary, pharmacologic, hormonal, and mechanical stressors (82 total). Scrollable panel; warn styling.
 
-- **Triggers** (warn styling) — stressors
-- **Inoculations** (action styling) — region-specific quick actions
+**Regional care** — two parts:
+- **Suggested for [tissue]** — curated shortcuts into the interventions catalog (strains, prebiotics, products) without duplicate buttons
+- **Tissue-specific treatments** — non-strain actions only (saline mist, pH serum, S. epidermidis, SCFA boost)
 
-**Individual Strains** — all 15 probiotic strains; works in any region.
+**Interventions catalog** — full-width row with tabs:
+- **Products & foods** — synbiotic capsule, oral lozenge, kefir, yogurt, kimchi
+- **Strain library** — all 15 probiotic strains
+- **Prebiotics** — inulin and FOS
 
-**Prebiotics** — + INULIN and + FOS buttons.
+**Action preview** — sits alongside the catalog (side-by-side on desktop). Click a suggested shortcut or catalog item to open a sticky preview; dismiss with × or Escape, or select another action.
 
-**Products & Fermented Foods** — multi-strain synbiotic capsule, oral probiotic lozenge, kefir, yogurt, kimchi. See [Products](domain/products.md).
-
-**Action Preview** — sits in the same row as Products & Fermented Foods (side-by-side on desktop, stacked on narrow screens). Click any strain, prebiotic, or product to open a sticky preview of what it adds and how tissue metrics shift; the panel stays open until you press × or Escape, or click a different action.
-
-Triggers and region inoculations require micro view. Strain and product panels work globally.
+Stressors and regional care require micro view. Catalog interventions work in any region.
 
 ### Footer
 

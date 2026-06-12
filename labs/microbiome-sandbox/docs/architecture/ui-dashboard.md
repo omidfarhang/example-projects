@@ -38,7 +38,7 @@ The dashboard is a **vanilla DOM** overlay — no React/Vue/Svelte. `Dashboard` 
 │              │                          │ - Prebiotics  │
 │              │                          │ - Event log   │
 ├──────────────┴──────────────────────────┴───────────────┤
-│ CONTROLS: env, triggers, strains | products + preview row │
+│ CONTROLS: env (full row) | stressors + regional | catalog + preview │
 ├─────────────────────────────────────────────────────────┤
 │ FOOTER: disclaimer, engine badge, FPS, links           │
 └─────────────────────────────────────────────────────────┘
@@ -133,12 +133,19 @@ Sliders not in region subset are hidden/omitted.
 
 ---
 
-## Action buttons
+## Region action panels
 
-`setRegionActions(region)` rebuilds trigger and inoculation rows from region config:
+`setRegionActions(region)` rebuilds stressor and regional care UI:
 
-- **Trigger row** — `def.triggers`, warn styling, `onTrigger`
-- **Inoculation row** — `def.inoculations`, action styling, `onInoculate`
+- **Stressors** — `def.triggers`, warn styling, `onTrigger`
+- **Suggested chips** — from [`regionSuggestions.ts`](../src/data/regionSuggestions.ts); apply via catalog callbacks + switch tab
+- **Regional care** — `def.regionalCare` (non-strain only), `onInoculate`
+
+## Interventions catalog
+
+Rendered once in `renderCatalog()` with three tabs (products, strains, prebiotics). Shares the preview row with [`actionImpact.ts`](../src/ui/actionImpact.ts).
+
+`setCatalogTab(tab)` toggles panes. Suggested chips call `setCatalogTab` before apply so the matching catalog tab is visible.
 
 `flashAction('warn' | 'action')` — brief visual feedback on button press.
 
