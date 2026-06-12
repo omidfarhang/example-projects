@@ -30,13 +30,15 @@ import { TISSUE_PICTOGRAMS } from '../scene/tissueCallouts';
 import { POPULATION_SCALE, type SimEngine } from '../sim/engine';
 import { formatStrainList, summarizeLiveStrains, totalCells } from '../sim/strainSummary';
 import type { BiomeState, MicrobeNode } from '../sim/types';
+import { dismissPresetTip, isPresetTipDismissed, PRESET_TIPS } from '../data/presetTips';
+import { getLocale, t, translateEvent } from '../i18n';
 import { initTouchGestureHints } from './touchGestureHints';
 import { renderDashboardShell } from './dashboard';
 
 function trendLabel(n: number): string {
-  if (n > 0) return '↑ Increasing';
-  if (n < 0) return '↓ Decreasing';
-  return '→ Stable';
+  if (n > 0) return t('stats.trendUp');
+  if (n < 0) return t('stats.trendDown');
+  return t('stats.trendStable');
 }
 
 function formatPopulation(count: number): string {
@@ -112,7 +114,12 @@ export class Dashboard {
   private zoomTitle!: HTMLElement;
   private modeBadge!: HTMLElement;
   private scaleLabel!: HTMLElement;
-  private hint!: HTMLElement;
+  private presetTip!: HTMLElement;
+  private presetTipText!: HTMLElement;
+  private presetTipDismiss!: HTMLButtonElement;
+  private microBanner!: HTMLElement;
+  private liveAnnouncer!: HTMLElement;
+  private langSelect!: HTMLSelectElement;
   private legendBox!: HTMLElement;
   private eventLog!: HTMLElement;
   private eventLogList!: HTMLElement;
@@ -136,11 +143,13 @@ export class Dashboard {
   private currentPreset: PresetId = 'allergy';
   private currentRegion: RegionId = 'nose';
   private microActive = false;
-  private hintDismissed = false;
   private staticScenario = '';
   private eventLogExpanded = false;
   private lastEventCount = 0;
   private cachedEvents: string[] = [];
+  private lastIntegrityPct = 85;
+  private lastInflammationPct = 10;
+  private boundKeyboardHandler = (e: KeyboardEvent) => this.onKeyboard(e);
 
   constructor(
     mount: HTMLElement,
@@ -209,7 +218,12 @@ export class Dashboard {
     this.zoomTitle = this.root.querySelector('[data-zoom-title]')!;
     this.modeBadge = this.root.querySelector('[data-mode-badge]')!;
     this.scaleLabel = this.root.querySelector('[data-scale-label]')!;
-    this.hint = this.root.querySelector('[data-hint]')!;
+    this.presetTip = this.root.querySelector('[data-preset-tip]')!;
+    this.presetTipText = this.root.querySelector('[data-preset-tip-text]')!;
+    this.presetTipDismiss = this.root.querySelector('[data-preset-tip-dismiss]')!;
+    this.microBanner = this.root.querySelector('[data-micro-banner]')!;
+    this.liveAnnouncer = this.root.querySelector('[data-live-announcer]')!;
+    this.langSelect = this.root.querySelector('[data-lang]') as HTMLSelectElement;
     this.legendBox = this.root.querySelector('[data-legend-box]')!;
     this.eventLog = this.root.querySelector('.bd-event-log')!;
     this.eventLogList = this.root.querySelector('[data-event-log]')!;
@@ -244,8 +258,18 @@ export class Dashboard {
     this.eventLogExpandBtn.addEventListener('click', () => {
       this.eventLogExpanded = !this.eventLogExpanded;
       this.eventLog.classList.toggle('bd-event-log--expanded', this.eventLogExpanded);
-      this.eventLogExpandBtn.textContent = this.eventLogExpanded ? 'Show recent' : 'Show all';
+      this.eventLogExpandBtn.textContent = this.eventLogExpanded
+        ? t('eventLog.showRecent')
+        : t('eventLog.showAll');
     });
+    this.presetTipDismiss.addEventListener('click', () => this.dismissCurrentPresetTip());
+    this.langSelect.value = getLocale();
+    this.langSelect.addEventListener('change', () => {
+      const params = new URLSearchParams(window.location.search);
+      params.set('lang', this.langSelect.value);
+      window.location.search = params.toString();
+    });
+    document.addEventListener('keydown', this.boundKeyboardHandler);
     this.eventLogExportBtn.addEventListener('click', () => this.exportEventLog());
     this.renderEnvControls(this.currentRegion);
     this.renderMealButtons();
@@ -258,6 +282,7 @@ export class Dashboard {
     this.syncAdvancedModeUI(this.currentRegion);
     this.renderCatalog();
     this.setMicroView(false);
+    this.syncPresetTip();
     initTouchGestureHints(this.viewport, this.getCanvas());
   }
 
@@ -433,7 +458,7 @@ export class Dashboard {
   private setActionBadge(label: string, tone: 'warn' | 'action') {
     if (!this.microActive) return;
     this.actionBadge.hidden = false;
-    this.actionBadge.textContent = `ACTIVE: ${label}`;
+    this.actionBadge.textContent = t('a11y.activeAction', { label });
     this.actionBadge.classList.remove('bd-action-badge--warn', 'bd-action-badge--action');
     this.actionBadge.classList.add(tone === 'warn' ? 'bd-action-badge--warn' : 'bd-action-badge--action');
   }
@@ -635,9 +660,7 @@ export class Dashboard {
     this.daySimPanel.hidden = !on || !DAY_SIM_REGIONS.includes(regionId);
     if (on && DAY_SIM_REGIONS.includes(regionId)) {
       this.daySimHint.textContent =
-        regionId === 'oral'
-          ? 'Oral meals briefly dip pH and raise sugar load — watch yeast/pathogen response'
-          : 'Gut meals raise lumen sugar load — slower decay than oral saliva clearance';
+        regionId === 'oral' ? t('env.daySimHintOral') : t('env.daySimHintGut');
     }
     this.renderEnvControls(regionId);
   }
@@ -645,7 +668,12 @@ export class Dashboard {
   private updateDaySimUI(engine: SimEngine) {
     if (!this.advancedMode || !DAY_SIM_REGIONS.includes(this.currentRegion)) return;
     const state = engine.getDaySimState();
-    this.dayStatus.textContent = `Day ${state.dayNumber} · next: ${state.nextMealLabel} (${state.stepIndex + 1}/${state.stepCount})`;
+    this.dayStatus.textContent = t('env.dayStatus', {
+      day: state.dayNumber,
+      meal: state.nextMealLabel,
+      step: state.stepIndex + 1,
+      total: state.stepCount,
+    });
     this.mealsRow.querySelectorAll('[data-meal]').forEach((btn) => {
       const id = (btn as HTMLElement).dataset.meal;
       btn.classList.toggle('bd-btn--meal-next', id === state.nextMealId);
@@ -654,13 +682,22 @@ export class Dashboard {
 
   private renderRegions() {
     this.regionList.innerHTML = REGIONS.map(
-      (r) => `
-      <li>
+      (r, i) => {
+        const key = r.active ? i + 1 : 0;
+        const shortcut = key ? `<kbd class="bd-region__key">${key}</kbd>` : '';
+        const ariaLabel = key
+          ? t('a11y.regionShortcut', { label: r.label, key })
+          : r.label;
+        return `
+      <li role="option">
         <button type="button" class="bd-region ${r.active ? '' : 'bd-region--soon'}"
-          data-region="${r.id}" ${r.active ? '' : 'disabled'}>
-          ${r.label}${r.active ? '' : ' <em>(inactive)</em>'}
+          data-region="${r.id}" data-region-key="${key || ''}"
+          ${r.active ? `aria-keyshortcuts="${key}"` : 'disabled'}
+          aria-label="${ariaLabel}">
+          ${shortcut}${r.label}${r.active ? '' : ' <em>(inactive)</em>'}
         </button>
-      </li>`,
+      </li>`;
+      },
     ).join('');
 
     this.regionList.querySelectorAll('[data-region]').forEach((btn) => {
@@ -669,6 +706,70 @@ export class Dashboard {
         this.callbacks.onRegionSelect(id);
       });
     });
+  }
+
+  private onKeyboard(e: KeyboardEvent) {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'SELECT' || target.tagName === 'TEXTAREA') {
+      return;
+    }
+
+    if (e.key === 'Escape' && this.microActive) {
+      e.preventDefault();
+      this.callbacks.onBackToBody();
+      return;
+    }
+
+    const keyNum = parseInt(e.key, 10);
+    if (keyNum >= 1 && keyNum <= REGIONS.length) {
+      const region = REGIONS[keyNum - 1];
+      if (region?.active) {
+        e.preventDefault();
+        this.callbacks.onRegionSelect(region.id);
+      }
+    }
+  }
+
+  private announce(message: string) {
+    this.liveAnnouncer.textContent = '';
+    requestAnimationFrame(() => {
+      this.liveAnnouncer.textContent = message;
+    });
+  }
+
+  private dismissCurrentPresetTip() {
+    dismissPresetTip(this.currentPreset);
+    this.syncPresetTip();
+  }
+
+  private syncPresetTip() {
+    const tip = PRESET_TIPS[this.currentPreset];
+    const dismissed = isPresetTipDismissed(this.currentPreset);
+    const show = !this.microActive && !dismissed;
+    this.presetTip.hidden = !show;
+    if (show) {
+      this.presetTipText.textContent = t(tip.i18nKey);
+    }
+  }
+
+  private checkStatAnnouncements(integrityPct: number, inflammationPct: number) {
+    const prevI = this.lastIntegrityPct;
+    const prevF = this.lastInflammationPct;
+
+    if (prevI >= 50 && integrityPct < 50) {
+      this.announce(t('a11y.statIntegrityLow', { pct: integrityPct }));
+    } else if (prevI < 70 && integrityPct >= 70) {
+      this.announce(t('a11y.statIntegrityHigh', { pct: integrityPct }));
+    }
+
+    if (prevF < 35 && inflammationPct >= 35) {
+      this.announce(t('a11y.statInflammationHigh', { pct: inflammationPct }));
+    } else if (prevF >= 20 && inflammationPct < 20) {
+      this.announce(t('a11y.statInflammationLow', { pct: inflammationPct }));
+    }
+
+    this.lastIntegrityPct = integrityPct;
+    this.lastInflammationPct = inflammationPct;
   }
 
   setPreset(presetId: PresetId, regionId: RegionId) {
@@ -692,13 +793,14 @@ export class Dashboard {
         ? ARTICLES.lifestage
         : ARTICLES[preset.articleKey];
     this.blogCta.href = article.url;
-    this.blogCta.textContent = `Read: ${article.title} →`;
+    this.blogCta.textContent = t('preset.readArticle', { title: article.title });
 
     this.commensalRow.hidden = presetId !== 'allergy';
     this.biofilmRow.hidden = presetId !== 'candida';
     this.prebioticStatRow.hidden = presetId !== 'lifecycle';
     this.postbioticRow.hidden = presetId !== 'lifecycle';
 
+    this.syncPresetTip();
     this.highlightRegion(regionId);
     this.updateLegend(getRegion(regionId));
   }
@@ -713,7 +815,7 @@ export class Dashboard {
         ? ARTICLES.lifestage
         : ARTICLES[preset.articleKey];
     this.blogCta.href = article.url;
-    this.blogCta.textContent = `Read: ${article.title} →`;
+    this.blogCta.textContent = t('preset.readArticle', { title: article.title });
   }
 
   private refreshPresetNarrative(regionId: RegionId) {
@@ -732,10 +834,13 @@ export class Dashboard {
     const suggestions = REGION_SUGGESTIONS[regionId];
 
     this.triggerRow.innerHTML = region.triggers
-      .map((t) => `<button type="button" class="bd-btn bd-btn--warn" data-trigger="${t.id}">${t.label}</button>`)
+      .map(
+        (tr) =>
+          `<button type="button" class="bd-btn bd-btn--warn" data-trigger="${tr.id}" aria-label="${tr.label}">${tr.label}</button>`,
+      )
       .join('');
 
-    this.suggestedHint.textContent = `Suggested for ${region.label} — click to preview and apply`;
+    this.suggestedHint.textContent = t('regional.suggestedHint', { region: region.label });
 
     const chips: string[] = [];
     for (const id of suggestions.strains ?? []) {
@@ -766,7 +871,10 @@ export class Dashboard {
     this.suggestedRow.innerHTML = chips.join('');
 
     this.regionalCareRow.innerHTML = region.regionalCare
-      .map((a) => `<button type="button" class="bd-btn bd-btn--action" data-regional-care="${a.id}">${a.label}</button>`)
+      .map(
+        (a) =>
+          `<button type="button" class="bd-btn bd-btn--action" data-regional-care="${a.id}" aria-label="${a.label}">${a.label}</button>`,
+      )
       .join('');
     this.regionalCareSection.hidden = region.regionalCare.length === 0;
 
@@ -948,34 +1056,49 @@ export class Dashboard {
     `;
   }
 
-  setMicroView(active: boolean, region?: RegionDef) {
+  setMicroView(active: boolean, region?: RegionDef, options?: { auto?: boolean }) {
     this.microActive = active;
     this.backBtn.hidden = !active;
-    const zoomHud = this.root.querySelector('[data-zoom-hud]') as HTMLElement;
     this.legendBox.hidden = !active;
     this.hotspotLayer.hidden = active;
     this.tissueCalloutLayer.hidden = !active;
     this.tissuePictogram.hidden = !active;
 
     if (active && region) {
-      this.modeBadge.textContent = 'TISSUE VIEW';
+      this.modeBadge.textContent = t('viewport.tissueView');
       this.zoomTitle.textContent = `ZOOM LAYER: ${region.zoomTitle}`;
       this.scaleLabel.textContent = region.scaleLabel;
       this.tissuePictogram.innerHTML = TISSUE_PICTOGRAMS[region.microGeometry];
-      if (!this.hintDismissed) {
-        this.hintDismissed = true;
-        this.hint.hidden = true;
-      }
+      this.playMicroEnterAnimation(options?.auto ?? false, region.label);
     } else {
-      this.modeBadge.textContent = 'BODY MAP';
-      this.zoomTitle.textContent = 'FULL-BODY MICROBIOME MAP';
-      this.scaleLabel.textContent = 'Click a highlighted region to zoom in';
-      this.hint.hidden = this.hintDismissed;
+      this.modeBadge.textContent = t('viewport.bodyMap');
+      this.zoomTitle.textContent = t('viewport.fullBodyTitle');
+      this.scaleLabel.textContent = t('viewport.clickToZoom');
+      this.microBanner.hidden = true;
       this.callout.hidden = true;
       this.tissueCalloutLayer.innerHTML = '';
       this.tissuePictogram.innerHTML = '';
       this.clearActionBadge();
     }
+    this.syncPresetTip();
+  }
+
+  private playMicroEnterAnimation(auto: boolean, regionLabel: string) {
+    this.viewport.classList.remove('bd-viewport--enter-micro');
+    void this.viewport.offsetWidth;
+    this.viewport.classList.add('bd-viewport--enter-micro');
+
+    if (auto) {
+      const msg = t('viewport.autoMicroBanner', { region: regionLabel });
+      this.microBanner.textContent = msg;
+      this.microBanner.hidden = false;
+      this.announce(msg);
+    }
+
+    window.setTimeout(() => {
+      this.viewport.classList.remove('bd-viewport--enter-micro');
+      if (auto) this.microBanner.hidden = true;
+    }, auto ? 2200 : 700);
   }
 
   updateTissueCallouts(projections: TissueCalloutProjection[]) {
@@ -1037,6 +1160,7 @@ export class Dashboard {
     this.inflammationMeter.style.width = `${inflamePct}%`;
     this.root.querySelector('[data-integrity-val]')!.textContent = `${integrityPct}%`;
     this.root.querySelector('[data-inflammation-val]')!.textContent = `${inflamePct}%`;
+    this.checkStatAnnouncements(integrityPct, inflamePct);
 
     if (this.advancedMode) {
       const immunePct = Math.round(b.immuneActivity * 100);
@@ -1066,26 +1190,35 @@ export class Dashboard {
     const hiddenCount = allEvents.length - 8;
 
     this.eventLogCount.textContent =
-      allEvents.length > 0 ? `${allEvents.length} events` : '';
+      allEvents.length > 0 ? t('eventLog.count', { count: allEvents.length }) : '';
     this.eventLogExpandBtn.hidden = hiddenCount <= 0;
     if (hiddenCount <= 0) {
       this.eventLogExpanded = false;
       this.eventLog.classList.remove('bd-event-log--expanded');
-      this.eventLogExpandBtn.textContent = 'Show all';
+      this.eventLogExpandBtn.textContent = t('eventLog.showAll');
     }
+
+    const newEventAdded = allEvents.length > this.lastEventCount;
+    const latestRaw = newEventAdded ? allEvents[allEvents.length - 1] : null;
 
     this.eventLogList.innerHTML = [...visibleEvents]
       .reverse()
-      .map((e, i) => {
-        const t = ((snap.tick - i * 10) / 30).toFixed(1);
-        const isNew = allEvents.length !== this.lastEventCount && i === 0;
-        return `<li class="${isNew ? 'bd-event--new' : ''}"><time>${t}s</time> ${e}</li>`;
+      .map((raw, i) => {
+        const secs = ((snap.tick - i * 10) / 30).toFixed(1);
+        const text = translateEvent(raw);
+        const isNew = newEventAdded && i === 0;
+        return `<li class="${isNew ? 'bd-event--new' : ''}"><time>${secs}s</time> ${text}</li>`;
       })
       .join('');
+
+    if (latestRaw) {
+      this.announce(t('eventLog.newEvent', { text: translateEvent(latestRaw) }));
+    }
+
     this.lastEventCount = allEvents.length;
 
     this.fpsBadge.textContent = `${fps} FPS`;
-    this.engineBadge.textContent = `ENGINE: DETERMINISTIC · ${fps >= 55 ? '60' : fps} FPS TARGET`;
+    this.engineBadge.textContent = t('footer.engine', { fps: fps >= 55 ? '60' : String(fps) });
   }
 
   private exportEventLog() {

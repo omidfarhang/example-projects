@@ -75,12 +75,12 @@ Core educational lab features implemented and documented.
 
 | ID | Priority | Current state | Target / gap |
 | --- | --- | --- | --- |
-| UX-01 | P1 | Canvas-only 3D interaction | Keyboard region selection (1–7 keys), focusable action buttons |
-| UX-02 | P1 | Limited screen reader support | ARIA live region for event log; stat announcements on major changes |
-| UX-03 | P2 | Triggers auto-switch to micro view silently | Explicit confirmation or animation when auto-entering micro view |
-| UX-04 | P2 | Hint dismissed permanently per session | Contextual tips per preset (allergy vs candida vs lifecycle) |
-| UX-05 | P3 | English-only | i18n for labels and event log |
-| UX-06 | P2 | Population ×1000 unexplained in UI | Tooltip or footnote explaining display scale |
+| UX-01 | P1 | **Done** — keyboard region selection + focusable actions | Keys 1–7 select regions; Esc returns to body; action buttons have aria-labels |
+| UX-02 | P1 | **Done** — screen reader support | ARIA live announcer for events + stat threshold announcements |
+| UX-03 | P2 | **Done** — auto micro view feedback | Zoom animation + banner when actions auto-enter tissue view |
+| UX-04 | P2 | **Done** — contextual preset tips | Per-preset tips (allergy/candida/lifecycle) dismissed per session |
+| UX-05 | P3 | **Done** — i18n (en/de/fa) | `?lang=de` or `?lang=fa` + header selector; UI labels and event log patterns translated |
+| UX-06 | P2 | **Done** — population scale explained | Footnote + tooltips on population stats (×1000 display scale) |
 | UX-07 | P1 | **Done** — Action Impact Preview Panel | See Next up |
 
 ---
@@ -149,7 +149,7 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 4. ~~**CONTENT-02** (article-linked strain notes)~~ — shipped
 5. ~~**SIM-04** (prebiotic stats)~~ — shipped
 6. ~~**ENG-01** (data-driven actions)~~ — shipped
-7. **UX-01, UX-02** (accessibility) — broadens audience
+7. ~~**UX-01, UX-02** (accessibility)~~ — shipped
 8. ~~**SIM-03, VIZ-01** (postbiotic visualization)~~ — shipped
 9. **STATE-01** (shareable state) — classroom sharing
 
@@ -178,6 +178,12 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 | SCI-01 | June 2026 | Advanced mode pH reference bands with citations (`phReference.ts`, env panel) |
 | SCI-02 | June 2026 | `immuneActivity` cytokine/macrophage proxy in advanced stats (`engine.ts`, `types.ts`) |
 | SCI-03 | June 2026 | Day meal simulation for gut/oral sugar load (`dayMeals.ts`, `engine.applyMeal()`) |
+| UX-01 | June 2026 | Keyboard region shortcuts 1–7, Esc to body map, focusable action buttons |
+| UX-02 | June 2026 | ARIA live announcer + stat threshold announcements (`Dashboard.ts`) |
+| UX-03 | June 2026 | Auto micro-view zoom animation + tissue banner (`App.ts`, `Dashboard.ts`) |
+| UX-04 | June 2026 | Per-preset contextual tips with session dismiss (`presetTips.ts`) |
+| UX-05 | June 2026 | English/German/Persian i18n via `?lang=` and header selector (`src/i18n/*`) |
+| UX-06 | June 2026 | Population ×1000 footnote and stat tooltips (`blogPanel.ts`, `Dashboard.ts`) |
 
 ---
 

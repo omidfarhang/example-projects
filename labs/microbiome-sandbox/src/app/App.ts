@@ -69,7 +69,7 @@ export class App {
   private ensureMicroView() {
     if (this.scene.getSelectedRegion() === null) {
       const target = getRegion(this.region).active ? this.region : PRESETS[this.preset].defaultRegion;
-      this.selectRegion(target);
+      this.selectRegion(target, { auto: true });
     }
   }
 
@@ -121,7 +121,7 @@ export class App {
     this.dashboard.flashAction('warn');
   }
 
-  private selectRegion(id: RegionId) {
+  private selectRegion(id: RegionId, options?: { auto?: boolean }) {
     const region = getRegion(id);
     if (!region.active) return;
     this.region = id;
@@ -131,7 +131,7 @@ export class App {
     this.dashboard.syncEnvSliders(this.engine.biome, this.region);
     this.syncUrlParams();
     this.scene.selectRegion(id);
-    this.dashboard.setMicroView(true, region);
+    this.dashboard.setMicroView(true, region, options);
   }
 
   private backToBody() {
@@ -164,10 +164,11 @@ export class App {
   }
 
   private syncUrlParams() {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(window.location.search);
     params.set('preset', this.preset);
     params.set('region', this.region);
     if (this.context) params.set('context', this.context);
+    else params.delete('context');
     const query = params.toString();
     const next = `${window.location.pathname}${query ? `?${query}` : ''}`;
     window.history.replaceState(null, '', next);
