@@ -58,6 +58,7 @@ Use these when changing simulation behavior, adding regions, or closing document
 | [domain/biotics.md](domain/biotics.md) | Microbe taxonomy, strains, pre/pro/postbiotic lifecycle |
 | [domain/environment.md](domain/environment.md) | Env sliders, region subsets, derived metrics |
 | [domain/actions-reference.md](domain/actions-reference.md) | Exhaustive trigger and inoculation catalog |
+| [domain/products.md](domain/products.md) | Supplements and fermented foods catalog |
 
 ### Simulation
 

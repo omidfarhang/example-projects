@@ -284,7 +284,8 @@ export const REGIONS: RegionDef[] = [
       { id: 'antibiotic_disruption', label: 'ANTIBIOTIC DISRUPTION' },
     ],
     inoculations: [
-      { id: 'prebiotic', label: 'ADD PREBIOTIC FIBER', strain: 'prebiotic' },
+      { id: 'prebiotic', label: 'ADD INULIN FIBER', strain: 'inulin' },
+      { id: 'prebiotic_fos', label: 'ADD FOS PREBIOTIC', strain: 'FOS' },
       { id: 'lplant', label: 'SEED L. PLANTARUM', strain: 'L. plantarum' },
       { id: 'scfa', label: 'RELEASE SCFA BOOST', strain: 'postbiotic' },
     ],

@@ -86,12 +86,18 @@ Region-specific subset of sliders (see [Environment](domain/environment.md)). Dr
 
 ### Action buttons
 
-Two rows per region:
+Two rows per region under **Stressors & Region Actions**:
 
-- **Triggers** (warn styling) — stressors: allergens, pH disruption, antibiotics, etc.
-- **Inoculations** (action styling) — interventions: probiotics, prebiotics, SCFA, saline mist, etc.
+- **Triggers** (warn styling) — stressors
+- **Inoculations** (action styling) — region-specific quick actions
 
-Actions unavailable for the current region are not shown. Attempting a disallowed action via code logs an event message.
+**Individual Strains** — all 13 probiotic strains; works in any region.
+
+**Prebiotics** — + INULIN and + FOS buttons.
+
+**Products & Fermented Foods** — multi-strain synbiotic capsule, oral probiotic lozenge, kefir, yogurt, kimchi. See [Products](domain/products.md).
+
+Triggers and region inoculations require micro view. Strain and product panels work globally.
 
 ### Footer
 

@@ -1,5 +1,7 @@
 import { parseUrlState, PRESETS, type PresetId } from '../data/presets';
 import { getRegion, REGIONS, type RegionId } from '../data/regions';
+import type { ProductId } from '../data/products';
+import type { PrebioticId, StrainId } from '../data/strains';
 import { SceneManager } from '../scene/SceneManager';
 import { SimEngine } from '../sim/engine';
 import { Dashboard } from '../ui/Dashboard';
@@ -30,6 +32,9 @@ export class App {
         onBackToBody: () => this.backToBody(),
         onTrigger: (id) => this.handleTrigger(id),
         onInoculate: (id) => this.handleInoculate(id),
+        onApplyStrain: (id) => this.handleApplyStrain(id),
+        onApplyPrebiotic: (id) => this.handleApplyPrebiotic(id),
+        onApplyProduct: (id) => this.handleApplyProduct(id),
         onEnvChange: (env) => this.engine.setEnv(env),
       },
       url.context,
@@ -69,6 +74,27 @@ export class App {
   private handleInoculate(id: string) {
     this.ensureMicroView();
     this.engine.inoculate(id);
+    this.dashboard.flashAction('action');
+    this.scene.playBurst(id);
+  }
+
+  private handleApplyStrain(id: StrainId) {
+    this.ensureMicroView();
+    this.engine.inoculateStrain(id);
+    this.dashboard.flashAction('action');
+    this.scene.playBurst(id);
+  }
+
+  private handleApplyPrebiotic(id: PrebioticId) {
+    this.ensureMicroView();
+    this.engine.inoculatePrebiotic(id);
+    this.dashboard.flashAction('action');
+    this.scene.playBurst('prebiotic');
+  }
+
+  private handleApplyProduct(id: ProductId) {
+    this.ensureMicroView();
+    this.engine.applyProduct(id);
     this.dashboard.flashAction('action');
     this.scene.playBurst(id);
   }

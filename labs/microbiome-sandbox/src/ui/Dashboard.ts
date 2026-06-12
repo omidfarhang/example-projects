@@ -5,7 +5,10 @@ import {
   type EnvVarId,
 } from '../data/envVars';
 import { PRESETS, type PresetId } from '../data/presets';
+import type { ProductId } from '../data/products';
+import { PRODUCT_LIST } from '../data/products';
 import { getRegion, REGIONS, type RegionDef, type RegionId } from '../data/regions';
+import { PREBIOTICS, STRAIN_LIST, type PrebioticId, type StrainId } from '../data/strains';
 import type { HotspotProjection, TissueCalloutProjection } from '../scene/SceneManager';
 import { TISSUE_PICTOGRAMS } from '../scene/tissueCallouts';
 import { POPULATION_SCALE, type SimEngine } from '../sim/engine';
@@ -29,6 +32,9 @@ export interface DashboardCallbacks {
   onBackToBody: () => void;
   onTrigger: (id: string) => void;
   onInoculate: (id: string) => void;
+  onApplyStrain: (id: StrainId) => void;
+  onApplyPrebiotic: (id: PrebioticId) => void;
+  onApplyProduct: (id: ProductId) => void;
   onEnvChange: (env: Partial<Record<EnvVarId, number>>) => void;
 }
 
@@ -51,6 +57,9 @@ export class Dashboard {
   private envReadouts = new Map<EnvVarId, HTMLElement>();
   private inoculationRow!: HTMLElement;
   private triggerRow!: HTMLElement;
+  private strainRow!: HTMLElement;
+  private prebioticRow!: HTMLElement;
+  private productRow!: HTMLElement;
   private engineBadge!: HTMLElement;
   private fpsBadge!: HTMLElement;
   private callout!: HTMLElement;
@@ -156,9 +165,22 @@ export class Dashboard {
           <div class="bd-env-grid" data-env-panel></div>
         </div>
         <div class="bd-panel bd-inoc">
-          <h2>BIOTIC INOCULATIONS</h2>
+          <h2>STRESSORS &amp; REGION ACTIONS</h2>
+          <p class="bd-section-hint">Region-specific triggers and quick inoculations</p>
           <div class="bd-btn-row" data-triggers></div>
           <div class="bd-btn-row" data-inoculations></div>
+        </div>
+        <div class="bd-panel bd-strains">
+          <h2>INDIVIDUAL STRAINS</h2>
+          <p class="bd-section-hint">Apply a single probiotic strain to the selected tissue</p>
+          <div class="bd-btn-row bd-btn-row--dense" data-strains></div>
+          <h3 class="bd-subheading">Prebiotics</h3>
+          <div class="bd-btn-row" data-prebiotics></div>
+        </div>
+        <div class="bd-panel bd-products">
+          <h2>PRODUCTS &amp; FERMENTED FOODS</h2>
+          <p class="bd-section-hint">Whole supplements and foods deliver multiple strains at once</p>
+          <div class="bd-btn-row bd-btn-row--products" data-products></div>
         </div>
       </div>
       <footer class="bd-footer">
@@ -187,6 +209,9 @@ export class Dashboard {
     this.envPanel = this.root.querySelector('[data-env-panel]')!;
     this.inoculationRow = this.root.querySelector('[data-inoculations]')!;
     this.triggerRow = this.root.querySelector('[data-triggers]')!;
+    this.strainRow = this.root.querySelector('[data-strains]')!;
+    this.prebioticRow = this.root.querySelector('[data-prebiotics]')!;
+    this.productRow = this.root.querySelector('[data-products]')!;
     this.engineBadge = this.root.querySelector('[data-engine]')!;
     this.fpsBadge = this.root.querySelector('[data-fps]')!;
     this.callout = this.root.querySelector('[data-callout]')!;
@@ -212,7 +237,51 @@ export class Dashboard {
       this.callbacks.onPresetChange(this.presetSelect.value as PresetId);
     });
     this.renderEnvControls(this.currentRegion);
+    this.renderStrainAndProductPanels();
     this.setMicroView(false);
+  }
+
+  private renderStrainAndProductPanels() {
+    this.strainRow.innerHTML = STRAIN_LIST.map(
+      (s) =>
+        `<button type="button" class="bd-btn bd-btn--strain" data-strain="${s.id}" title="${s.commonRegions ? 'Common: ' + s.commonRegions.join(', ') : ''}">${s.name}</button>`,
+    ).join('');
+
+    this.prebioticRow.innerHTML = Object.values(PREBIOTICS)
+      .map(
+        (p) =>
+          `<button type="button" class="bd-btn bd-btn--action bd-btn--compact" data-prebiotic="${p.id}">+ ${p.name.toUpperCase()}</button>`,
+      )
+      .join('');
+
+    this.productRow.innerHTML = PRODUCT_LIST.map(
+      (p) =>
+        `<button type="button" class="bd-btn bd-btn--product bd-btn--${p.category}" data-product="${p.id}" title="${p.description}">${p.label}<span class="bd-product-form">${p.form} · ${p.category}</span></button>`,
+    ).join('');
+
+    this.strainRow.querySelectorAll('[data-strain]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLButtonElement;
+        this.flashButton(el);
+        this.callbacks.onApplyStrain(el.dataset.strain as StrainId);
+      });
+    });
+
+    this.prebioticRow.querySelectorAll('[data-prebiotic]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLButtonElement;
+        this.flashButton(el);
+        this.callbacks.onApplyPrebiotic(el.dataset.prebiotic as PrebioticId);
+      });
+    });
+
+    this.productRow.querySelectorAll('[data-product]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLButtonElement;
+        this.flashButton(el);
+        this.callbacks.onApplyProduct(el.dataset.product as ProductId);
+      });
+    });
   }
 
   getCanvas(): HTMLCanvasElement {

@@ -1,6 +1,16 @@
 import type { EnvVarId } from '../data/envVars';
+import { getProduct, type ProductId } from '../data/products';
 import { getRegion, type RegionId } from '../data/regions';
 import type { PresetId } from '../data/presets';
+import {
+  getStrain,
+  PREBIOTICS,
+  STRAINS,
+  type PrebioticId,
+  type StrainId,
+  type BiomeEffect,
+} from '../data/strains';
+import { applyBiomeEffects, scaleCount } from './bioticEffects';
 import type { BiomeState, MicrobeNode, MicrobeType, SimSnapshot } from './types';
 
 const FIXED_DT = 1 / 30;
@@ -139,6 +149,86 @@ export class SimEngine {
     return list.some((a) => a.id === actionId);
   }
 
+  private applyStrainBiomeEffects(effects?: BiomeEffect) {
+    if (!effects) return;
+    const b = this.biome;
+    applyBiomeEffects(b, effects);
+    if (effects.biofilm !== undefined && effects.biofilm < 0) {
+      b.biofilm = Math.max(0, b.biofilm);
+    }
+    if (effects.commensalVitality !== undefined) {
+      this.adjustVitality(['commensal'], effects.commensalVitality);
+    }
+    if (effects.yeastVitality !== undefined) {
+      this.adjustVitality(['yeast'], effects.yeastVitality);
+    }
+  }
+
+  /** Apply a single probiotic strain (available in all regions). */
+  inoculateStrain(strainId: StrainId) {
+    const def = getStrain(strainId);
+    this.spawnBatch('probiotic', def.name, def.spawnCount);
+    this.applyStrainBiomeEffects(def.effects);
+    this.events.push(this.legacyStrainEvent(strainId));
+    this.updateCounts();
+  }
+
+  /** Add prebiotic substrate (inulin or FOS). */
+  inoculatePrebiotic(prebioticId: PrebioticId) {
+    const def = PREBIOTICS[prebioticId];
+    this.spawnBatch('prebiotic', def.name, def.spawnCount);
+    this.events.push(`${def.name} prebiotic added — substrate for probiotics`);
+    this.updateCounts();
+  }
+
+  /** Apply a whole supplement or fermented food product. */
+  applyProduct(productId: ProductId) {
+    const product = getProduct(productId);
+    const mult = product.preferredRegions.includes(this.region)
+      ? product.preferredMultiplier
+      : product.otherMultiplier;
+
+    if (mult < 1) {
+      this.events.push(
+        `${product.label} — reduced efficacy outside ${product.preferredRegions.join('/')}`,
+      );
+    }
+
+    for (const dose of product.strains) {
+      const strain = STRAINS[dose.id];
+      const count = scaleCount(strain.spawnCount, dose.dose * mult);
+      this.spawnBatch('probiotic', strain.name, count);
+    }
+
+    for (const pre of product.prebiotics ?? []) {
+      const preDef = PREBIOTICS[pre.id];
+      const count = scaleCount(preDef.spawnCount, pre.dose * mult);
+      this.spawnBatch('prebiotic', preDef.name, count);
+    }
+
+    if (product.effects) {
+      const scaled: BiomeEffect = { ...product.effects };
+      if (scaled.integrity) scaled.integrity *= mult;
+      if (scaled.inflammation) scaled.inflammation *= mult;
+      if (scaled.postbioticLevel) scaled.postbioticLevel *= mult;
+      if (scaled.ph) scaled.ph *= mult;
+      if (scaled.moisture) scaled.moisture *= mult;
+      if (scaled.biofilm) scaled.biofilm *= mult;
+      this.applyStrainBiomeEffects(scaled);
+    }
+
+    if (product.form === 'lozenge') {
+      this.events.push(
+        `${product.label} dissolving in situ — S. salivarius K12/M18 colonizing oral & airway mucosa`,
+      );
+    } else if (product.form === 'capsule') {
+      this.events.push(`${product.label} taken — strains released after swallowing (not a lozenge)`);
+    } else {
+      this.events.push(`${product.label} applied — ${product.description.split('.')[0]}`);
+    }
+    this.updateCounts();
+  }
+
   trigger(id: string) {
     if (!this.isActionAllowed(id, 'trigger')) {
       this.events.push(`Trigger "${id}" not available for ${this.region} tissue`);
@@ -258,29 +348,46 @@ export class SimEngine {
 
     const b = this.biome;
 
+    const strainLegacy: Record<string, StrainId> = {
+      lrham: 'lrham',
+      lacid: 'lacid',
+      binf: 'binf',
+      lplant: 'lplant',
+      lsaliv: 'lsaliv',
+      sboul: 'sboul',
+      lcasei: 'lcasei',
+      lreuteri: 'lreuteri',
+      blactis: 'blactis',
+      blongum: 'blongum',
+      bbifidum: 'bbifidum',
+      lbulgaricus: 'lbulgaricus',
+      sthermo: 'sthermo',
+    };
+
+    if (strainLegacy[actionId]) {
+      const id = strainLegacy[actionId];
+      const def = getStrain(id);
+      this.spawnBatch('probiotic', def.name, def.spawnCount);
+      this.applyStrainBiomeEffects(def.effects);
+      this.events.push(this.legacyStrainEvent(id));
+      this.updateCounts();
+      return;
+    }
+
     if (actionId === 'prebiotic') {
-      this.spawnBatch('prebiotic', 'inulin', 20);
-      this.events.push('Prebiotic fiber added — substrate for probiotics');
-    } else if (actionId === 'scfa') {
+      this.inoculatePrebiotic('inulin');
+      return;
+    }
+    if (actionId === 'prebiotic_fos') {
+      this.inoculatePrebiotic('fos');
+      return;
+    }
+
+    if (actionId === 'scfa') {
       b.postbioticLevel = clamp(b.postbioticLevel + 0.3, 0, 1);
       b.integrity = clamp(b.integrity + 0.12, 0, 1);
       b.inflammation = Math.max(0, b.inflammation - 0.15);
       this.events.push('SCFA postbiotic surge — barrier recovery');
-    } else if (actionId === 'lacid') {
-      this.spawnBatch('probiotic', 'L. acidophilus', 18);
-      b.ph = clamp(b.ph - 0.5, 3.8, 7);
-      b.biofilm = Math.max(0, b.biofilm - 0.2);
-      this.events.push('L. acidophilus acidifying local pH');
-    } else if (actionId === 'lrham') {
-      this.spawnBatch('probiotic', 'L. rhamnosus', 16);
-      b.inflammation = Math.max(0, b.inflammation - 0.18);
-      b.integrity = clamp(b.integrity + 0.1, 0, 1);
-      this.events.push('L. rhamnosus inoculated — competing for attachment');
-    } else if (actionId === 'binf') {
-      this.spawnBatch('probiotic', 'B. infantis', 14);
-      this.adjustVitality(['commensal'], 0.2);
-      b.integrity = clamp(b.integrity + 0.08, 0, 1);
-      this.events.push('B. infantis applied — commensal support boosted');
     } else if (actionId === 'saline_mist') {
       b.moisture = clamp(b.moisture + 0.15, 0, 1);
       b.inflammation = Math.max(0, b.inflammation - 0.1);
@@ -294,24 +401,30 @@ export class SimEngine {
       b.ph = clamp(b.ph - 0.35, 3.8, 7);
       b.moisture = clamp(b.moisture + 0.05, 0, 1);
       this.events.push('pH balancing serum — local acidity restored');
-    } else if (actionId === 'lplant') {
-      this.spawnBatch('probiotic', 'L. plantarum', 16);
-      b.inflammation = Math.max(0, b.inflammation - 0.18);
-      b.integrity = clamp(b.integrity + 0.1, 0, 1);
-      this.events.push('L. plantarum seeded — competing for attachment');
-    } else if (actionId === 'lsaliv') {
-      this.spawnBatch('probiotic', 'L. salivarius', 18);
-      b.ph = Math.max(5.5, b.ph - 0.2);
-      b.biofilm = Math.max(0, b.biofilm - 0.15);
-      this.events.push('L. salivarius applied — oral commensal niche restored');
-    } else if (actionId === 'sboul') {
-      this.spawnBatch('probiotic', 'S. boulardii', 14);
-      this.adjustVitality(['yeast'], -0.25);
-      b.inflammation = Math.max(0, b.inflammation - 0.12);
-      this.events.push('S. boulardii seeded — antifungal competition active');
     }
 
     this.updateCounts();
+  }
+
+  private legacyStrainEvent(id: StrainId): string {
+    const messages: Partial<Record<StrainId, string>> = {
+      lrham: 'L. rhamnosus inoculated — competing for attachment',
+      lacid: 'L. acidophilus acidifying local pH',
+      binf: 'B. infantis applied — commensal support boosted',
+      lplant: 'L. plantarum seeded — competing for attachment',
+      lsaliv: 'L. salivarius applied — oral commensal niche restored',
+      sboul: 'S. boulardii seeded — antifungal competition active',
+      lcasei: 'L. casei inoculated — immune-modulatory strain active',
+      lreuteri: 'L. reuteri applied — antimicrobial metabolites rising',
+      blactis: 'B. lactis seeded — bifidobacterial niche expanding',
+      blongum: 'B. longum applied — fiber fermenting commensals supported',
+      bbifidum: 'B. bifidum inoculated — early-life commensal pattern',
+      lbulgaricus: 'L. bulgaricus applied — yogurt culture acidifying',
+      sthermo: 'S. thermophilus seeded — fermented dairy culture active',
+      ssaliv_k12: 'S. salivarius K12 applied — oral BLIS activity, biofilm competition',
+      ssaliv_m18: 'S. salivarius M18 applied — dental plaque & gum niche restoration',
+    };
+    return messages[id] ?? `${getStrain(id).name} inoculated — strain colony forming`;
   }
 
   applyEnv(env: Partial<Record<EnvVarId, number>>) {

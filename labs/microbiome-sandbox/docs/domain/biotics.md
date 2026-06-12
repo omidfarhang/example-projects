@@ -37,12 +37,27 @@ Pathogen count in the UI includes both `pathogen` and `yeast` node types.
 
 | Strain | Action ID | Available regions | Primary effects |
 | --- | --- | --- | --- |
-| L. rhamnosus | `lrham` | ear, scalp, nose, vaginal | Spawn 16; inflammation −0.18; integrity +0.1 |
-| B. infantis | `binf` | nose | Spawn 14; commensal vitality +0.2; integrity +0.08 |
-| L. acidophilus | `lacid` | oral, skin, vaginal | Spawn 18; pH −0.5; biofilm −0.2 |
-| L. plantarum | `lplant` | gut | Spawn 16; inflammation −0.18; integrity +0.1 |
-| L. salivarius | `lsaliv` | oral | Spawn 18; pH −0.2 (min 5.5); biofilm −0.15 |
-| S. boulardii | `sboul` | oral | Spawn 14; yeast vitality −0.25; inflammation −0.12 |
+| L. rhamnosus | `lrham` | ear, scalp, nose, vaginal (+ all via strain panel) | Spawn 16; inflammation −0.18; integrity +0.1 |
+| L. acidophilus | `lacid` | oral, skin, vaginal (+ strain panel) | Spawn 18; pH −0.5; biofilm −0.2 |
+| L. casei | `lcasei` | strain panel (all regions) | Spawn 14; inflammation −0.12; integrity +0.08 |
+| L. salivarius | `lsaliv` | oral (+ strain panel) | Spawn 18; pH −0.2; biofilm −0.15 |
+| L. reuteri | `lreuteri` | strain panel (all regions) | Spawn 12; inflammation −0.14; integrity +0.09; pH −0.15 |
+| B. lactis | `blactis` | strain panel (all regions) | Spawn 14; commensal +0.15; postbiotic +0.04 |
+| B. longum | `blongum` | strain panel (all regions) | Spawn 12; commensal +0.12; postbiotic +0.05 |
+| B. bifidum | `bbifidum` | strain panel (all regions) | Spawn 12; commensal +0.14; postbiotic +0.04 |
+| B. infantis | `binf` | nose (+ strain panel) | Spawn 14; commensal +0.2; integrity +0.08 |
+| L. plantarum | `lplant` | gut (+ strain panel) | Spawn 16; inflammation −0.18; integrity +0.1 |
+| L. bulgaricus | `lbulgaricus` | strain panel (all regions) | Spawn 10; pH −0.25; biofilm −0.1 |
+| S. thermophilus | `sthermo` | strain panel (all regions) | Spawn 10; pH −0.15 |
+| S. boulardii | `sboul` | oral (+ strain panel) | Spawn 14; yeast −0.25; inflammation −0.12 |
+| S. salivarius K12 | `ssaliv_k12` | oral, nose, ear (+ strain panel) | Spawn 16; biofilm −0.18; oral BLIS niche |
+| S. salivarius M18 | `ssaliv_m18` | oral, nose, ear (+ strain panel) | Spawn 16; biofilm −0.22; dental/gum niche |
+
+Note: **L. salivarius** (`lsaliv`) and **S. salivarius K12/M18** are different organisms — the oral lozenge product uses *Streptococcus* salivarius strains.
+
+**Typical 8-strain synbiotic capsule:** acidophilus, casei, rhamnosus, salivarius, reuteri, lactis, longum, bifidum plus FOS — see [Multi-strain synbiotic capsule](products.md).
+
+Catalog source: [`src/data/strains.ts`](../../src/data/strains.ts)
 
 ### Growth preferences
 
@@ -59,9 +74,12 @@ Additional region modifiers in [Simulation dynamics](../simulation/dynamics.md).
 
 | Substrate | Action ID | Regions | Effect |
 | --- | --- | --- | --- |
-| Inulin | `prebiotic` | gut | Spawn 20 prebiotic nodes |
+| Inulin | `prebiotic` / panel `inulin` | gut, all (panel) | Spawn 20 prebiotic nodes |
+| FOS | `prebiotic_fos` / panel `fos` | gut, all (panel) | Spawn 18 FOS nodes |
 
 **Gut baseline:** 8 inulin prebiotic nodes seeded at region init.
+
+Use the **Prebiotics** row in the dashboard (+ INULIN / + FOS) or gut region action buttons.
 
 Prebiotics drift in the lumen layer. When a probiotic is within **0.4** units, prebiotic vitality decreases and `postbioticLevel` increases (conversion rate 0.008/tick, halved in gut when moisture < 0.45).
 
@@ -180,6 +198,7 @@ Postbiotics affect tissue overlay emissive color in [`Epithelium3D`](../src/scen
 
 ## Related docs
 
+- [Products & foods](products.md)
 - [Actions reference](actions-reference.md)
 - [Simulation dynamics](../simulation/dynamics.md)
 - [Body regions](regions.md)
