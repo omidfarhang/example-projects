@@ -51,9 +51,9 @@ export class EffectBurst {
       y = b.epithelialY + (b.mucusY - b.epithelialY) * 0.55;
       x = b.xMin + (b.xMax - b.xMin) * 0.72;
     } else if (this.burstCategory === 'stress') {
-      y = b.epithelialY + 0.04;
-      x = b.xMin + (b.xMax - b.xMin) * 0.38;
-      z = b.zMin + (b.zMax - b.zMin) * 0.35;
+      y = b.epithelialY + (b.mucusY - b.epithelialY) * 0.45;
+      x = (b.xMin + b.xMax) * 0.5;
+      z = (b.zMin + b.zMax) * 0.5;
     }
 
     this.ring.position.set(x, y, z);
@@ -128,7 +128,12 @@ export class EffectBurst {
     this.life = Math.max(0, this.life - dt * 2.5);
     const mat = this.ring.material as THREE.MeshBasicMaterial;
     mat.opacity = this.life * 0.75;
-    const scale = 1 + (1 - this.life) * (this.burstCategory === 'allergen' ? 5 : 3.5);
-    this.ring.scale.setScalar(scale);
+    const spread = 1 + (1 - this.life) * (this.burstCategory === 'allergen' || this.burstCategory === 'stress' ? 5 : 3.5);
+    if (this.burstCategory === 'stress') {
+      // Systemic stress reads as a wide epithelial wave, not a pin-point in the middle.
+      this.ring.scale.set(spread * 12, spread * 3.5, 1);
+    } else {
+      this.ring.scale.setScalar(spread);
+    }
   }
 }

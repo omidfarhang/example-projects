@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, type TissueBuildResult } from './shared';
+import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 
 /**
@@ -61,7 +61,6 @@ export function buildGutTissue(): TissueBuildResult {
 
   for (let i = 0; i < villusCount; i++) {
     const vx = -W / 2 + margin + i * pitch;
-    const inflamed = i >= 3 && i <= 7;
     const villusH = 0.3 + (i % 3) * 0.07;
     const villusR = 0.052;
     const tipY = mucosalSurfaceY + villusR * 2 + villusH;
@@ -69,14 +68,11 @@ export function buildGutTissue(): TissueBuildResult {
 
     const villus = new THREE.Mesh(
       new THREE.CapsuleGeometry(villusR, villusH, 10, 14),
-      mat(inflamed ? P.cytoplasmDeep : P.villusEpi),
+      mat(P.villusEpi),
     );
     villus.position.set(vx, mucosalSurfaceY + villusR + villusH * 0.5, 0.06);
     group.add(villus, outline(villus, 0xe89090, 0.38));
-    if (inflamed) {
-      villus.userData.baseColor = P.villusEpi;
-      inflamedMeshes.push(villus);
-    }
+    trackInflamed(villus, P.villusEpi, inflamedMeshes);
 
     const brushBorder = new THREE.Mesh(
       new THREE.TorusGeometry(villusR * 0.92, 0.006, 6, 16),

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, type TissueBuildResult } from './shared';
+import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 /**
  * SKIN — unmistakable layer cake with rete ridges + hair follicle.
@@ -39,9 +39,8 @@ export function buildSkinTissue(): TissueBuildResult {
         );
         bump.position.set(cx + stagger, y + layer.h / 2 + (layer.name === 'corneum' ? 0.01 : 0), DEPTH * 0.24);
         group.add(bump);
-        if (layer.name === 'spinous' && i >= 4 && i <= 7) {
-          bump.userData.baseColor = P.spinous;
-          inflamedMeshes.push(bump);
+        if (layer.name === 'spinous') {
+          trackInflamed(bump, P.spinous, inflamedMeshes);
         }
         if (layer.name !== 'corneum' && layer.name !== 'granulosum') {
           const nuc = new THREE.Mesh(

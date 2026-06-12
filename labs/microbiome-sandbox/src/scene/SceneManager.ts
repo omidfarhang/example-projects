@@ -242,15 +242,9 @@ export class SceneManager {
       this.tissue.update(snapshot.nodes, snapshot.biome, dt);
       this.body.visible = false;
       this.hotspots.visible = false;
-      const bounds = LUMEN_BOUNDS[this.microGeometry];
-      const inflame = snapshot.biome.inflammation;
-      this.inflameLight.position.set(
-        0,
-        bounds.epithelialY + 0.06,
-        bounds.zMin + (bounds.zMax - bounds.zMin) * 0.42,
-      );
-      this.inflameLight.intensity = inflame * 1.35;
-      this.inflameLight.distance = 1.8;
+      // Inflammation redness comes from uniform epithelial emissive tint — not a center point light,
+      // which only lit ~1.8 units and left edges dark on ~5-unit-wide tissue cross-sections.
+      this.inflameLight.intensity = 0;
     } else {
       this.body.visible = true;
       this.hotspots.visible = true;

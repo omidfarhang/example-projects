@@ -129,7 +129,7 @@ export class TissueLayer {
       this.burstTime = Math.max(0, this.burstTime - dt * 2.2);
       const t = this.burstTime;
       if (this.burstKind === 'stress') {
-        this.lumenGroup.position.x = Math.sin(t * 18) * 0.04 * t;
+        this.group.position.x = Math.sin(t * 18) * 0.025 * t;
       } else if (this.burstKind === 'default') {
         const pulse = 1 + (1 - t) * 0.08;
         this.lumenGroup.scale.setScalar(pulse);
@@ -142,6 +142,7 @@ export class TissueLayer {
 
     this.lumenGroup.position.y = THREE.MathUtils.lerp(this.lumenGroup.position.y, 0, dt * 4);
     this.lumenGroup.position.x = THREE.MathUtils.lerp(this.lumenGroup.position.x, 0, dt * 6);
+    this.group.position.x = THREE.MathUtils.lerp(this.group.position.x, 0, dt * 6);
 
     const bounds = LUMEN_BOUNDS[this.geometry];
     const time = performance.now();

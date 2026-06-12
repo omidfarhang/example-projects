@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, type TissueBuildResult } from './shared';
+import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 /**
  * ORAL — non-keratinized mucosa with papillae, saliva film, thrush-prone patches.
@@ -40,10 +40,7 @@ export function buildOralTissue(): TissueBuildResult {
         );
         papilla.position.set(cx, y + layer.h / 2 + 0.03, DEPTH * 0.3);
         group.add(papilla);
-        if (i >= 4 && i <= 7) {
-          papilla.userData.baseColor = 0xf0d0c0;
-          inflamedMeshes.push(papilla);
-        }
+        trackInflamed(papilla, 0xf0d0c0, inflamedMeshes);
       }
     }
     y += layer.h;

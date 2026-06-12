@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, type TissueBuildResult } from './shared';
+import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 /**
  * EAR CANAL — narrow tubular squamous canal (not ciliated sinus):
@@ -45,9 +45,8 @@ export function buildEarCanalTissue(): TissueBuildResult {
       );
       bump.position.set(cx, y + layer.h / 2 + (layer.name === 'corneum' ? 0.008 : 0), DEPTH * 0.22);
       group.add(bump);
-      if (layer.name === 'spinous' && i >= 3 && i <= 6) {
-        bump.userData.baseColor = P.spinous;
-        inflamedMeshes.push(bump);
+      if (layer.name === 'spinous') {
+        trackInflamed(bump, P.spinous, inflamedMeshes);
       }
     }
     y += layer.h;

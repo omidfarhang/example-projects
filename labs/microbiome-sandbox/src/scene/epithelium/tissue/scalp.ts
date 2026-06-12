@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, type TissueBuildResult } from './shared';
+import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 /**
  * SCALP — dense follicular field with sebaceous units (distinct from single-follicle skin).
@@ -46,18 +46,14 @@ export function buildScalpTissue(): TissueBuildResult {
 
   for (let fi = 0; fi < follicleXs.length; fi++) {
     const fx = follicleXs[fi];
-    const inflamed = fi === 1;
     const follicleH = 0.38 + fi * 0.04;
     const follicle = new THREE.Mesh(
       new THREE.CylinderGeometry(0.055, 0.085, follicleH, 12),
-      mat(inflamed ? P.cytoplasmDeep : P.basale),
+      mat(P.basale),
     );
     follicle.position.set(fx, follicleH / 2 - 0.02, 0.02);
     group.add(follicle, outline(follicle, 0xc08070, 0.38));
-    if (inflamed) {
-      follicle.userData.baseColor = P.basale;
-      inflamedMeshes.push(follicle);
-    }
+    trackInflamed(follicle, P.basale, inflamedMeshes);
 
     const hair = new THREE.Mesh(
       new THREE.CylinderGeometry(0.022, 0.028, 0.72, 8),

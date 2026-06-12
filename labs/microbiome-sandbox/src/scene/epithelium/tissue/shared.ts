@@ -1,6 +1,6 @@
-import * as THREE from 'three';
-import { P } from '../tissuePalette';
-import type { EpitheliumKind } from '../types';
+import * as THREE from "three";
+import { P } from "../tissuePalette";
+import type { EpitheliumKind } from "../types";
 
 export interface TissueBuildResult {
   group: THREE.Group;
@@ -12,8 +12,16 @@ export interface TissueBuildResult {
 /** Cross-section thickness — enough Z depth to read as 3D tissue, not a flat card. */
 export const DEPTH = 0.38;
 
-export function mat(color: number, opts?: Partial<THREE.MeshStandardMaterialParameters>) {
-  return new THREE.MeshStandardMaterial({ color, roughness: 0.55, metalness: 0.03, ...opts });
+export function mat(
+  color: number,
+  opts?: Partial<THREE.MeshStandardMaterialParameters>,
+) {
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness: 0.55,
+    metalness: 0.03,
+    ...opts,
+  });
 }
 
 export function outline(mesh: THREE.Mesh, color = 0x38bdf8, opacity = 0.42) {
@@ -25,6 +33,16 @@ export function outline(mesh: THREE.Mesh, color = 0x38bdf8, opacity = 0.42) {
   edges.rotation.copy(mesh.rotation);
   edges.scale.copy(mesh.scale);
   return edges;
+}
+
+/** Register epithelial geometry so inflammation tints the full surface, not a static hot spot. */
+export function trackInflamed(
+  mesh: THREE.Mesh,
+  baseColor: number,
+  inflamedMeshes: THREE.Mesh[],
+) {
+  mesh.userData.baseColor = baseColor;
+  inflamedMeshes.push(mesh);
 }
 
 export function mucusSheet(w: number, h: number, y: number, z: number) {

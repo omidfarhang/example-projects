@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, type TissueBuildResult } from './shared';
+import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 /**
  * NOSE/SINUS — layered airway cross-section (like skin clarity):
@@ -36,7 +36,6 @@ export function buildNasalTissue(): TissueBuildResult {
 
   for (let i = 0; i < cols; i++) {
     const x = -span / 2 + i * pitch;
-    const inflamed = i >= 4 && i <= 7;
     const isGoblet = i === 1 || i === 4 || i === 7 || i === 10;
 
     if (isGoblet) {
@@ -56,22 +55,16 @@ export function buildNasalTissue(): TissueBuildResult {
       cup.scale.set(0.95, 0.78, 0.82);
       group.add(cup, outline(cup, 0xa8d0e8, 0.4));
       maxApicalY = Math.max(maxApicalY, epiBase + stemH + 0.18);
-      if (inflamed) {
-        cup.userData.baseColor = P.mucusVacuole;
-        inflamedMeshes.push(cup);
-      }
+      trackInflamed(cup, P.mucusVacuole, inflamedMeshes);
     } else {
       const colH = 0.34 + (i % 3) * 0.08;
       const col = new THREE.Mesh(
         new THREE.BoxGeometry(0.1, colH, DEPTH * 0.78),
-        mat(inflamed ? P.cytoplasmDeep : P.cytoplasm),
+        mat(P.cytoplasm),
       );
       col.position.set(x, epiBase + colH / 2 + 0.02, 0);
       group.add(col, outline(col, 0xe0b0a8, 0.35));
-      if (inflamed) {
-        col.userData.baseColor = P.cytoplasm;
-        inflamedMeshes.push(col);
-      }
+      trackInflamed(col, P.cytoplasm, inflamedMeshes);
 
       const nucOffsets = [0.12, 0.24, 0.18, 0.3];
       const nucY = epiBase + nucOffsets[i % nucOffsets.length];
