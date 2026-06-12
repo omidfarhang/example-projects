@@ -1,12 +1,26 @@
 import { ARTICLES } from '../data/articles';
 import { PRESETS, type PresetId } from '../data/presets';
-import { REGIONS, type RegionId } from '../data/regions';
-import type { SimEngine } from '../sim/engine';
+import { getRegion, REGIONS, type RegionDef, type RegionId } from '../data/regions';
+import type { HotspotProjection, TissueCalloutProjection } from '../scene/SceneManager';
+import { TISSUE_PICTOGRAMS } from '../scene/tissueCallouts';
+import { POPULATION_SCALE, type SimEngine } from '../sim/engine';
 
-function trendArrow(n: number): string {
-  if (n > 0) return '↑';
-  if (n < 0) return '↓';
-  return '→';
+function trendLabel(n: number): string {
+  if (n > 0) return '↑ Increasing';
+  if (n < 0) return '↓ Decreasing';
+  return '→ Stable';
+}
+
+function formatPopulation(count: number): string {
+  const scaled = count * POPULATION_SCALE;
+  if (scaled >= 1000) return `${Math.round(scaled / 1000)}k`;
+  return String(scaled);
+}
+
+function phLabel(ph: number): string {
+  if (ph < 6.5) return `${ph.toFixed(1)} (Acidic)`;
+  if (ph > 7.2) return `${ph.toFixed(1)} (Alkaline)`;
+  return `${ph.toFixed(1)} (Neutral)`;
 }
 
 export interface DashboardCallbacks {
@@ -27,6 +41,11 @@ export class Dashboard {
   private probioticStat!: HTMLElement;
   private pathogenStat!: HTMLElement;
   private allergenStat!: HTMLElement;
+  private commensalStat!: HTMLElement;
+  private biofilmStat!: HTMLElement;
+  private postbioticStat!: HTMLElement;
+  private integrityMeter!: HTMLElement;
+  private inflammationMeter!: HTMLElement;
   private phSlider!: HTMLInputElement;
   private moistureSlider!: HTMLInputElement;
   private phReadout!: HTMLElement;
@@ -38,6 +57,25 @@ export class Dashboard {
   private callout!: HTMLElement;
   private backBtn!: HTMLButtonElement;
   private presetSelect!: HTMLSelectElement;
+  private viewport!: HTMLElement;
+  private zoomTitle!: HTMLElement;
+  private modeBadge!: HTMLElement;
+  private scaleLabel!: HTMLElement;
+  private hint!: HTMLElement;
+  private legendBox!: HTMLElement;
+  private eventLog!: HTMLElement;
+  private hotspotLayer!: HTMLElement;
+  private tissueCalloutLayer!: HTMLElement;
+  private tissuePictogram!: HTMLElement;
+  private commensalRow!: HTMLElement;
+  private biofilmRow!: HTMLElement;
+  private postbioticRow!: HTMLElement;
+
+  private currentPreset: PresetId = 'allergy';
+  private currentRegion: RegionId = 'nose';
+  private microActive = false;
+  private hintDismissed = false;
+  private staticScenario = '';
 
   constructor(
     mount: HTMLElement,
@@ -58,19 +96,23 @@ export class Dashboard {
       </header>
       <div class="bd-grid">
         <aside class="bd-panel bd-regions">
-          <h2>REGION SELECTOR</h2>
+          <h2>BODY-MAP REGION SELECTOR</h2>
           <ul class="bd-region-list" data-region-list></ul>
           <button type="button" class="bd-btn bd-btn--ghost bd-back" data-back hidden>← Back to body</button>
         </aside>
         <section class="bd-viewport-wrap">
           <div class="bd-viewport" data-viewport>
             <canvas data-canvas></canvas>
-            <div class="bd-legend">
-              <span class="bd-legend__pill probiotic">● Probiotic</span>
-              <span class="bd-legend__pill commensal">● Commensal</span>
-              <span class="bd-legend__pill pathogen">● Pathogen</span>
-              <span class="bd-legend__pill allergen">● Allergen</span>
+            <div class="bd-hotspot-layer" data-hotspot-layer></div>
+            <div class="bd-tissue-callout-layer" data-tissue-callouts hidden></div>
+            <div class="bd-zoom-hud" data-zoom-hud>
+              <span class="bd-mode-badge" data-mode-badge>BODY MAP</span>
+              <div class="bd-tissue-pictogram" data-tissue-pictogram hidden></div>
+              <h2 class="bd-zoom-title" data-zoom-title>ZOOM LAYER</h2>
+              <span class="bd-scale-label" data-scale-label></span>
             </div>
+            <p class="bd-hint" data-hint>Select a tissue region on the body map, then run a scenario trigger.</p>
+            <div class="bd-legend-box" data-legend-box hidden></div>
             <div class="bd-callout" data-callout hidden>INFLAMMATION SPIKE</div>
           </div>
         </section>
@@ -86,9 +128,24 @@ export class Dashboard {
           <a class="bd-cta" data-blog-cta href="#" target="_blank" rel="noopener">Read full breakdown →</a>
           <div class="bd-stats">
             <h3>REAL-TIME STATS</h3>
-            <div class="bd-stat"><span>Probiotic count</span><strong data-probiotic>0 →</strong></div>
-            <div class="bd-stat"><span>Pathogen count</span><strong data-pathogen>0 →</strong></div>
-            <div class="bd-stat"><span>Allergen count</span><strong data-allergen>0 →</strong></div>
+            <div class="bd-meter">
+              <label>Barrier integrity <span data-integrity-val>85%</span></label>
+              <div class="bd-meter__track"><div class="bd-meter__fill bd-meter__fill--integrity" data-integrity-meter></div></div>
+            </div>
+            <div class="bd-meter">
+              <label>Inflammation <span data-inflammation-val>10%</span></label>
+              <div class="bd-meter__track"><div class="bd-meter__fill bd-meter__fill--inflammation" data-inflammation-meter></div></div>
+            </div>
+            <div class="bd-stat"><span>Probiotic strains</span><strong data-probiotic>0 →</strong></div>
+            <div class="bd-stat"><span>Pathogen strains</span><strong data-pathogen>0 →</strong></div>
+            <div class="bd-stat"><span>Allergen particles</span><strong data-allergen>0 →</strong></div>
+            <div class="bd-stat" data-commensal-row hidden><span>Commensal count</span><strong data-commensal>0 →</strong></div>
+            <div class="bd-stat" data-biofilm-row hidden><span>Biofilm level</span><strong data-biofilm>0%</strong></div>
+            <div class="bd-stat" data-postbiotic-row hidden><span>Postbiotic SCFA</span><strong data-postbiotic>0%</strong></div>
+          </div>
+          <div class="bd-event-log">
+            <h3>EVENT LOG</h3>
+            <ul data-event-log></ul>
           </div>
         </aside>
       </div>
@@ -100,7 +157,7 @@ export class Dashboard {
             <input type="range" min="4" max="8" step="0.1" value="6.8" data-ph />
           </div>
           <div class="bd-slider-row">
-            <label>Moisture <output data-moisture-readout>0.70</output></label>
+            <label>Moisture <output data-moisture-readout>70%</output></label>
             <input type="range" min="0" max="1" step="0.01" value="0.70" data-moisture />
           </div>
         </div>
@@ -128,6 +185,11 @@ export class Dashboard {
     this.probioticStat = this.root.querySelector('[data-probiotic]')!;
     this.pathogenStat = this.root.querySelector('[data-pathogen]')!;
     this.allergenStat = this.root.querySelector('[data-allergen]')!;
+    this.commensalStat = this.root.querySelector('[data-commensal]')!;
+    this.biofilmStat = this.root.querySelector('[data-biofilm]')!;
+    this.postbioticStat = this.root.querySelector('[data-postbiotic]')!;
+    this.integrityMeter = this.root.querySelector('[data-integrity-meter]')!;
+    this.inflammationMeter = this.root.querySelector('[data-inflammation-meter]')!;
     this.phSlider = this.root.querySelector('[data-ph]')!;
     this.moistureSlider = this.root.querySelector('[data-moisture]')!;
     this.phReadout = this.root.querySelector('[data-ph-readout]')!;
@@ -139,6 +201,19 @@ export class Dashboard {
     this.callout = this.root.querySelector('[data-callout]')!;
     this.backBtn = this.root.querySelector('[data-back]')!;
     this.presetSelect = this.root.querySelector('[data-preset]')!;
+    this.viewport = this.root.querySelector('[data-viewport]')!;
+    this.zoomTitle = this.root.querySelector('[data-zoom-title]')!;
+    this.modeBadge = this.root.querySelector('[data-mode-badge]')!;
+    this.scaleLabel = this.root.querySelector('[data-scale-label]')!;
+    this.hint = this.root.querySelector('[data-hint]')!;
+    this.legendBox = this.root.querySelector('[data-legend-box]')!;
+    this.eventLog = this.root.querySelector('[data-event-log]')!;
+    this.hotspotLayer = this.root.querySelector('[data-hotspot-layer]')!;
+    this.tissueCalloutLayer = this.root.querySelector('[data-tissue-callouts]')!;
+    this.tissuePictogram = this.root.querySelector('[data-tissue-pictogram]')!;
+    this.commensalRow = this.root.querySelector('[data-commensal-row]')!;
+    this.biofilmRow = this.root.querySelector('[data-biofilm-row]')!;
+    this.postbioticRow = this.root.querySelector('[data-postbiotic-row]')!;
 
     this.renderRegions();
     this.backBtn.addEventListener('click', () => this.callbacks.onBackToBody());
@@ -147,6 +222,7 @@ export class Dashboard {
     });
     this.phSlider.addEventListener('input', () => this.emitEnv());
     this.moistureSlider.addEventListener('input', () => this.emitEnv());
+    this.setMicroView(false);
   }
 
   getCanvas(): HTMLCanvasElement {
@@ -156,8 +232,8 @@ export class Dashboard {
   private emitEnv() {
     const ph = parseFloat(this.phSlider.value);
     const moisture = parseFloat(this.moistureSlider.value);
-    this.phReadout.textContent = ph.toFixed(1);
-    this.moistureReadout.textContent = moisture.toFixed(2);
+    this.phReadout.textContent = phLabel(ph);
+    this.moistureReadout.textContent = `${Math.round(moisture * 100)}%`;
     this.callbacks.onEnvChange(ph, moisture);
   }
 
@@ -167,7 +243,7 @@ export class Dashboard {
       <li>
         <button type="button" class="bd-region ${r.active ? '' : 'bd-region--soon'}"
           data-region="${r.id}" ${r.active ? '' : 'disabled'}>
-          ${r.label}${r.active ? '' : ' <em>(coming soon)</em>'}
+          ${r.label}${r.active ? '' : ' <em>(inactive)</em>'}
         </button>
       </li>`,
     ).join('');
@@ -181,6 +257,7 @@ export class Dashboard {
   }
 
   setPreset(presetId: PresetId, regionId: RegionId) {
+    this.currentPreset = presetId;
     const preset = PRESETS[presetId];
     this.presetSelect.value = presetId;
     this.presetTitle.textContent = preset.title;
@@ -189,6 +266,7 @@ export class Dashboard {
       presetId === 'allergy' && this.context === 'lifestage' && preset.scenarioLifestage
         ? preset.scenarioLifestage
         : preset.scenario;
+    this.staticScenario = scenario;
     this.scenarioText.textContent = scenario;
 
     const article =
@@ -200,8 +278,12 @@ export class Dashboard {
 
     this.phSlider.value = String(preset.env.ph);
     this.moistureSlider.value = String(preset.env.moisture);
-    this.phReadout.textContent = preset.env.ph.toFixed(1);
-    this.moistureReadout.textContent = preset.env.moisture.toFixed(2);
+    this.phReadout.textContent = phLabel(preset.env.ph);
+    this.moistureReadout.textContent = `${Math.round(preset.env.moisture * 100)}%`;
+
+    this.commensalRow.hidden = presetId !== 'allergy';
+    this.biofilmRow.hidden = presetId !== 'candida';
+    this.postbioticRow.hidden = presetId !== 'lifecycle';
 
     this.triggerRow.innerHTML = preset.triggers
       .map((t) => `<button type="button" class="bd-btn bd-btn--warn" data-trigger="${t.id}">${t.label}</button>`)
@@ -210,25 +292,117 @@ export class Dashboard {
       .map((i) => `<button type="button" class="bd-btn bd-btn--action" data-inoc="${i.strain}">${i.label}</button>`)
       .join('');
 
+    this.bindActionButtons();
+    this.highlightRegion(regionId);
+    this.updateLegend(getRegion(regionId));
+  }
+
+  private bindActionButtons() {
     this.triggerRow.querySelectorAll('[data-trigger]').forEach((btn) => {
-      btn.addEventListener('click', () => this.callbacks.onTrigger((btn as HTMLElement).dataset.trigger!));
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLButtonElement;
+        const id = el.dataset.trigger!;
+        this.flashButton(el);
+        this.callbacks.onTrigger(id);
+      });
     });
     this.inoculationRow.querySelectorAll('[data-inoc]').forEach((btn) => {
-      btn.addEventListener('click', () => this.callbacks.onInoculate((btn as HTMLElement).dataset.inoc!));
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLButtonElement;
+        const strain = el.dataset.inoc!;
+        this.flashButton(el);
+        this.callbacks.onInoculate(strain);
+      });
     });
+  }
 
-    this.highlightRegion(regionId);
+  private flashButton(btn: HTMLButtonElement) {
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'ACTIVE…';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }, 400);
+  }
+
+  flashAction(kind: 'warn' | 'action') {
+    this.viewport.classList.remove('bd-viewport--pulse-warn', 'bd-viewport--pulse-action');
+    void this.viewport.offsetWidth;
+    this.viewport.classList.add(kind === 'warn' ? 'bd-viewport--pulse-warn' : 'bd-viewport--pulse-action');
+    setTimeout(() => {
+      this.viewport.classList.remove('bd-viewport--pulse-warn', 'bd-viewport--pulse-action');
+    }, 600);
   }
 
   highlightRegion(id: RegionId) {
+    this.currentRegion = id;
     this.regionList.querySelectorAll('.bd-region').forEach((btn) => {
       btn.classList.toggle('bd-region--active', (btn as HTMLElement).dataset.region === id);
     });
+    const region = getRegion(id);
+    this.updateLegend(region);
   }
 
-  setMicroView(active: boolean) {
+  private updateLegend(region: RegionDef) {
+    const s = region.defaultStrains;
+    this.legendBox.innerHTML = `
+      <div class="bd-legend__row probiotic">● Good Bacteria (${s.probiotics.join(', ')})</div>
+      <div class="bd-legend__row pathogen">● Pathogens (${s.pathogens.join(', ')})</div>
+      <div class="bd-legend__row allergen">● Allergens (${s.allergens.join(', ')})</div>
+      <div class="bd-legend__note">Pathogens compete for tight junction attachment sites.</div>
+    `;
+  }
+
+  setMicroView(active: boolean, region?: RegionDef) {
+    this.microActive = active;
     this.backBtn.hidden = !active;
-    this.callout.hidden = !active;
+    const zoomHud = this.root.querySelector('[data-zoom-hud]') as HTMLElement;
+    this.legendBox.hidden = !active;
+    this.hotspotLayer.hidden = active;
+    this.tissueCalloutLayer.hidden = !active;
+    this.tissuePictogram.hidden = !active;
+
+    if (active && region) {
+      this.modeBadge.textContent = 'TISSUE VIEW';
+      this.zoomTitle.textContent = `ZOOM LAYER: ${region.zoomTitle}`;
+      this.scaleLabel.textContent = region.scaleLabel;
+      this.tissuePictogram.innerHTML = TISSUE_PICTOGRAMS[region.microGeometry];
+      if (!this.hintDismissed) {
+        this.hintDismissed = true;
+        this.hint.hidden = true;
+      }
+    } else {
+      this.modeBadge.textContent = 'BODY MAP';
+      this.zoomTitle.textContent = 'FULL-BODY MICROBIOME MAP';
+      this.scaleLabel.textContent = 'Click a highlighted region to zoom in';
+      this.hint.hidden = this.hintDismissed;
+      this.callout.hidden = true;
+      this.tissueCalloutLayer.innerHTML = '';
+      this.tissuePictogram.innerHTML = '';
+    }
+  }
+
+  updateTissueCallouts(projections: TissueCalloutProjection[]) {
+    if (!this.microActive) return;
+    this.tissueCalloutLayer.innerHTML = projections
+      .map(
+        (p) =>
+          `<div class="bd-tissue-callout" style="left:${p.x}px;top:${p.y}px"><span>${p.label}</span></div>`,
+      )
+      .join('');
+  }
+
+  updateHotspotLabels(projections: HotspotProjection[]) {
+    if (this.microActive) return;
+    this.hotspotLayer.innerHTML = projections
+      .map((p) => {
+        const region = getRegion(p.id);
+        const state = !p.active ? 'inactive' : p.selected ? 'selected' : 'active';
+        const label = region.label.toUpperCase().replace(' / ', '/');
+        return `<div class="bd-hotspot-label bd-hotspot-label--${state}" style="left:${p.x}px;top:${p.y}px">${label}${!p.active ? '<span>Inactive</span>' : p.selected ? '<span>Selected</span>' : ''}</div>`;
+      })
+      .join('');
   }
 
   update(engine: SimEngine, fps: number) {
@@ -236,11 +410,35 @@ export class Dashboard {
     const trends = engine.getTrends();
     const b = snap.biome;
 
-    this.probioticStat.textContent = `${b.probioticCount} ${trendArrow(trends.probiotic)}`;
-    this.pathogenStat.textContent = `${b.pathogenCount} ${trendArrow(trends.pathogen)}`;
-    this.allergenStat.textContent = `${b.allergenCount} ${trendArrow(trends.allergen)}`;
+    this.probioticStat.textContent = `${formatPopulation(b.probioticCount)} ${trendLabel(trends.probiotic)}`;
+    this.pathogenStat.textContent = `${formatPopulation(b.pathogenCount)} ${trendLabel(trends.pathogen)}`;
+    this.allergenStat.textContent = `${formatPopulation(b.allergenCount)} ${trendLabel(trends.allergen)}`;
+    this.commensalStat.textContent = `${formatPopulation(b.commensalCount)} ${trendLabel(trends.commensal)}`;
+    this.biofilmStat.textContent = `${Math.round(b.biofilm * 100)}%`;
+    this.postbioticStat.textContent = `${Math.round(b.postbioticLevel * 100)}%`;
 
-    this.callout.hidden = b.inflammation < 0.35;
+    const integrityPct = Math.round(b.integrity * 100);
+    const inflamePct = Math.round(b.inflammation * 100);
+    this.integrityMeter.style.width = `${integrityPct}%`;
+    this.inflammationMeter.style.width = `${inflamePct}%`;
+    this.root.querySelector('[data-integrity-val]')!.textContent = `${integrityPct}%`;
+    this.root.querySelector('[data-inflammation-val]')!.textContent = `${inflamePct}%`;
+
+    const dynamic = engine.getDynamicScenario();
+    if (dynamic) this.scenarioText.textContent = dynamic;
+    else this.scenarioText.textContent = this.staticScenario;
+
+    this.callout.hidden = !this.microActive || b.inflammation < 0.35;
+
+    this.eventLog.innerHTML = snap.events
+      .slice()
+      .reverse()
+      .map((e, i) => {
+        const t = ((snap.tick - i * 10) / 30).toFixed(1);
+        return `<li class="${i === 0 ? 'bd-event--new' : ''}"><time>${t}s</time> ${e}</li>`;
+      })
+      .join('');
+
     this.fpsBadge.textContent = `${fps} FPS`;
     this.engineBadge.textContent = `ENGINE: DETERMINISTIC · ${fps >= 55 ? '60' : fps} FPS TARGET`;
   }

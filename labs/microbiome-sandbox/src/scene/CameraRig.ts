@@ -1,7 +1,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import type { EpitheliumKind } from './epithelium/types';
 
 export type ViewMode = 'macro' | 'micro';
+
+const MICRO_FRAMES: Record<EpitheliumKind, { pos: THREE.Vector3; target: THREE.Vector3 }> = {
+  gut: { pos: new THREE.Vector3(0, 0.82, 2.2), target: new THREE.Vector3(0, 0.72, 0) },
+  skin: { pos: new THREE.Vector3(0, 0.34, 1.95), target: new THREE.Vector3(0, 0.3, 0) },
+  sinus: { pos: new THREE.Vector3(0, 0.58, 2.3), target: new THREE.Vector3(0, 0.48, 0) },
+};
 
 export class CameraRig {
   readonly camera: THREE.PerspectiveCamera;
@@ -11,8 +18,6 @@ export class CameraRig {
 
   private macroPos = new THREE.Vector3(0, 1.1, 3.2);
   private macroTarget = new THREE.Vector3(0, 0.9, 0);
-  private microPos = new THREE.Vector3(0, 0.2, 1.8);
-  private microTarget = new THREE.Vector3(0, 0, 0);
 
   constructor(canvas: HTMLCanvasElement, renderer: THREE.WebGLRenderer) {
     this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 50);
@@ -21,9 +26,11 @@ export class CameraRig {
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.06;
+    this.controls.enablePan = true;
+    this.controls.enableRotate = true;
     this.controls.target.copy(this.macroTarget);
-    this.controls.minDistance = 1.5;
-    this.controls.maxDistance = 6;
+    this.controls.minDistance = 1.2;
+    this.controls.maxDistance = 8;
     this.controls.update();
 
     renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -34,6 +41,10 @@ export class CameraRig {
     this.camera.updateProjectionMatrix();
   }
 
+  getActiveCamera(): THREE.Camera {
+    return this.camera;
+  }
+
   getMode(): ViewMode {
     return this.mode;
   }
@@ -41,14 +52,25 @@ export class CameraRig {
   flyToMacro() {
     this.startTween(this.camera.position.clone(), this.macroPos, this.controls.target.clone(), this.macroTarget);
     this.mode = 'macro';
+    this.controls.minDistance = 1.5;
+    this.controls.maxDistance = 6;
+    this.controls.minAzimuthAngle = -Infinity;
+    this.controls.maxAzimuthAngle = Infinity;
+    this.controls.minPolarAngle = 0;
+    this.controls.maxPolarAngle = Math.PI;
   }
 
-  flyToMicro(hotspot?: THREE.Vector3) {
-    const offset = hotspot ? hotspot.clone().multiplyScalar(0.3) : new THREE.Vector3();
-    const to = this.microPos.clone().add(offset);
-    const look = offset;
-    this.startTween(this.camera.position.clone(), to, this.controls.target.clone(), look);
+  flyToMicro(kind: EpitheliumKind = 'sinus') {
+    const frame = MICRO_FRAMES[kind];
+    this.startTween(this.camera.position.clone(), frame.pos.clone(), this.controls.target.clone(), frame.target.clone());
     this.mode = 'micro';
+    this.controls.minDistance = 1.4;
+    this.controls.maxDistance = 4.5;
+    // Keep a textbook front-on cross-section; free rotation hides the silhouette.
+    this.controls.minAzimuthAngle = -0.22;
+    this.controls.maxAzimuthAngle = 0.22;
+    this.controls.minPolarAngle = 1.25;
+    this.controls.maxPolarAngle = 1.52;
   }
 
   private startTween(fromPos: THREE.Vector3, toPos: THREE.Vector3, fromLook: THREE.Vector3, toLook: THREE.Vector3) {

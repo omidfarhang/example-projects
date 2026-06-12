@@ -28,8 +28,8 @@ export class App {
         onRegionSelect: (id) => this.selectRegion(id),
         onPresetChange: (id) => this.changePreset(id),
         onBackToBody: () => this.backToBody(),
-        onTrigger: (id) => this.engine.trigger(id),
-        onInoculate: (strain) => this.engine.inoculate(strain),
+        onTrigger: (id) => this.handleTrigger(id),
+        onInoculate: (strain) => this.handleInoculate(strain),
         onEnvChange: (ph, moisture) => this.engine.setEnv(ph, moisture),
       },
       url.context,
@@ -43,12 +43,32 @@ export class App {
       (id) => this.selectRegion(id),
     );
 
-    // Deep link: fly to region on load
     if (getRegion(this.region).active) {
       requestAnimationFrame(() => this.selectRegion(this.region));
     }
 
     this.loop();
+  }
+
+  private ensureMicroView() {
+    if (this.scene.getSelectedRegion() === null) {
+      const target = getRegion(this.region).active ? this.region : PRESETS[this.preset].defaultRegion;
+      this.selectRegion(target);
+    }
+  }
+
+  private handleTrigger(id: string) {
+    this.ensureMicroView();
+    this.engine.trigger(id);
+    this.dashboard.flashAction('warn');
+    this.scene.playBurst(id);
+  }
+
+  private handleInoculate(strain: string) {
+    this.ensureMicroView();
+    this.engine.inoculate(strain);
+    this.dashboard.flashAction('action');
+    this.scene.playBurst(strain);
   }
 
   private selectRegion(id: RegionId) {
@@ -57,7 +77,7 @@ export class App {
     this.region = id;
     this.dashboard.highlightRegion(id);
     this.scene.selectRegion(id);
-    this.dashboard.setMicroView(true);
+    this.dashboard.setMicroView(true, region);
   }
 
   private backToBody() {
@@ -85,6 +105,8 @@ export class App {
 
     const snap = this.engine.step(dt);
     this.scene.render(snap);
+    this.dashboard.updateHotspotLabels(this.scene.getHotspotProjections());
+    this.dashboard.updateTissueCallouts(this.scene.getTissueCalloutProjections());
     this.dashboard.update(this.engine, this.scene.fps);
 
     requestAnimationFrame(() => this.loop());
