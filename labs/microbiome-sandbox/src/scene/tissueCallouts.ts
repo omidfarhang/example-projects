@@ -40,6 +40,20 @@ const CALLOUTS: Record<EpitheliumKind, TissueCallout[]> = {
     { label: 'SEBUM FILM', position: new THREE.Vector3(-1.5, 0.42, 0.12) },
     { label: 'SWEAT DUCT', position: new THREE.Vector3(-1.2, 0.34, 0.1) },
   ],
+  oral: [
+    { label: 'ORAL CAVITY', position: new THREE.Vector3(0, 0.72, 0) },
+    { label: 'SALIVA FILM', position: new THREE.Vector3(-1.5, 0.44, 0.12) },
+    { label: 'FILIFORM PAPILLAE', position: new THREE.Vector3(0.6, 0.4, 0.1) },
+    { label: 'THRUSH PATCH', position: new THREE.Vector3(-0.8, 0.42, 0.14) },
+    { label: 'SALIVARY GLAND', position: new THREE.Vector3(-0.7, 0.14, 0.08) },
+  ],
+  vaginal: [
+    { label: 'LUMEN', position: new THREE.Vector3(0, 0.72, 0) },
+    { label: 'RUGAE FOLD', position: new THREE.Vector3(-1.2, 0.38, 0.1) },
+    { label: 'GLYCOGEN MUCUS', position: new THREE.Vector3(1.3, 0.42, 0.12) },
+    { label: 'SQUAMOUS EPI', position: new THREE.Vector3(0, 0.28, 0.08) },
+    { label: 'LAMINA PROPRIA', position: new THREE.Vector3(1.6, 0.12, 0.06) },
+  ],
 };
 
 export function getTissueCallouts(kind: EpitheliumKind): TissueCallout[] {
@@ -52,4 +66,6 @@ export const TISSUE_PICTOGRAMS: Record<EpitheliumKind, string> = {
   sinus: `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="30" width="40" height="6" fill="#a86860"/><rect x="4" y="22" width="40" height="8" fill="#1a4870" opacity="0.5"/><path d="M4 22 Q24 6 44 22" fill="none" stroke="#7a98a8" stroke-width="4"/><rect x="10" y="26" width="3" height="12" fill="#e8b0a8"/><circle cx="18" cy="30" r="4" fill="#f4fafc"/><rect x="24" y="24" width="3" height="14" fill="#e8b0a8"/><rect x="32" y="27" width="3" height="11" fill="#e8b0a8"/><line x1="8" y1="22" x2="40" y2="22" stroke="#b8a090" stroke-width="2"/></svg>`,
   ear: `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="28" width="32" height="14" fill="#2a1810" opacity="0.55" rx="2"/><rect x="4" y="32" width="36" height="5" fill="#c89878"/><rect x="4" y="26" width="36" height="4" fill="#f0e0c8"/><rect x="4" y="22" width="36" height="4" fill="#d8a890"/><rect x="4" y="18" width="36" height="4" fill="#c08878"/><rect x="6" y="14" width="34" height="3" fill="#d4a040" opacity="0.7"/><circle cx="40" cy="24" r="5" fill="#f0e8d8"/><line x1="10" y1="12" x2="12" y2="8" stroke="#3a2818" stroke-width="1.5"/><line x1="18" y1="12" x2="18" y2="7" stroke="#3a2818" stroke-width="1.5"/><line x1="26" y1="12" x2="24" y2="8" stroke="#3a2818" stroke-width="1.5"/></svg>`,
   scalp: `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="34" width="40" height="8" fill="#c8a878"/><rect x="4" y="28" width="40" height="6" fill="#b87870"/><rect x="4" y="22" width="40" height="6" fill="#c08878"/><rect x="4" y="16" width="40" height="6" fill="#f0e0c8"/><rect x="14" y="8" width="5" height="22" fill="#8a5048"/><rect x="22" y="8" width="5" height="24" fill="#8a5048"/><rect x="30" y="8" width="5" height="22" fill="#8a5048"/><circle cx="20" cy="20" r="4" fill="#f0e0a8"/><circle cx="28" cy="20" r="4" fill="#f0e0a8"/><circle cx="36" cy="20" r="4" fill="#f0e0a8"/><rect x="4" y="14" width="40" height="2" fill="#f0d878" opacity="0.8"/></svg>`,
+  oral: `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="30" width="40" height="6" fill="#a86860"/><rect x="4" y="24" width="40" height="5" fill="#e8b0a8"/><rect x="4" y="19" width="40" height="5" fill="#c08878"/><rect x="4" y="14" width="40" height="5" fill="#9a5850"/><rect x="6" y="8" width="36" height="5" fill="#281820" opacity="0.5" rx="1"/><rect x="4" y="12" width="40" height="2" fill="#d8eef8" opacity="0.8"/><rect x="14" y="11" width="6" height="2" fill="#f8f4f0" rx="1"/><line x1="10" y1="13" x2="10" y2="16" stroke="#f0d0c0" stroke-width="2"/><line x1="18" y1="13" x2="18" y2="16" stroke="#f0d0c0" stroke-width="2"/><line x1="26" y1="13" x2="26" y2="16" stroke="#f0d0c0" stroke-width="2"/></svg>`,
+  vaginal: `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="30" width="40" height="5" fill="#a86860"/><rect x="4" y="18" width="40" height="12" fill="#e8b0a8"/><rect x="6" y="8" width="36" height="8" fill="#2a1828" opacity="0.45" rx="2"/><rect x="4" y="16" width="40" height="2" fill="#f0e0f0" opacity="0.85"/><rect x="8" y="19" width="32" height="2" fill="#d8a0b0" opacity="0.6"/><rect x="8" y="23" width="32" height="2" fill="#d8a0b0" opacity="0.5"/><rect x="8" y="27" width="32" height="2" fill="#d8a0b0" opacity="0.4"/></svg>`,
 };

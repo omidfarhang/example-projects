@@ -160,7 +160,10 @@ export class SceneManager {
   }
 
   playBurst(kind: string) {
-    const probioticIds = new Set(['lrham', 'binf', 'lacid', 'lplant', 's_epidermidis', 'prebiotic', 'scfa', 'saline_mist', 'ph_serum']);
+    const probioticIds = new Set([
+      'lrham', 'binf', 'lacid', 'lplant', 's_epidermidis', 'prebiotic', 'scfa',
+      'saline_mist', 'ph_serum', 'lsaliv', 'sboul',
+    ]);
     const burstKind =
       kind === 'allergen' || kind === 'histamine' || kind === 'friction_irritant'
         ? 'allergen'

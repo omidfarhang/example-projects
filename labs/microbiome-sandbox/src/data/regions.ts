@@ -1,7 +1,7 @@
 import { buildRegionEnv, type RegionEnv } from './envVars';
 import type { EpitheliumKind } from '../scene/epithelium/types';
 
-export type RegionId = 'ear' | 'scalp' | 'nose' | 'skin' | 'gut';
+export type RegionId = 'ear' | 'scalp' | 'nose' | 'oral' | 'skin' | 'vaginal' | 'gut';
 
 export interface RegionBaseline {
   commensals: number;
@@ -148,6 +148,43 @@ export const REGIONS: RegionDef[] = [
     ],
   },
   {
+    id: 'oral',
+    label: 'Oral / Mouth',
+    active: true,
+    hotspot: [0, 1.58, 0.22],
+    microGeometry: 'oral',
+    zoomTitle: 'ORAL MUCOSA CROSS-SECTION',
+    scaleLabel: '350× magnification',
+    defaultStrains: {
+      probiotics: ['L. salivarius', 'L. acidophilus', 'S. boulardii'],
+      pathogens: ['C. albicans', 'S. mutans'],
+      allergens: ['Irritant'],
+    },
+    env: buildRegionEnv({
+      ph: 6.8,
+      moisture: 0.78,
+      temperature: 0.57,
+      salinity: 0.45,
+      oxygenation: 0.88,
+    }),
+    baseline: {
+      commensals: 45,
+      probiotics: [{ strain: 'L. salivarius', count: 10 }],
+      pathogens: [{ strain: 'C. albicans', count: 4, kind: 'yeast' }],
+      biofilm: 0.06,
+    },
+    triggers: [
+      { id: 'thrush_bloom', label: 'ORAL THRUSH BLOOM' },
+      { id: 'dry_mouth', label: 'DRY MOUTH (XEROSTOMIA)' },
+      { id: 'sugar_exposure', label: 'SUGAR / CARB EXPOSURE' },
+    ],
+    inoculations: [
+      { id: 'lsaliv', label: 'APPLY L. SALIVARIUS', strain: 'L. salivarius' },
+      { id: 'lacid', label: 'INOCULATE L. ACIDOPHILUS', strain: 'L. acidophilus' },
+      { id: 'sboul', label: 'SEED S. BOULARDII', strain: 'S. boulardii' },
+    ],
+  },
+  {
     id: 'skin',
     label: 'Skin',
     active: true,
@@ -179,6 +216,46 @@ export const REGIONS: RegionDef[] = [
       { id: 'lacid', label: 'INOCULATE L. ACIDOPHILUS', strain: 'L. acidophilus' },
       { id: 's_epidermidis', label: 'APPLY S. EPIDERMIDIS', strain: 'S. epidermidis' },
       { id: 'ph_serum', label: 'pH BALANCING SERUM', strain: 'ph_serum' },
+    ],
+  },
+  {
+    id: 'vaginal',
+    label: 'Vaginal',
+    active: true,
+    hotspot: [0, 0.52, 0.18],
+    microGeometry: 'vaginal',
+    zoomTitle: 'VAGINAL EPITHELIUM / MUCOSA',
+    scaleLabel: '280× magnification',
+    defaultStrains: {
+      probiotics: ['L. acidophilus', 'L. rhamnosus'],
+      pathogens: ['C. albicans', 'Gardnerella'],
+      allergens: ['Irritant'],
+    },
+    env: buildRegionEnv({
+      ph: 4.2,
+      moisture: 0.62,
+      temperature: 0.58,
+      oxygenTension: 0.08,
+    }),
+    baseline: {
+      commensals: 38,
+      probiotics: [
+        { strain: 'L. acidophilus', count: 12 },
+        { strain: 'L. rhamnosus', count: 6 },
+      ],
+      pathogens: [{ strain: 'C. albicans', count: 3, kind: 'yeast' }],
+      integrity: 0.88,
+      biofilm: 0.05,
+    },
+    triggers: [
+      { id: 'alkaline_flush', label: 'ALKALINE FLUSH (pH DISRUPTION)' },
+      { id: 'antibiotic_course', label: 'ANTIBIOTIC COURSE' },
+      { id: 'glycogen_spike', label: 'GLYCOGEN / SUGAR SPIKE' },
+    ],
+    inoculations: [
+      { id: 'lacid', label: 'APPLY L. ACIDOPHILUS', strain: 'L. acidophilus' },
+      { id: 'lrham', label: 'SEED L. RHAMNOSUS', strain: 'L. rhamnosus' },
+      { id: 'ph_serum', label: 'pH RESTORING SERUM', strain: 'ph_serum' },
     ],
   },
   {

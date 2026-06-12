@@ -99,6 +99,45 @@ export function createLumenChamber(kind: EpitheliumKind = 'sinus'): THREE.Group 
         ),
       );
     }
+  } else if (kind === 'oral') {
+    const backdrop = new THREE.Mesh(
+      new THREE.PlaneGeometry(5.8, 2.4),
+      new THREE.MeshStandardMaterial({ color: 0x1a1018, roughness: 1 }),
+    );
+    backdrop.position.set(0, 0.42, -0.5);
+    group.add(backdrop);
+
+    const wash = new THREE.Mesh(
+      new THREE.PlaneGeometry(5, 0.5),
+      new THREE.MeshBasicMaterial({ color: 0xd8eef8, transparent: true, opacity: 0.08 }),
+    );
+    wash.position.set(0, 0.58, -0.44);
+    group.add(wash);
+  } else if (kind === 'vaginal') {
+    const backdrop = new THREE.Mesh(
+      new THREE.PlaneGeometry(5.4, 2.5),
+      new THREE.MeshStandardMaterial({ color: 0x180818, roughness: 1 }),
+    );
+    backdrop.position.set(0, 0.44, -0.5);
+    group.add(backdrop);
+
+    const wash = new THREE.Mesh(
+      new THREE.PlaneGeometry(4.6, 0.55),
+      new THREE.MeshBasicMaterial({ color: 0xf0e0f0, transparent: true, opacity: 0.07 }),
+    );
+    wash.position.set(0, 0.56, -0.44);
+    group.add(wash);
+
+    for (let i = 0; i < 4; i++) {
+      const y = 0.36 + i * 0.08;
+      group.add(
+        diagramLine(
+          [new THREE.Vector3(-2.2, y, -0.42), new THREE.Vector3(2.2, y, -0.42)],
+          0xd8a0c0,
+          0.1,
+        ),
+      );
+    }
   } else if (kind === 'skin') {
     const backdrop = new THREE.Mesh(
       new THREE.PlaneGeometry(6, 2.8),

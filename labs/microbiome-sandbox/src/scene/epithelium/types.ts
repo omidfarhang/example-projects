@@ -1,4 +1,4 @@
-export type EpitheliumKind = 'sinus' | 'skin' | 'gut' | 'ear' | 'scalp';
+export type EpitheliumKind = 'sinus' | 'skin' | 'gut' | 'ear' | 'scalp' | 'oral' | 'vaginal';
 
 export interface EpitheliumState {
   inflammation: number;

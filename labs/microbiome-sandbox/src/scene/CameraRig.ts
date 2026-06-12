@@ -10,6 +10,8 @@ const MICRO_FRAMES: Record<EpitheliumKind, { pos: THREE.Vector3; target: THREE.V
   sinus: { pos: new THREE.Vector3(0, 0.58, 2.3), target: new THREE.Vector3(0, 0.48, 0) },
   ear: { pos: new THREE.Vector3(0, 0.52, 2.15), target: new THREE.Vector3(0, 0.46, 0) },
   scalp: { pos: new THREE.Vector3(0, 0.36, 2.0), target: new THREE.Vector3(0, 0.34, 0) },
+  oral: { pos: new THREE.Vector3(0, 0.4, 1.95), target: new THREE.Vector3(0, 0.38, 0) },
+  vaginal: { pos: new THREE.Vector3(0, 0.42, 2.05), target: new THREE.Vector3(0, 0.4, 0) },
 };
 
 export class CameraRig {

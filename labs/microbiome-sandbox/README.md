@@ -10,6 +10,8 @@ Rotate a low-poly body map, fly into tissue cross-sections, and run deterministi
 | --- | --- |
 | Allergy & Barrier Defense (Nose/Sinus) | `?preset=allergy&region=nose` |
 | Through the Ages variant | `?preset=allergy&context=lifestage` |
+| Candida & pH (Vaginal) | `?preset=candida&region=vaginal` |
+| Candida & pH (Oral thrush) | `?preset=candida&region=oral` |
 | Candida & pH (Skin) | `?preset=candida&region=skin` |
 | Biotic Lifecycle (Gut) | `?preset=lifecycle&region=gut` |
 

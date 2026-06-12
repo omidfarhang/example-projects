@@ -3,8 +3,10 @@ import {
   buildEarCanalTissue,
   buildGutTissue,
   buildNasalTissue,
+  buildOralTissue,
   buildScalpTissue,
   buildSkinTissue,
+  buildVaginalTissue,
 } from './tissueModels';
 import type { EpitheliumKind, EpitheliumState } from './types';
 
@@ -25,6 +27,8 @@ export class Epithelium3D {
       gut: buildGutTissue,
       ear: buildEarCanalTissue,
       scalp: buildScalpTissue,
+      oral: buildOralTissue,
+      vaginal: buildVaginalTissue,
     } as const;
     const result = builders[kind]();
 
@@ -100,6 +104,10 @@ export class Epithelium3D {
         const m = overlay.material as THREE.MeshStandardMaterial;
         m.opacity = 0.05 + state.sebum * 0.32 + state.sweatRate * 0.08;
         m.emissiveIntensity = state.sebum * 0.15;
+      }
+      if (overlay.userData.isThrush) {
+        (overlay.material as THREE.MeshStandardMaterial).opacity =
+          0.04 + state.biofilm * 0.35 + (state.ph > 6.5 ? 0.08 : 0);
       }
     }
   }

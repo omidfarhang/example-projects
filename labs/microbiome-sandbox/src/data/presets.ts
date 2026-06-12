@@ -30,10 +30,10 @@ export const PRESETS: Record<PresetId, PresetDef> = {
     id: 'candida',
     title: 'Candida & pH Balance',
     scenario:
-      'Select skin or gut tissue and adjust pH and moisture to see how the biome shifts. Alkaline pH and sugar load favor C. albicans — acidifying inoculations and pH balancing restore equilibrium.',
+      'Select oral, vaginal, skin, or gut tissue and adjust pH and moisture. Alkaline shifts and sugar load favor C. albicans — try oral thrush or vaginal pH disruption, then acidifying inoculations to restore balance.',
     articleKey: 'candidiasis',
-    defaultRegion: 'skin',
-    env: buildRegionEnv({ ph: 7.4, moisture: 0.55, temperature: 0.52, sebum: 0.28 }),
+    defaultRegion: 'vaginal',
+    env: buildRegionEnv({ ph: 4.2, moisture: 0.62, temperature: 0.58, oxygenTension: 0.08 }),
   },
   lifecycle: {
     id: 'lifecycle',

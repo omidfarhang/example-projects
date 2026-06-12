@@ -116,7 +116,9 @@ export const REGION_ENV_CONTROLS: Record<RegionId, EnvVarId[]> = {
   ear: ['ph', 'moisture', 'temperature', 'cerumen', 'salinity', 'oxygenation'],
   scalp: ['ph', 'moisture', 'temperature', 'sebum', 'sweatRate'],
   nose: ['ph', 'moisture', 'temperature', 'oxygenation'],
+  oral: ['ph', 'moisture', 'temperature', 'salinity', 'oxygenation'],
   skin: ['ph', 'moisture', 'temperature', 'sebum'],
+  vaginal: ['ph', 'moisture', 'temperature', 'oxygenTension'],
   gut: ['ph', 'moisture', 'temperature', 'oxygenTension'],
 };
 

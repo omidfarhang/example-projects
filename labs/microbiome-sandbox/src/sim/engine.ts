@@ -213,6 +213,38 @@ export class SimEngine {
       b.sebum = Math.max(0.05, b.sebum - 0.25);
       this.adjustVitality(['commensal'], -0.2);
       this.events.push('Harsh shampoo — alkaline wash strips sebum film');
+    } else if (id === 'thrush_bloom') {
+      this.spawnBatch('yeast', 'C. albicans', 22);
+      b.biofilm = clamp(b.biofilm + 0.3, 0, 1);
+      b.inflammation = clamp(b.inflammation + 0.2, 0, 1);
+      this.events.push('Oral thrush bloom — C. albicans patches spreading');
+    } else if (id === 'dry_mouth') {
+      b.moisture = Math.max(0.12, b.moisture - 0.35);
+      b.salinity = clamp(b.salinity + 0.1, 0, 1);
+      this.spawnBatch('yeast', 'C. albicans', 10);
+      this.events.push('Dry mouth — saliva film depleted, yeast adhesion rising');
+    } else if (id === 'sugar_exposure') {
+      b.sugarLoad = Math.min(1, b.sugarLoad + 0.7);
+      b.ph = Math.min(7.5, b.ph + 0.3);
+      this.spawnBatch('pathogen', 'S. mutans', 8);
+      this.events.push('Sugar exposure — acid-tolerant pathogens mobilizing');
+    } else if (id === 'alkaline_flush') {
+      b.ph = Math.min(7.5, b.ph + 1.2);
+      b.integrity = Math.max(0.2, b.integrity - 0.18);
+      this.spawnBatch('yeast', 'C. albicans', 16);
+      this.spawnBatch('pathogen', 'Gardnerella', 6);
+      this.events.push('Alkaline flush — vaginal pH disrupted, Candida bloom risk');
+    } else if (id === 'antibiotic_course') {
+      this.adjustVitality(['commensal'], -0.45);
+      this.adjustVitality(['probiotic'], -0.3);
+      b.ph = Math.min(6.5, b.ph + 0.4);
+      b.integrity = Math.max(0.2, b.integrity - 0.12);
+      this.events.push('Antibiotic course — Lactobacillus depleted, pH rising');
+    } else if (id === 'glycogen_spike') {
+      b.sugarLoad = Math.min(1, b.sugarLoad + 0.55);
+      b.moisture = clamp(b.moisture + 0.12, 0, 1);
+      this.spawnBatch('yeast', 'C. albicans', 12);
+      this.events.push('Glycogen spike — yeast substrate surge in mucosa');
     }
 
     this.updateCounts();
@@ -236,7 +268,7 @@ export class SimEngine {
       this.events.push('SCFA postbiotic surge — barrier recovery');
     } else if (actionId === 'lacid') {
       this.spawnBatch('probiotic', 'L. acidophilus', 18);
-      b.ph = Math.max(4.5, b.ph - 0.5);
+      b.ph = clamp(b.ph - 0.5, 3.8, 7);
       b.biofilm = Math.max(0, b.biofilm - 0.2);
       this.events.push('L. acidophilus acidifying local pH');
     } else if (actionId === 'lrham') {
@@ -259,7 +291,7 @@ export class SimEngine {
       b.biofilm = Math.max(0, b.biofilm - 0.15);
       this.events.push('S. epidermidis applied — commensal biofilm competition');
     } else if (actionId === 'ph_serum') {
-      b.ph = Math.max(4.5, b.ph - 0.3);
+      b.ph = clamp(b.ph - 0.35, 3.8, 7);
       b.moisture = clamp(b.moisture + 0.05, 0, 1);
       this.events.push('pH balancing serum — local acidity restored');
     } else if (actionId === 'lplant') {
@@ -267,6 +299,16 @@ export class SimEngine {
       b.inflammation = Math.max(0, b.inflammation - 0.18);
       b.integrity = clamp(b.integrity + 0.1, 0, 1);
       this.events.push('L. plantarum seeded — competing for attachment');
+    } else if (actionId === 'lsaliv') {
+      this.spawnBatch('probiotic', 'L. salivarius', 18);
+      b.ph = Math.max(5.5, b.ph - 0.2);
+      b.biofilm = Math.max(0, b.biofilm - 0.15);
+      this.events.push('L. salivarius applied — oral commensal niche restored');
+    } else if (actionId === 'sboul') {
+      this.spawnBatch('probiotic', 'S. boulardii', 14);
+      this.adjustVitality(['yeast'], -0.25);
+      b.inflammation = Math.max(0, b.inflammation - 0.12);
+      this.events.push('S. boulardii seeded — antifungal competition active');
     }
 
     this.updateCounts();
@@ -294,7 +336,12 @@ export class SimEngine {
     return this.snapshot();
   }
 
-  private probioticGrowthRate(ph: number): number {
+  private probioticGrowthRate(ph: number, region: RegionId): number {
+    if (region === 'oral' || region === 'vaginal') {
+      if (ph >= 3.8 && ph <= 5.2) return 0.004;
+      if (ph >= 3.5 && ph <= 6.0) return 0.002;
+      return 0.0005;
+    }
     if (ph >= 5.5 && ph <= 6.8) return 0.004;
     if (ph >= 5.0 && ph <= 7.2) return 0.002;
     return 0.0005;
@@ -354,11 +401,15 @@ export class SimEngine {
       if (Math.abs(node.y) > 0.9) node.vy *= -1;
 
       if (node.type === 'probiotic') {
-        let rate = this.probioticGrowthRate(b.ph) * tempMul;
+        let rate = this.probioticGrowthRate(b.ph, region) * tempMul;
         if (region === 'gut' && b.moisture >= 0.55 && b.moisture <= 0.75) {
           rate += 0.001;
         }
         if (region === 'gut' && b.oxygenTension > 0.35) rate *= 0.5;
+        if (region === 'vaginal' && b.oxygenTension < 0.2) rate += 0.001;
+        if (region === 'vaginal' && b.ph > 5.0) rate *= 0.4;
+        if (region === 'oral' && b.moisture > 0.6) rate += 0.0008;
+        if (region === 'oral' && b.moisture < 0.35) rate *= 0.5;
         if ((region === 'nose' || region === 'ear') && b.oxygenation < 0.4) rate *= 0.7;
         node.vitality = Math.min(1, node.vitality + rate);
       } else if (node.type === 'pathogen' || node.type === 'yeast') {
@@ -376,9 +427,19 @@ export class SimEngine {
         if ((region === 'nose' || region === 'ear') && b.oxygenation < 0.35) {
           rate += 0.001;
         }
+        if ((region === 'oral' || region === 'vaginal') && node.type === 'yeast') {
+          if (b.ph > 5.5) rate += 0.003;
+          if (b.moisture < 0.4 && region === 'oral') rate += 0.002;
+          if (b.sugarLoad > 0.3) rate += 0.002;
+        }
+        if (region === 'vaginal' && b.ph > 5.0 && node.type === 'yeast') {
+          rate += 0.0025;
+        }
         node.vitality = Math.min(1, node.vitality + rate);
       } else if (node.type === 'commensal') {
-        if (b.ph < 5.5 || b.ph > 7.5) {
+        if (region === 'vaginal' && b.ph > 5.5) {
+          node.vitality = Math.max(0.05, node.vitality - 0.0015);
+        } else if (b.ph < 5.5 || b.ph > 7.5) {
           node.vitality = Math.max(0.05, node.vitality - 0.001);
         } else {
           node.vitality = Math.min(1, node.vitality + 0.0005);
@@ -429,6 +490,12 @@ export class SimEngine {
     if (region === 'ear' && b.cerumen > 0.45) {
       b.biofilm = clamp(b.biofilm + 0.0006, 0, 1);
     }
+    if (region === 'oral' && b.moisture < 0.4) {
+      b.biofilm = clamp(b.biofilm + 0.001, 0, 1);
+    }
+    if (region === 'vaginal' && b.ph > 5.2) {
+      b.biofilm = clamp(b.biofilm + 0.0012, 0, 1);
+    }
     if (b.ph < 6 && b.biofilm > 0) {
       b.biofilm = Math.max(0, b.biofilm - 0.002);
     }
@@ -440,6 +507,14 @@ export class SimEngine {
     } else if (region === 'nose' || region === 'ear') {
       if (b.moisture < 0.4) {
         b.integrity = Math.max(0.15, b.integrity - 0.0006);
+      }
+    } else if (region === 'oral') {
+      if (b.moisture < 0.35) {
+        b.integrity = Math.max(0.15, b.integrity - 0.0009);
+      }
+    } else if (region === 'vaginal') {
+      if (b.ph > 5.0) {
+        b.integrity = Math.max(0.15, b.integrity - 0.001);
       }
     }
 

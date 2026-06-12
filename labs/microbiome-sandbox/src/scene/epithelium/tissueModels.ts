@@ -655,6 +655,183 @@ export function buildScalpTissue(): TissueBuildResult {
   return { group, inflamedMeshes, overlays, kind: 'scalp' };
 }
 
+/**
+ * ORAL — non-keratinized mucosa with papillae, saliva film, thrush-prone patches.
+ */
+export function buildOralTissue(): TissueBuildResult {
+  const group = new THREE.Group();
+  const overlays: THREE.Mesh[] = [];
+  const inflamedMeshes: THREE.Mesh[] = [];
+  const W = 5;
+
+  const submucosa = new THREE.Mesh(
+    new THREE.BoxGeometry(W, 0.12, DEPTH),
+    mat(P.laminaDeep),
+  );
+  submucosa.position.set(0, 0.08, 0);
+  group.add(submucosa, outline(submucosa, 0xa07068, 0.32));
+
+  const layers: { name: string; h: number; color: number; cells: number }[] = [
+    { name: 'basale', h: 0.06, color: P.basale, cells: 11 },
+    { name: 'spinous', h: 0.08, color: P.spinous, cells: 11 },
+    { name: 'superficial', h: 0.05, color: 0xf0c8b8, cells: 12 },
+  ];
+
+  let y = 0.14;
+  for (const layer of layers) {
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(W, layer.h, DEPTH * 0.88), mat(layer.color));
+    slab.position.set(0, y + layer.h / 2, 0);
+    group.add(slab, outline(slab, 0xe0a898, 0.3));
+
+    const pitch = W / layer.cells;
+    for (let i = 0; i < layer.cells; i++) {
+      const cx = -W / 2 + pitch * 0.5 + i * pitch;
+      if (layer.name === 'superficial') {
+        const papilla = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.018, 0.028, 0.05, 6),
+          mat(0xf0d0c0, { roughness: 0.35 }),
+        );
+        papilla.position.set(cx, y + layer.h / 2 + 0.03, DEPTH * 0.3);
+        group.add(papilla);
+        if (i >= 4 && i <= 7) {
+          papilla.userData.baseColor = 0xf0d0c0;
+          inflamedMeshes.push(papilla);
+        }
+      }
+    }
+    y += layer.h;
+  }
+
+  const surfaceY = y;
+  for (let i = 0; i < 3; i++) {
+    const gx = -0.7 + i * 0.7;
+    const gland = new THREE.Mesh(
+      new THREE.SphereGeometry(0.05, 10, 8),
+      mat(0xd8b8a8, { roughness: 0.4 }),
+    );
+    gland.position.set(gx, 0.1, DEPTH * 0.28);
+    gland.scale.set(1.3, 0.65, 0.9);
+    group.add(gland);
+  }
+
+  const saliva = mucusSheet(W * 0.92, 0.14, surfaceY + 0.05, 0.1);
+  group.add(saliva);
+  overlays.push(saliva);
+
+  const thrush = new THREE.Mesh(
+    new THREE.PlaneGeometry(W * 0.55, 0.08),
+    mat(0xf8f4f0, { transparent: true, opacity: 0.12, roughness: 0.2 }),
+  );
+  thrush.position.set(-0.4, surfaceY + 0.08, DEPTH * 0.46);
+  thrush.userData.isThrush = true;
+  group.add(thrush);
+  overlays.push(thrush);
+
+  const oralCavity = new THREE.Mesh(
+    new THREE.BoxGeometry(W * 0.85, 0.42, DEPTH * 0.75),
+    mat(0x281820, { transparent: true, opacity: 0.38 }),
+  );
+  oralCavity.position.set(0, surfaceY + 0.28, -0.01);
+  group.add(oralCavity);
+
+  const biofilm = new THREE.Mesh(
+    new THREE.PlaneGeometry(W * 0.88, 0.04),
+    mat(0x9333ea, { transparent: true, opacity: 0 }),
+  );
+  biofilm.position.set(0, surfaceY + 0.06, DEPTH * 0.48);
+  biofilm.userData.isBiofilm = true;
+  group.add(biofilm);
+  overlays.push(biofilm);
+
+  return { group, inflamedMeshes, overlays, kind: 'oral' };
+}
+
+/**
+ * VAGINAL — stratified squamous wall with rugae, glycogen-rich mucus, acidic niche.
+ */
+export function buildVaginalTissue(): TissueBuildResult {
+  const group = new THREE.Group();
+  const overlays: THREE.Mesh[] = [];
+  const inflamedMeshes: THREE.Mesh[] = [];
+  const W = 4.8;
+
+  const lamina = new THREE.Mesh(
+    new THREE.BoxGeometry(W, 0.11, DEPTH),
+    mat(P.laminaDeep),
+  );
+  lamina.position.set(0, 0.08, 0);
+  group.add(lamina, outline(lamina, 0xa07068, 0.32));
+
+  const epiH = 0.22;
+  const epi = new THREE.Mesh(
+    new THREE.BoxGeometry(W, epiH, DEPTH * 0.85),
+    mat(P.cytoplasm),
+  );
+  epi.position.set(0, 0.08 + epiH / 2 + 0.02, 0);
+  group.add(epi, outline(epi, 0xe0b0a8, 0.35));
+
+  const cols = 10;
+  const pitch = W / cols;
+  const epiBase = 0.08 + 0.02;
+  for (let i = 0; i < cols; i++) {
+    const x = -W / 2 + pitch * 0.5 + i * pitch;
+    const inflamed = i >= 3 && i <= 6;
+    const col = new THREE.Mesh(
+      new THREE.BoxGeometry(pitch * 0.72, epiH * 0.82, DEPTH * 0.55),
+      mat(inflamed ? P.cytoplasmDeep : P.cytoplasm),
+    );
+    col.position.set(x, epiBase + epiH * 0.5, DEPTH * 0.18);
+    group.add(col);
+    if (inflamed) {
+      col.userData.baseColor = P.cytoplasm;
+      inflamedMeshes.push(col);
+    }
+  }
+
+  const rugaeCount = 5;
+  const surfaceY = epiBase + epiH;
+  for (let i = 0; i < rugaeCount; i++) {
+    const rx = -W / 2 + 0.4 + i * ((W - 0.8) / (rugaeCount - 1));
+    const fold = new THREE.Mesh(
+      new THREE.BoxGeometry(0.55, 0.04, DEPTH * 0.45),
+      mat(0xd8a0a0, { roughness: 0.45 }),
+    );
+    fold.position.set(rx, surfaceY + 0.02 + (i % 2) * 0.02, DEPTH * 0.22);
+    group.add(fold);
+  }
+
+  const glycogenMucus = mucusSheet(W * 0.9, 0.16, surfaceY + 0.1, 0.1);
+  group.add(glycogenMucus);
+  overlays.push(glycogenMucus);
+
+  const acidSheen = new THREE.Mesh(
+    new THREE.PlaneGeometry(W, 0.025),
+    mat(0xf0e8f8, { transparent: true, opacity: 0.14, metalness: 0.18 }),
+  );
+  acidSheen.position.set(0, surfaceY + 0.04, DEPTH * 0.44);
+  acidSheen.userData.isSheen = true;
+  group.add(acidSheen);
+  overlays.push(acidSheen);
+
+  const lumen = new THREE.Mesh(
+    new THREE.BoxGeometry(W * 0.78, 0.48, DEPTH * 0.8),
+    mat(0x2a1828, { transparent: true, opacity: 0.42 }),
+  );
+  lumen.position.set(0, surfaceY + 0.32, -0.01);
+  group.add(lumen);
+
+  const biofilm = new THREE.Mesh(
+    new THREE.PlaneGeometry(W * 0.82, 0.04),
+    mat(0x9333ea, { transparent: true, opacity: 0 }),
+  );
+  biofilm.position.set(0, surfaceY + 0.07, DEPTH * 0.48);
+  biofilm.userData.isBiofilm = true;
+  group.add(biofilm);
+  overlays.push(biofilm);
+
+  return { group, inflamedMeshes, overlays, kind: 'vaginal' };
+}
+
 /** 3D volume where microbes swim, aligned to each tissue cross-section. */
 export interface LumenBounds {
   xMin: number;
@@ -732,6 +909,30 @@ export const LUMEN_BOUNDS: Record<EpitheliumKind, LumenBounds> = {
     allergenBase: 0.88,
     allergenHeight: 0.2,
   },
+  oral: {
+    xMin: -2.35,
+    xMax: 2.35,
+    yMin: 0.46,
+    yMax: 0.95,
+    zMin: 0.08,
+    zMax: 0.38,
+    epithelialY: 0.48,
+    mucusY: 0.58,
+    allergenBase: 0.78,
+    allergenHeight: 0.2,
+  },
+  vaginal: {
+    xMin: -2.2,
+    xMax: 2.2,
+    yMin: 0.44,
+    yMax: 0.92,
+    zMin: 0.06,
+    zMax: 0.34,
+    epithelialY: 0.46,
+    mucusY: 0.56,
+    allergenBase: 0.76,
+    allergenHeight: 0.18,
+  },
 };
 
 /** Epithelial receptor columns — attachment sites along the tissue surface. */
@@ -741,4 +942,6 @@ export const RECEPTOR_SITES: Record<EpitheliumKind, number[]> = {
   gut: Array.from({ length: 11 }, (_, i) => -2.6 + 0.32 + i * ((5.2 - 0.64) / 10)),
   ear: Array.from({ length: 10 }, (_, i) => -2.1 + i * (4.2 / 9)),
   scalp: [-1.35, 0, 1.35, -0.68, 0.68, -2.0, 2.0],
+  oral: Array.from({ length: 11 }, (_, i) => -2.3 + i * (4.6 / 10)),
+  vaginal: Array.from({ length: 10 }, (_, i) => -2.1 + i * (4.2 / 9)),
 };
