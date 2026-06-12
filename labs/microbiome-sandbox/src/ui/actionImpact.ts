@@ -3,6 +3,7 @@ import type { PostbioticId } from '../data/postbiotics';
 import { POSTBIOTICS, postbioticRegionMultiplier } from '../data/postbiotics';
 import type { ProductId } from '../data/products';
 import { PRODUCTS, productRegionMultiplier } from '../data/products';
+import { getInoculation } from '../data/inoculations';
 import type { RegionId } from '../data/regions';
 import { getRegion } from '../data/regions';
 import { getStressor, type StressorBiomeDelta } from '../data/stressors';
@@ -298,35 +299,12 @@ export function buildStressorImpact(stressorId: string, _regionId: RegionId): Ac
   };
 }
 
-const REGIONAL_CARE_EFFECTS: Record<
-  string,
-  { biome: StressorBiomeDelta; adds?: ImpactAdd[]; why: string }
-> = {
-  scfa: {
-    biome: { postbioticLevel: 0.3, integrity: 0.12, inflammation: -0.15 },
-    why: 'Direct SCFA postbiotic surge — barrier recovery and inflammation easing',
-  },
-  saline_mist: {
-    biome: { moisture: 0.15, inflammation: -0.1 },
-    why: 'Saline mist — moisture restored, allergen adhesion reduced, inflammation easing',
-  },
-  s_epidermidis: {
-    biome: { biofilm: -0.15 },
-    adds: [{ label: 'S. epidermidis', count: 20, type: 'probiotic' }],
-    why: 'Commensal seeding — competes for biofilm attachment sites on epithelium',
-  },
-  ph_serum: {
-    biome: { ph: -0.35, moisture: 0.05 },
-    why: 'pH balancing serum — restores local acidity and acid mantle',
-  },
-};
-
 export function buildRegionalCareImpact(actionId: string, regionId: RegionId): ActionImpact {
   const region = getRegion(regionId);
   const regional = region.regionalCare.find((a) => a.id === actionId);
-  const effect = REGIONAL_CARE_EFFECTS[actionId];
+  const def = getInoculation(actionId);
 
-  if (!regional || !effect) {
+  if (!regional || !def) {
     return {
       title: actionId,
       efficacyPct: 100,
@@ -337,14 +315,26 @@ export function buildRegionalCareImpact(actionId: string, regionId: RegionId): A
     };
   }
 
-  const deltas = stressorBiomeToDeltas(effect.biome).map((d) => ({ ...d, source: 'regional' as const }));
+  if (def.strain) {
+    const strainImpact = buildStrainImpact(def.strain, regionId);
+    return { ...strainImpact, title: regional.label, category: 'regional' };
+  }
+
+  if (def.postbiotic) {
+    const postImpact = buildPostbioticImpact(def.postbiotic, regionId);
+    return { ...postImpact, title: regional.label, category: 'regional' };
+  }
+
+  const deltas = def.biome
+    ? stressorBiomeToDeltas(def.biome).map((d) => ({ ...d, source: 'regional' as const }))
+    : [];
 
   return {
     title: regional.label,
     efficacyPct: 100,
-    adds: effect.adds ?? [],
+    adds: def.impactAdds ?? [],
     deltas,
-    why: effect.why,
+    why: def.why,
     category: 'regional',
   };
 }

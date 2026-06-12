@@ -111,10 +111,10 @@ Core educational lab features implemented and documented.
 
 | ID | Priority | Current state | Target / gap |
 | --- | --- | --- | --- |
-| ENG-01 | P1 | Action effects hardcoded in engine switch statements | Data-driven action defs shared with docs (JSON or TS config imported by engine) |
-| ENG-02 | P2 | Dashboard builds all DOM in one template string | Component modules or template partials for maintainability |
+| ENG-01 | P1 | **Done** — data-driven inoculations | `inoculations.ts` shared by engine + impact preview |
+| ENG-02 | P2 | **Done** — dashboard template partials | `ui/dashboard/*` modules composed by `renderDashboardShell()` |
 | ENG-03 | P2 | No CI for lab | Playground build smoke test in GitHub Actions |
-| ENG-04 | P3 | tissueModels.ts ~950 lines monolithic | Split per tissue builder file |
+| ENG-04 | P3 | **Done** — split per tissue builder | `epithelium/tissue/` modules + `tissueModels.ts` barrel re-export |
 | ENG-05 | P2 | Docs manually synced | CI check that action IDs in regions.ts match engine branches |
 
 ---
@@ -148,7 +148,7 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 3. **SIM-01** (tests) — safety net for further sim changes
 4. ~~**CONTENT-02** (article-linked strain notes)~~ — shipped
 5. ~~**SIM-04** (prebiotic stats)~~ — shipped
-6. **ENG-01** (data-driven actions) — reduces doc/code drift
+6. ~~**ENG-01** (data-driven actions)~~ — shipped
 7. **UX-01, UX-02** (accessibility) — broadens audience
 8. ~~**SIM-03, VIZ-01** (postbiotic visualization)~~ — shipped
 9. **STATE-01** (shareable state) — classroom sharing
@@ -172,6 +172,9 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 | CONTENT-02 | June 2026 | Article-linked strain tooltips + impact preview notes (`strains.ts`, `actionImpact.ts`) |
 | CONTENT-03 | June 2026 | Life-stage scenario variant selector in dashboard (`Dashboard.ts`, `App.ts`) |
 | CONTENT-04 | June 2026 | Expandable event log + classroom `.txt` export (`engine.getEvents()`, `Dashboard.ts`) |
+| ENG-04 | June 2026 | Split `tissueModels.ts` into `epithelium/tissue/*` per-region builders |
+| ENG-01 | June 2026 | Data-driven inoculation defs (`inoculations.ts`) replace engine switch branches |
+| ENG-02 | June 2026 | Dashboard shell split into `ui/dashboard/*` template partials |
 
 ---
 

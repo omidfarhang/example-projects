@@ -1,9 +1,10 @@
 import type { EnvVarId } from '../data/envVars';
 import { getProduct, type ProductId } from '../data/products';
 import { getPostbiotic, postbioticRegionMultiplier, type PostbioticId } from '../data/postbiotics';
+import { getInoculation, strainInoculationEventLog, type InoculationDef } from '../data/inoculations';
+import type { PresetId } from '../data/presets';
 import { getRegion, type RegionId } from '../data/regions';
 import { getStressor, type StressorBiomeDelta } from '../data/stressors';
-import type { PresetId } from '../data/presets';
 import {
   getStrain,
   PREBIOTICS,
@@ -170,12 +171,12 @@ export class SimEngine {
   }
 
   /** Apply a single strain from the library (probiotic or commensal). */
-  inoculateStrain(strainId: StrainId) {
+  inoculateStrain(strainId: StrainId, eventLog?: string) {
     const def = getStrain(strainId);
     const microbeType = def.kind === 'commensal' ? 'commensal' : 'probiotic';
     this.spawnBatch(microbeType, def.name, def.spawnCount);
     this.applyStrainBiomeEffects(def.effects);
-    this.events.push(this.legacyStrainEvent(strainId));
+    this.events.push(eventLog ?? strainInoculationEventLog(strainId));
     this.updateCounts();
   }
 
@@ -313,91 +314,44 @@ export class SimEngine {
       return;
     }
 
-    const b = this.biome;
-
-    const strainLegacy: Record<string, StrainId> = {
-      lrham: 'lrham',
-      lacid: 'lacid',
-      binf: 'binf',
-      lplant: 'lplant',
-      lsaliv: 'lsaliv',
-      sboul: 'sboul',
-      lcasei: 'lcasei',
-      lreuteri: 'lreuteri',
-      blactis: 'blactis',
-      blongum: 'blongum',
-      bbifidum: 'bbifidum',
-      lbulgaricus: 'lbulgaricus',
-      sthermo: 'sthermo',
-    };
-
-    if (strainLegacy[actionId]) {
-      const id = strainLegacy[actionId];
-      const def = getStrain(id);
-      this.spawnBatch('probiotic', def.name, def.spawnCount);
-      this.applyStrainBiomeEffects(def.effects);
-      this.events.push(this.legacyStrainEvent(id));
-      this.updateCounts();
+    const def = getInoculation(actionId);
+    if (!def) {
+      this.events.push(`Unknown inoculation "${actionId}"`);
       return;
     }
 
-    if (actionId === 'prebiotic') {
-      this.inoculatePrebiotic('inulin');
-      return;
-    }
-    if (actionId === 'prebiotic_fos') {
-      this.inoculatePrebiotic('fos');
+    this.applyInoculationDef(def);
+  }
+
+  private applyInoculationDef(def: InoculationDef) {
+    if (def.strain) {
+      this.inoculateStrain(def.strain, def.eventLog);
       return;
     }
 
-    if (actionId === 'scfa') {
-      this.applyPostbiotic('scfa_mix');
+    if (def.prebiotic) {
+      this.inoculatePrebiotic(def.prebiotic);
       return;
     }
 
-    if (actionId === 's_epidermidis') {
-      this.inoculateStrain('sepidermidis');
+    if (def.postbiotic) {
+      this.applyPostbiotic(def.postbiotic);
       return;
     }
 
-    if (actionId === 'saline_mist') {
-      b.moisture = clamp(b.moisture + 0.15, 0, 1);
-      b.inflammation = Math.max(0, b.inflammation - 0.1);
-      this.allergenAdhesion = Math.max(0, this.allergenAdhesion - 0.2);
-      this.events.push('Saline mist — moisture restored, inflammation easing');
-    } else if (actionId === 'ph_serum') {
-      b.ph = clamp(b.ph - 0.35, 3.8, 7);
-      b.moisture = clamp(b.moisture + 0.05, 0, 1);
-      this.events.push('pH balancing serum — local acidity restored');
+    if (def.biome) {
+      this.applyStressorBiome(def.biome);
+    }
+
+    if (def.allergenAdhesionDelta !== undefined) {
+      this.allergenAdhesion = Math.max(0, this.allergenAdhesion + def.allergenAdhesionDelta);
+    }
+
+    if (def.eventLog) {
+      this.events.push(def.eventLog);
     }
 
     this.updateCounts();
-  }
-
-  private legacyStrainEvent(id: StrainId): string {
-    const messages: Partial<Record<StrainId, string>> = {
-      lrham: 'L. rhamnosus inoculated — competing for attachment',
-      lacid: 'L. acidophilus acidifying local pH',
-      binf: 'B. infantis applied — commensal support boosted',
-      lplant: 'L. plantarum seeded — competing for attachment',
-      lsaliv: 'L. salivarius applied — oral commensal niche restored',
-      sboul: 'S. boulardii seeded — antifungal competition active',
-      lcasei: 'L. casei inoculated — immune-modulatory strain active',
-      lreuteri: 'L. reuteri applied — antimicrobial metabolites rising',
-      blactis: 'B. lactis seeded — bifidobacterial niche expanding',
-      blongum: 'B. longum applied — fiber fermenting commensals supported',
-      bbifidum: 'B. bifidum inoculated — early-life commensal pattern',
-      lbulgaricus: 'L. bulgaricus applied — yogurt culture acidifying',
-      sthermo: 'S. thermophilus seeded — fermented dairy culture active',
-      ssaliv_k12: 'S. salivarius K12 applied — oral BLIS activity, biofilm competition',
-      ssaliv_m18: 'S. salivarius M18 applied — dental plaque & gum niche restoration',
-      lparacasei: 'L. paracasei inoculated — immune-modulatory strain active',
-      lgasseri: 'L. gasseri applied — vaginal/oral acidification and barrier support',
-      lferment: 'L. fermentum seeded — fermentation and SCFA production rising',
-      bbreve: 'B. breve inoculated — infant-style bifidobacterial niche expanding',
-      sepidermidis: 'S. epidermidis applied — commensal biofilm competition',
-    };
-    return messages[id] ?? `${getStrain(id).name} inoculated — strain colony forming`;
   }
 
   applyEnv(env: Partial<Record<EnvVarId, number>>) {
