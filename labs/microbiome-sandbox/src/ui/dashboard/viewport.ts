@@ -8,6 +8,12 @@ export function viewportPartial(): string {
             <canvas data-canvas aria-hidden="true"></canvas>
             <div class="bd-hotspot-layer" data-hotspot-layer aria-hidden="true"></div>
             <div class="bd-tissue-callout-layer" data-tissue-callouts hidden aria-hidden="true"></div>
+            <aside class="bd-tissue-guide" data-tissue-guide hidden aria-label="${t('viewport.tissueGuideTitle')}">
+              <h3 class="bd-tissue-guide__title">${t('viewport.tissueGuideTitle')}</h3>
+              <p class="bd-tissue-guide__text" data-tissue-guide-text></p>
+              <p class="bd-tissue-guide__hint">${t('viewport.microbeHint')}</p>
+              <ul class="bd-tissue-guide__layers" data-tissue-guide-layers></ul>
+            </aside>
             <div class="bd-zoom-hud" data-zoom-hud>
               <span class="bd-mode-badge" data-mode-badge>${t('viewport.bodyMap')}</span>
               <span class="bd-action-badge" data-action-badge hidden></span>

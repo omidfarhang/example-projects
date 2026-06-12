@@ -4,14 +4,15 @@ import type { EpitheliumKind } from './epithelium/types';
 
 export type ViewMode = 'macro' | 'micro';
 
+/** Per-region default orbit — slight azimuth shows depth; user can rotate freely after fly-in. */
 const MICRO_FRAMES: Record<EpitheliumKind, { pos: THREE.Vector3; target: THREE.Vector3 }> = {
-  gut: { pos: new THREE.Vector3(0, 0.52, 2.05), target: new THREE.Vector3(0, 0.48, 0) },
-  skin: { pos: new THREE.Vector3(0, 0.34, 1.95), target: new THREE.Vector3(0, 0.3, 0) },
-  sinus: { pos: new THREE.Vector3(0, 0.58, 2.3), target: new THREE.Vector3(0, 0.48, 0) },
-  ear: { pos: new THREE.Vector3(0, 0.52, 2.15), target: new THREE.Vector3(0, 0.46, 0) },
-  scalp: { pos: new THREE.Vector3(0, 0.36, 2.0), target: new THREE.Vector3(0, 0.34, 0) },
-  oral: { pos: new THREE.Vector3(0, 0.4, 1.95), target: new THREE.Vector3(0, 0.38, 0) },
-  vaginal: { pos: new THREE.Vector3(0, 0.42, 2.05), target: new THREE.Vector3(0, 0.4, 0) },
+  gut: { pos: new THREE.Vector3(0.42, 0.58, 2.15), target: new THREE.Vector3(0.05, 0.5, 0.08) },
+  skin: { pos: new THREE.Vector3(-0.28, 0.38, 2.05), target: new THREE.Vector3(0, 0.32, 0.06) },
+  sinus: { pos: new THREE.Vector3(0.35, 0.72, 2.35), target: new THREE.Vector3(0, 0.55, 0.1) },
+  ear: { pos: new THREE.Vector3(-0.55, 0.56, 2.25), target: new THREE.Vector3(0.15, 0.48, 0.08) },
+  scalp: { pos: new THREE.Vector3(0.3, 0.42, 2.1), target: new THREE.Vector3(0, 0.36, 0.08) },
+  oral: { pos: new THREE.Vector3(0.25, 0.46, 2.0), target: new THREE.Vector3(0, 0.4, 0.07) },
+  vaginal: { pos: new THREE.Vector3(-0.32, 0.48, 2.15), target: new THREE.Vector3(0, 0.42, 0.08) },
 };
 
 export class CameraRig {
@@ -68,13 +69,12 @@ export class CameraRig {
     const frame = MICRO_FRAMES[kind];
     this.startTween(this.camera.position.clone(), frame.pos.clone(), this.controls.target.clone(), frame.target.clone());
     this.mode = 'micro';
-    this.controls.minDistance = 1.4;
-    this.controls.maxDistance = 4.5;
-    // Keep a textbook front-on cross-section; free rotation hides the silhouette.
-    this.controls.minAzimuthAngle = -0.22;
-    this.controls.maxAzimuthAngle = 0.22;
-    this.controls.minPolarAngle = 1.25;
-    this.controls.maxPolarAngle = 1.52;
+    this.controls.minDistance = 1.2;
+    this.controls.maxDistance = 5.5;
+    this.controls.minAzimuthAngle = -Infinity;
+    this.controls.maxAzimuthAngle = Infinity;
+    this.controls.minPolarAngle = 0.12;
+    this.controls.maxPolarAngle = Math.PI - 0.12;
   }
 
   private startTween(fromPos: THREE.Vector3, toPos: THREE.Vector3, fromLook: THREE.Vector3, toLook: THREE.Vector3) {

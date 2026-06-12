@@ -4,6 +4,7 @@ import { Epithelium3D, createLumenChamber, type EpitheliumKind } from './epithel
 import { LUMEN_BOUNDS, RECEPTOR_SITES, type LumenBounds } from './epithelium/tissueModels';
 import { bucketForType, colorForMicrobe, createMicrobeMeshSet } from './microbes/MicrobeMeshes';
 import { ScfaParticleField } from './ScfaParticleField';
+import { ImmuneHaze } from './ImmuneHaze';
 
 const SIM_X = 1.8;
 const SIM_Y = 0.9;
@@ -70,6 +71,7 @@ export class TissueLayer {
   private burstKind: 'allergen' | 'probiotic' | 'alkaline' | 'stress' | 'default' | null = null;
   private burstTime = 0;
   private scfaParticles = new ScfaParticleField();
+  private immuneHaze = new ImmuneHaze();
 
   constructor() {
     this.epithelium.setKind('sinus');
@@ -80,6 +82,7 @@ export class TissueLayer {
     }
     this.group.add(this.lumenGroup);
     this.group.add(this.scfaParticles.group);
+    this.group.add(this.immuneHaze.group);
     this.group.visible = false;
   }
 
@@ -141,7 +144,9 @@ export class TissueLayer {
     this.lumenGroup.position.x = THREE.MathUtils.lerp(this.lumenGroup.position.x, 0, dt * 6);
 
     const bounds = LUMEN_BOUNDS[this.geometry];
+    const time = performance.now();
     this.scfaParticles.update(bounds, biome.postbioticLevel, dt);
+    this.immuneHaze.update(bounds, biome.immuneActivity ?? 0, time);
 
     this.epithelium.update({
       inflammation: biome.inflammation,
@@ -149,6 +154,7 @@ export class TissueLayer {
       biofilm: biome.biofilm,
       postbioticLevel: biome.postbioticLevel,
       scfaGlowBoost: this.scfaParticles.getGlowBoost(),
+      immuneActivity: biome.immuneActivity,
       ph: biome.ph,
       moisture: biome.moisture,
       sebum: biome.sebum,
@@ -157,7 +163,6 @@ export class TissueLayer {
     });
 
     const receptors = RECEPTOR_SITES[this.geometry];
-    const time = performance.now();
     const buckets: Record<string, number> = {
       probiotic: 0,
       commensal: 0,
@@ -190,6 +195,9 @@ export class TissueLayer {
       } else if (bucket === 'prebiotic') {
         this.dummy.scale.set(0.4, scale * 1.2, 0.4);
         this.dummy.rotation.z = n.id * 0.4;
+      } else if (bucket === 'commensal') {
+        this.dummy.scale.set(scale * 0.45, scale * 0.75, scale * 0.45);
+        this.dummy.rotation.z = Math.PI / 2;
       } else if (bucket === 'probiotic') {
         this.dummy.scale.set(scale * 0.5, scale * 0.85, scale * 0.5);
         this.dummy.rotation.z = Math.PI / 2;
@@ -199,7 +207,13 @@ export class TissueLayer {
 
       this.dummy.updateMatrix();
       mesh.setMatrixAt(idx, this.dummy.matrix);
-      if (n.type === 'probiotic' || n.type === 'prebiotic' || n.type === 'pathogen' || n.type === 'yeast') {
+      if (
+        n.type === 'probiotic' ||
+        n.type === 'prebiotic' ||
+        n.type === 'pathogen' ||
+        n.type === 'yeast' ||
+        n.type === 'commensal'
+      ) {
         this.instanceColor.setHex(colorForMicrobe(n.type, n.strain));
         mesh.setColorAt(idx, this.instanceColor);
       }

@@ -101,8 +101,9 @@ export class Epithelium3D {
       if (overlay.userData.isSheen) {
         const dryPenalty = state.moisture < 0.35 ? (0.35 - state.moisture) * 0.3 : 0;
         const phSheen = state.ph >= 5.5 && state.ph <= 7 ? 0.04 : 0;
+        const barrierLoss = state.integrity < 0.5 ? (0.5 - state.integrity) * 0.35 : 0;
         (overlay.material as THREE.MeshStandardMaterial).opacity =
-          0.04 + state.integrity * 0.12 + phSheen - dryPenalty;
+          0.04 + state.integrity * 0.12 + phSheen - dryPenalty - barrierLoss;
       }
       if (overlay.userData.isCerumen) {
         (overlay.material as THREE.MeshStandardMaterial).opacity =

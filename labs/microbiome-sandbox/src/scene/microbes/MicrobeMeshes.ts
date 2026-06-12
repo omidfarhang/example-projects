@@ -3,9 +3,9 @@ import type { MicrobeType } from '../../sim/types';
 
 export const TYPE_COLORS: Record<MicrobeType, number> = {
   probiotic: 0x4ade80,
-  commensal: 0x60a5fa,
+  commensal: 0x94a3b8,
   pathogen: 0xf87171,
-  allergen: 0x38bdf8,
+  allergen: 0xfbbf24,
   yeast: 0xc084fc,
   prebiotic: 0xa3e635,
   postbiotic: 0x2dd4bf,
@@ -51,6 +51,11 @@ export function colorForMicrobe(type: MicrobeType, strain: string): number {
   if (type === 'yeast') return YEAST_PALETTE[hashStrain(strain) % YEAST_PALETTE.length];
   if (type === 'pathogen') return PATHOGEN_PALETTE[hashStrain(strain) % PATHOGEN_PALETTE.length];
   return TYPE_COLORS[type];
+}
+
+/** Short rod — commensal residents on epithelial surface. */
+function createCommensalGeometry(): THREE.BufferGeometry {
+  return new THREE.CapsuleGeometry(0.014, 0.042, 4, 6);
 }
 
 /** Rod-shaped bacterium with irregular spikes — pathogens. */
@@ -128,7 +133,7 @@ export function createMicrobeMeshSet(maxPerBucket = 120): MicrobeMeshSet {
 
   return {
     probiotic: make(new THREE.CapsuleGeometry(0.025, 0.07, 4, 8), TYPE_COLORS.probiotic),
-    commensal: make(new THREE.CapsuleGeometry(0.02, 0.05, 4, 6), TYPE_COLORS.commensal),
+    commensal: make(createCommensalGeometry(), TYPE_COLORS.commensal),
     pathogen: make(createBacteriumGeometry(), TYPE_COLORS.pathogen),
     yeast: make(createYeastGeometry(), TYPE_COLORS.yeast),
     allergen: make(createAllergenGeometry(), TYPE_COLORS.allergen),

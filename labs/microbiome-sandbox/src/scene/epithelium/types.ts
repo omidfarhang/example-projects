@@ -7,6 +7,8 @@ export interface EpitheliumState {
   postbioticLevel: number;
   /** Brief boost when postbioticLevel rises — syncs lumen particles with SCFA tissue glow. */
   scfaGlowBoost?: number;
+  /** Acute immune signaling — pink lumen haze, not center glow. */
+  immuneActivity?: number;
   ph: number;
   moisture: number;
   sebum: number;

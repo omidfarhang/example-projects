@@ -9,7 +9,8 @@ export interface TissueBuildResult {
   kind: EpitheliumKind;
 }
 
-export const DEPTH = 0.16;
+/** Cross-section thickness — enough Z depth to read as 3D tissue, not a flat card. */
+export const DEPTH = 0.38;
 
 export function mat(color: number, opts?: Partial<THREE.MeshStandardMaterialParameters>) {
   return new THREE.MeshStandardMaterial({ color, roughness: 0.55, metalness: 0.03, ...opts });

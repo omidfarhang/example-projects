@@ -5,6 +5,7 @@ import type { SimSnapshot } from '../sim/types';
 import { createBodyMesh, createHotspots } from './BodyMesh';
 import { CameraRig } from './CameraRig';
 import type { EpitheliumKind } from './epithelium/types';
+import { LUMEN_BOUNDS } from './epithelium/tissueModels';
 import { EffectBurst } from './EffectBurst';
 import { getTissueCallouts } from './tissueCallouts';
 import { TissueLayer } from './TissueLayer';
@@ -19,8 +20,10 @@ export interface HotspotProjection {
 
 export interface TissueCalloutProjection {
   label: string;
-  x: number;
-  y: number;
+  anchorX: number;
+  anchorY: number;
+  labelX: number;
+  labelY: number;
 }
 
 export class SceneManager {
@@ -175,6 +178,7 @@ export class SceneManager {
     ]);
     const burstKind = probioticIds.has(kind) ? 'probiotic' : stressorBurstKind(kind);
     this.tissue.playBurst(burstKind);
+    this.burst.setBurstCategory(burstKind);
     this.burst.play(kind);
   }
 
@@ -182,17 +186,26 @@ export class SceneManager {
     if (this.cameraRig.getMode() !== 'micro') return [];
 
     const rect = this.canvas.getBoundingClientRect();
-    const vec = new THREE.Vector3();
+    const anchor = new THREE.Vector3();
+    const labelPt = new THREE.Vector3();
     const result: TissueCalloutProjection[] = [];
 
     for (const callout of getTissueCallouts(this.microGeometry)) {
-      vec.copy(callout.position);
-      vec.project(this.cameraRig.camera);
-      if (vec.z >= 1) continue;
+      anchor.copy(callout.position);
+      anchor.project(this.cameraRig.camera);
+      if (anchor.z >= 1) continue;
+
+      labelPt.copy(callout.position);
+      labelPt.y += 0.14;
+      labelPt.project(this.cameraRig.camera);
+      if (labelPt.z >= 1) continue;
+
       result.push({
         label: callout.label,
-        x: ((vec.x + 1) / 2) * rect.width,
-        y: ((-vec.y + 1) / 2) * rect.height,
+        anchorX: ((anchor.x + 1) / 2) * rect.width,
+        anchorY: ((-anchor.y + 1) / 2) * rect.height,
+        labelX: ((labelPt.x + 1) / 2) * rect.width,
+        labelY: ((-labelPt.y + 1) / 2) * rect.height,
       });
     }
     return result;
@@ -229,7 +242,15 @@ export class SceneManager {
       this.tissue.update(snapshot.nodes, snapshot.biome, dt);
       this.body.visible = false;
       this.hotspots.visible = false;
-      this.inflameLight.intensity = snapshot.biome.inflammation * 2.5;
+      const bounds = LUMEN_BOUNDS[this.microGeometry];
+      const inflame = snapshot.biome.inflammation;
+      this.inflameLight.position.set(
+        0,
+        bounds.epithelialY + 0.06,
+        bounds.zMin + (bounds.zMax - bounds.zMin) * 0.42,
+      );
+      this.inflameLight.intensity = inflame * 1.35;
+      this.inflameLight.distance = 1.8;
     } else {
       this.body.visible = true;
       this.hotspots.visible = true;
@@ -237,7 +258,7 @@ export class SceneManager {
       this.inflameLight.intensity = 0;
     }
 
-    this.scene.fog!.density = 0.06 + snapshot.biome.inflammation * 0.04;
+    this.scene.fog!.density = 0.06 + snapshot.biome.inflammation * 0.018;
     this.renderer.render(this.scene, this.cameraRig.getActiveCamera());
   }
 }

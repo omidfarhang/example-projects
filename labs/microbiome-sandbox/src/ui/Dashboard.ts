@@ -27,6 +27,7 @@ import {
 } from './actionImpact';
 import type { HotspotProjection, TissueCalloutProjection } from '../scene/SceneManager';
 import { TISSUE_PICTOGRAMS } from '../scene/tissueCallouts';
+import { getTissueGuide } from '../scene/tissueGuides';
 import { POPULATION_SCALE, type SimEngine } from '../sim/engine';
 import { formatStrainList, summarizeLiveStrains, totalCells } from '../sim/strainSummary';
 import type { BiomeState, MicrobeNode } from '../sim/types';
@@ -140,6 +141,9 @@ export class Dashboard {
   private hotspotLayer!: HTMLElement;
   private tissueCalloutLayer!: HTMLElement;
   private tissuePictogram!: HTMLElement;
+  private tissueGuide!: HTMLElement;
+  private tissueGuideLayers!: HTMLElement;
+  private tissueGuideText!: HTMLElement;
   private commensalRow!: HTMLElement;
   private biofilmRow!: HTMLElement;
   private prebioticStatRow!: HTMLElement;
@@ -252,6 +256,9 @@ export class Dashboard {
     this.hotspotLayer = this.root.querySelector('[data-hotspot-layer]')!;
     this.tissueCalloutLayer = this.root.querySelector('[data-tissue-callouts]')!;
     this.tissuePictogram = this.root.querySelector('[data-tissue-pictogram]')!;
+    this.tissueGuide = this.root.querySelector('[data-tissue-guide]')!;
+    this.tissueGuideLayers = this.root.querySelector('[data-tissue-guide-layers]')!;
+    this.tissueGuideText = this.root.querySelector('[data-tissue-guide-text]')!;
     this.commensalRow = this.root.querySelector('[data-commensal-row]')!;
     this.biofilmRow = this.root.querySelector('[data-biofilm-row]')!;
     this.prebioticStatRow = this.root.querySelector('[data-prebiotic-stat-row]')!;
@@ -1087,12 +1094,21 @@ export class Dashboard {
     this.hotspotLayer.hidden = active;
     this.tissueCalloutLayer.hidden = !active;
     this.tissuePictogram.hidden = !active;
+    this.tissueGuide.hidden = !active;
 
     if (active && region) {
       this.modeBadge.textContent = t('viewport.tissueView');
       this.zoomTitle.textContent = `ZOOM LAYER: ${region.zoomTitle}`;
-      this.scaleLabel.textContent = region.scaleLabel;
+      this.scaleLabel.textContent = `${region.scaleLabel} · ${t('viewport.dragToOrbit')}`;
       this.tissuePictogram.innerHTML = TISSUE_PICTOGRAMS[region.microGeometry];
+      const guide = getTissueGuide(region.microGeometry);
+      this.tissueGuideText.textContent = guide.orientation;
+      this.tissueGuideLayers.innerHTML = guide.layers
+        .map(
+          (layer) =>
+            `<li><span class="bd-tissue-guide__swatch" style="background:${layer.color}"></span>${layer.name}</li>`,
+        )
+        .join('');
       this.playMicroEnterAnimation(options?.auto ?? false, region.label);
     } else {
       this.modeBadge.textContent = t('viewport.bodyMap');
@@ -1102,6 +1118,8 @@ export class Dashboard {
       this.callout.hidden = true;
       this.tissueCalloutLayer.innerHTML = '';
       this.tissuePictogram.innerHTML = '';
+      this.tissueGuideText.textContent = '';
+      this.tissueGuideLayers.innerHTML = '';
       this.clearActionBadge();
     }
     this.syncPresetTip();
@@ -1127,12 +1145,28 @@ export class Dashboard {
 
   updateTissueCallouts(projections: TissueCalloutProjection[]) {
     if (!this.microActive) return;
-    this.tissueCalloutLayer.innerHTML = projections
+    const rect = this.viewport.getBoundingClientRect();
+    const lines = projections
       .map(
         (p) =>
-          `<div class="bd-tissue-callout" style="left:${p.x}px;top:${p.y}px"><span>${p.label}</span></div>`,
+          `<line x1="${p.labelX}" y1="${p.labelY + 8}" x2="${p.anchorX}" y2="${p.anchorY}" />`,
       )
       .join('');
+    const labels = projections
+      .map(
+        (p) =>
+          `<div class="bd-tissue-callout" style="left:${p.labelX}px;top:${p.labelY}px"><span>${p.label}</span></div>`,
+      )
+      .join('');
+    const dots = projections
+      .map(
+        (p) =>
+          `<circle class="bd-tissue-callout__dot" cx="${p.anchorX}" cy="${p.anchorY}" r="3" />`,
+      )
+      .join('');
+    this.tissueCalloutLayer.innerHTML = `
+      <svg class="bd-tissue-callout-lines" width="${rect.width}" height="${rect.height}" aria-hidden="true">${lines}${dots}</svg>
+      ${labels}`;
   }
 
   updateHotspotLabels(projections: HotspotProjection[]) {

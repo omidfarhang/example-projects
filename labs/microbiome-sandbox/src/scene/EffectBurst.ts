@@ -1,15 +1,19 @@
 import * as THREE from 'three';
 import type { EpitheliumKind } from './epithelium/types';
 import { LUMEN_BOUNDS } from './epithelium/tissueModels';
+import type { StressorBurst } from '../data/stressors';
+
+type BurstVisualCategory = StressorBurst | 'probiotic';
 
 export class EffectBurst {
   private ring: THREE.Mesh;
   private life = 0;
   private color = 0xffffff;
   private kind: EpitheliumKind = 'sinus';
+  private burstCategory: BurstVisualCategory = 'default';
 
   constructor(parent: THREE.Group) {
-    const geo = new THREE.RingGeometry(0.1, 0.15, 32);
+    const geo = new THREE.RingGeometry(0.08, 0.12, 32);
     const mat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
@@ -26,18 +30,44 @@ export class EffectBurst {
     this.reposition();
   }
 
+  setBurstCategory(category: BurstVisualCategory) {
+    this.burstCategory = category;
+    this.reposition();
+  }
+
   private reposition() {
     const b = LUMEN_BOUNDS[this.kind];
-    const cx = (b.xMin + b.xMax) * 0.5;
-    const cy = (b.mucusY + b.yMax) * 0.5;
-    const cz = (b.zMin + b.zMax) * 0.5;
-    this.ring.position.set(cx, cy, cz);
+    let x = (b.xMin + b.xMax) * 0.5;
+    let y = (b.mucusY + b.yMax) * 0.5;
+    let z = (b.zMin + b.zMax) * 0.5;
+
+    if (this.burstCategory === 'allergen') {
+      y = b.allergenBase + b.allergenHeight * 0.35;
+      z = b.zMax * 0.85;
+    } else if (this.burstCategory === 'probiotic') {
+      y = (b.mucusY + b.yMax) * 0.5;
+      z = b.zMin + (b.zMax - b.zMin) * 0.72;
+    } else if (this.burstCategory === 'alkaline') {
+      y = b.epithelialY + (b.mucusY - b.epithelialY) * 0.55;
+      x = b.xMin + (b.xMax - b.xMin) * 0.72;
+    } else if (this.burstCategory === 'stress') {
+      y = b.epithelialY + 0.04;
+      x = b.xMin + (b.xMax - b.xMin) * 0.38;
+      z = b.zMin + (b.zMax - b.zMin) * 0.35;
+    }
+
+    this.ring.position.set(x, y, z);
+    this.ring.rotation.set(
+      this.burstCategory === 'allergen' ? -0.35 : 0,
+      0,
+      this.burstCategory === 'stress' ? 0.15 : 0,
+    );
   }
 
   play(kind: string) {
     this.life = 1;
     const colors: Record<string, number> = {
-      allergen: 0x38bdf8,
+      allergen: 0xfbbf24,
       histamine: 0xf472b6,
       dry_air: 0x94a3b8,
       alkaline: 0xc084fc,
@@ -86,7 +116,8 @@ export class EffectBurst {
     this.color = colors[kind] ?? 0x38bdf8;
     const mat = this.ring.material as THREE.MeshBasicMaterial;
     mat.color.setHex(this.color);
-    mat.opacity = 0.8;
+    mat.opacity = 0.85;
+    this.reposition();
   }
 
   update(dt: number) {
@@ -96,8 +127,8 @@ export class EffectBurst {
     }
     this.life = Math.max(0, this.life - dt * 2.5);
     const mat = this.ring.material as THREE.MeshBasicMaterial;
-    mat.opacity = this.life * 0.7;
-    const scale = 1 + (1 - this.life) * 4;
+    mat.opacity = this.life * 0.75;
+    const scale = 1 + (1 - this.life) * (this.burstCategory === 'allergen' ? 5 : 3.5);
     this.ring.scale.setScalar(scale);
   }
 }

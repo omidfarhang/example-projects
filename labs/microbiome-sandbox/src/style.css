@@ -246,7 +246,7 @@ body.pg-has-companion-bar {
 }
 
 .bd-legend__pill.probiotic { color: #4ade80; }
-.bd-legend__pill.commensal { color: #60a5fa; }
+.bd-legend__pill.commensal { color: #94a3b8; }
 .bd-legend__pill.pathogen { color: #f87171; }
 .bd-legend__pill.allergen { color: #fbbf24; }
 
@@ -886,11 +886,93 @@ body.pg-has-companion-bar {
   display: block;
 }
 
+.bd-tissue-guide {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  z-index: 3;
+  max-width: min(16rem, 42%);
+  padding: 0.45rem 0.55rem;
+  background: rgba(5, 11, 20, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.bd-tissue-guide[hidden] {
+  display: none;
+}
+
+.bd-tissue-guide__title {
+  margin: 0 0 0.25rem;
+  font-family: var(--bd-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--bd-accent);
+  text-transform: uppercase;
+}
+
+.bd-tissue-guide__text {
+  margin: 0 0 0.3rem;
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: var(--bd-text);
+}
+
+.bd-tissue-guide__hint {
+  margin: 0 0 0.35rem;
+  font-size: 0.6rem;
+  line-height: 1.4;
+  color: var(--bd-muted);
+}
+
+.bd-tissue-guide__layers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.bd-tissue-guide__layers li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--bd-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
+  color: var(--bd-muted);
+}
+
+.bd-tissue-guide__swatch {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 1px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 .bd-tissue-callout-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 2;
+}
+
+.bd-tissue-callout-lines {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.bd-tissue-callout-lines line {
+  stroke: rgba(56, 189, 248, 0.45);
+  stroke-width: 1;
+}
+
+.bd-tissue-callout-lines circle {
+  fill: rgba(56, 189, 248, 0.85);
 }
 
 .bd-tissue-callout {
@@ -901,6 +983,7 @@ body.pg-has-companion-bar {
   letter-spacing: 0.1em;
   color: var(--bd-accent);
   white-space: nowrap;
+  z-index: 1;
 }
 
 .bd-tissue-callout span {
@@ -909,15 +992,6 @@ body.pg-has-companion-bar {
   border: 1px solid rgba(56, 189, 248, 0.35);
   padding: 0.12rem 0.35rem;
   border-radius: 2px;
-}
-
-.bd-tissue-callout::after {
-  content: '';
-  display: block;
-  width: 1px;
-  height: 0.45rem;
-  margin: 0 auto;
-  background: rgba(56, 189, 248, 0.45);
 }
 
 .bd-preset-tip {
