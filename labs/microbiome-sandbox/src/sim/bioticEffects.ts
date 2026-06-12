@@ -42,6 +42,49 @@ export function scaleCount(base: number, multiplier: number): number {
   return Math.max(1, Math.round(base * multiplier));
 }
 
+/** Scale biome effect magnitudes by dose × region multiplier (bounds unchanged). */
+export function scaleBiomeEffect(effects: BiomeEffect, multiplier: number): BiomeEffect {
+  const scaled: BiomeEffect = {};
+  if (effects.ph !== undefined) scaled.ph = effects.ph * multiplier;
+  if (effects.phMin !== undefined) scaled.phMin = effects.phMin;
+  if (effects.phMax !== undefined) scaled.phMax = effects.phMax;
+  if (effects.inflammation !== undefined) scaled.inflammation = effects.inflammation * multiplier;
+  if (effects.integrity !== undefined) scaled.integrity = effects.integrity * multiplier;
+  if (effects.biofilm !== undefined) scaled.biofilm = effects.biofilm * multiplier;
+  if (effects.postbioticLevel !== undefined) scaled.postbioticLevel = effects.postbioticLevel * multiplier;
+  if (effects.moisture !== undefined) scaled.moisture = effects.moisture * multiplier;
+  if (effects.commensalVitality !== undefined) {
+    scaled.commensalVitality = effects.commensalVitality * multiplier;
+  }
+  if (effects.yeastVitality !== undefined) scaled.yeastVitality = effects.yeastVitality * multiplier;
+  return scaled;
+}
+
+/** Sum multiple biome effects for impact preview aggregation. */
+export function mergeBiomeEffects(...effects: (BiomeEffect | undefined)[]): BiomeEffect {
+  const out: BiomeEffect = {};
+  for (const e of effects) {
+    if (!e) continue;
+    if (e.ph !== undefined) out.ph = (out.ph ?? 0) + e.ph;
+    if (e.phMin !== undefined) out.phMin = e.phMin;
+    if (e.phMax !== undefined) out.phMax = e.phMax;
+    if (e.inflammation !== undefined) out.inflammation = (out.inflammation ?? 0) + e.inflammation;
+    if (e.integrity !== undefined) out.integrity = (out.integrity ?? 0) + e.integrity;
+    if (e.biofilm !== undefined) out.biofilm = (out.biofilm ?? 0) + e.biofilm;
+    if (e.postbioticLevel !== undefined) {
+      out.postbioticLevel = (out.postbioticLevel ?? 0) + e.postbioticLevel;
+    }
+    if (e.moisture !== undefined) out.moisture = (out.moisture ?? 0) + e.moisture;
+    if (e.commensalVitality !== undefined) {
+      out.commensalVitality = (out.commensalVitality ?? 0) + e.commensalVitality;
+    }
+    if (e.yeastVitality !== undefined) {
+      out.yeastVitality = (out.yeastVitality ?? 0) + e.yeastVitality;
+    }
+  }
+  return out;
+}
+
 export function isGutOrOral(region: RegionId): boolean {
   return region === 'gut' || region === 'oral';
 }

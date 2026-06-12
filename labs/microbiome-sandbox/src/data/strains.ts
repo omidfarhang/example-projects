@@ -40,12 +40,15 @@ export interface StrainDef {
   effects?: BiomeEffect;
   /** Regions where this strain is commonly used (UI hint only). */
   commonRegions?: RegionId[];
+  /** Plain-language causal explanation for impact preview. */
+  why: string;
 }
 
 export interface PrebioticDef {
   id: PrebioticId;
   name: string;
   spawnCount: number;
+  why: string;
 }
 
 export const STRAINS: Record<StrainId, StrainDef> = {
@@ -55,6 +58,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 16,
     effects: { inflammation: -0.18, integrity: 0.1 },
     commonRegions: ['ear', 'scalp', 'nose', 'vaginal'],
+    why: 'Barrier-supporting strain that calms mucosal inflammation and strengthens epithelial integrity.',
   },
   lacid: {
     id: 'lacid',
@@ -62,6 +66,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 18,
     effects: { ph: -0.5, phMin: 3.8, phMax: 7, biofilm: -0.2 },
     commonRegions: ['oral', 'skin', 'vaginal', 'gut'],
+    why: 'Acidifies local pH and disrupts pathogen biofilm — unfavorable environment for yeast and alkaliphiles.',
   },
   lcasei: {
     id: 'lcasei',
@@ -69,6 +74,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 14,
     effects: { inflammation: -0.12, integrity: 0.08 },
     commonRegions: ['gut', 'oral'],
+    why: 'Reduces inflammatory signaling while supporting tight junction repair.',
   },
   lsaliv: {
     id: 'lsaliv',
@@ -76,6 +82,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 18,
     effects: { ph: -0.2, phMin: 5.5, biofilm: -0.15 },
     commonRegions: ['oral'],
+    why: 'Oral lactic acid producer — lowers pH and clears biofilm in saliva film.',
   },
   lreuteri: {
     id: 'lreuteri',
@@ -83,6 +90,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 12,
     effects: { inflammation: -0.14, integrity: 0.09, ph: -0.15, phMin: 4.0 },
     commonRegions: ['gut', 'oral', 'vaginal'],
+    why: 'Anti-inflammatory reuterin producer that acidifies niche and supports barrier recovery.',
   },
   blactis: {
     id: 'blactis',
@@ -90,6 +98,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 14,
     effects: { commensalVitality: 0.15, integrity: 0.07, postbioticLevel: 0.04 },
     commonRegions: ['gut'],
+    why: 'Gut bifidobacterium that boosts commensal neighbors and contributes SCFA metabolites.',
   },
   blongum: {
     id: 'blongum',
@@ -97,6 +106,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 12,
     effects: { commensalVitality: 0.12, integrity: 0.08, postbioticLevel: 0.05 },
     commonRegions: ['gut'],
+    why: 'Colonizes gut lumen, supports commensal ecology, and raises postbiotic SCFA levels.',
   },
   bbifidum: {
     id: 'bbifidum',
@@ -104,6 +114,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 12,
     effects: { commensalVitality: 0.14, integrity: 0.06, postbioticLevel: 0.04 },
     commonRegions: ['gut'],
+    why: 'Infant-associated bifidobacterium that nourishes commensals and produces SCFA.',
   },
   binf: {
     id: 'binf',
@@ -111,6 +122,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 14,
     effects: { commensalVitality: 0.2, integrity: 0.08 },
     commonRegions: ['nose', 'gut'],
+    why: 'Early-life commensal booster — strengthens resident flora and barrier in airway niches.',
   },
   lplant: {
     id: 'lplant',
@@ -118,6 +130,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 16,
     effects: { inflammation: -0.18, integrity: 0.1 },
     commonRegions: ['gut'],
+    why: 'Fermentation workhorse — anti-inflammatory and barrier-supporting in gut lumen.',
   },
   lbulgaricus: {
     id: 'lbulgaricus',
@@ -125,6 +138,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 10,
     effects: { ph: -0.25, phMin: 5.0, biofilm: -0.1 },
     commonRegions: ['oral', 'gut'],
+    why: 'Yogurt culture strain that acidifies and reduces biofilm in dairy-fermented niches.',
   },
   sthermo: {
     id: 'sthermo',
@@ -132,6 +146,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 10,
     effects: { ph: -0.15, phMin: 5.2 },
     commonRegions: ['oral', 'gut'],
+    why: 'Thermophilic starter culture — mild acidification typical of fermented dairy.',
   },
   sboul: {
     id: 'sboul',
@@ -139,6 +154,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 14,
     effects: { yeastVitality: -0.25, inflammation: -0.12 },
     commonRegions: ['oral', 'gut'],
+    why: 'Probiotic yeast competitor — suppresses Candida overgrowth and lowers inflammation.',
   },
   ssaliv_k12: {
     id: 'ssaliv_k12',
@@ -146,6 +162,7 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 16,
     effects: { biofilm: -0.18, ph: -0.12, phMin: 5.5, inflammation: -0.1, moisture: 0.08 },
     commonRegions: ['oral', 'nose', 'ear'],
+    why: 'BLIS K12 colonizes saliva film — clears biofilm, restores moisture, and calms irritated mucosa.',
   },
   ssaliv_m18: {
     id: 'ssaliv_m18',
@@ -153,12 +170,23 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     spawnCount: 16,
     effects: { biofilm: -0.22, ph: -0.1, phMin: 5.5, integrity: 0.06 },
     commonRegions: ['oral', 'nose', 'ear'],
+    why: 'BLIS M18 targets dental plaque biofilm and supports gum-line barrier integrity.',
   },
 };
 
 export const PREBIOTICS: Record<PrebioticId, PrebioticDef> = {
-  inulin: { id: 'inulin', name: 'inulin', spawnCount: 20 },
-  fos: { id: 'fos', name: 'FOS', spawnCount: 18 },
+  inulin: {
+    id: 'inulin',
+    name: 'inulin',
+    spawnCount: 20,
+    why: 'Soluble fiber substrate — probiotics convert nearby inulin into postbiotic SCFA over time.',
+  },
+  fos: {
+    id: 'fos',
+    name: 'FOS',
+    spawnCount: 18,
+    why: 'Fructooligosaccharide prebiotic that feeds bifidobacteria; converts to SCFA near probiotics.',
+  },
 };
 
 export const STRAIN_LIST = Object.values(STRAINS);

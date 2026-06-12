@@ -8,11 +8,12 @@ Sources: [`src/data/products.ts`](../../src/data/products.ts), [`src/sim/engine.
 
 ## How products work
 
-1. User clicks a product button (available in **all regions**)
+1. User clicks a product button (available in **all regions**); hover shows the **Action Preview** panel first
 2. Engine spawns each strain at `spawnCount × dose × regionMultiplier`
-3. Prebiotics in the product spawn similarly
-4. Product-level biome bonus applied once (scaled by region multiplier)
-5. Event log notes reduced efficacy outside preferred regions
+3. Per-strain biome effects from the strain catalog applied (scaled by `dose × regionMultiplier`)
+4. Prebiotics in the product spawn similarly
+5. Product-level biome bonus applied once (scaled by region multiplier)
+6. Event log records a structured summary (strains added + top biome deltas); reduced efficacy noted outside preferred regions
 
 **Region multipliers:**
 

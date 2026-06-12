@@ -9,6 +9,14 @@ import type { ProductId } from '../data/products';
 import { PRODUCT_LIST } from '../data/products';
 import { getRegion, REGIONS, type RegionDef, type RegionId } from '../data/regions';
 import { PREBIOTICS, STRAIN_LIST, type PrebioticId, type StrainId } from '../data/strains';
+import {
+  buildPrebioticImpact,
+  buildProductImpact,
+  buildStrainImpact,
+  deltasForMeters,
+  formatImpactDelta,
+  type ActionImpact,
+} from './actionImpact';
 import type { HotspotProjection, TissueCalloutProjection } from '../scene/SceneManager';
 import { TISSUE_PICTOGRAMS } from '../scene/tissueCallouts';
 import { POPULATION_SCALE, type SimEngine } from '../sim/engine';
@@ -78,7 +86,11 @@ export class Dashboard {
   private commensalRow!: HTMLElement;
   private biofilmRow!: HTMLElement;
   private postbioticRow!: HTMLElement;
+  private impactPanel!: HTMLElement;
+  private impactCloseBtn!: HTMLButtonElement;
   private envDragging = false;
+  private impactSource: { kind: 'strain' | 'prebiotic' | 'product'; id: string } | null = null;
+  private boundImpactKeyDown = (e: KeyboardEvent) => this.onImpactKeyDown(e);
 
   private currentPreset: PresetId = 'allergy';
   private currentRegion: RegionId = 'nose';
@@ -172,15 +184,27 @@ export class Dashboard {
         </div>
         <div class="bd-panel bd-strains">
           <h2>INDIVIDUAL STRAINS</h2>
-          <p class="bd-section-hint">Apply a single probiotic strain to the selected tissue</p>
+          <p class="bd-section-hint">Apply a single strain — preview appears in the products row below</p>
           <div class="bd-btn-row bd-btn-row--dense" data-strains></div>
           <h3 class="bd-subheading">Prebiotics</h3>
           <div class="bd-btn-row" data-prebiotics></div>
         </div>
-        <div class="bd-panel bd-products">
-          <h2>PRODUCTS &amp; FERMENTED FOODS</h2>
-          <p class="bd-section-hint">Whole supplements and foods deliver multiple strains at once</p>
-          <div class="bd-btn-row bd-btn-row--products" data-products></div>
+        <div class="bd-actions-row">
+          <div class="bd-panel bd-products">
+            <h2>PRODUCTS &amp; FERMENTED FOODS</h2>
+            <p class="bd-section-hint">Click a supplement or food — preview appears alongside</p>
+            <div class="bd-btn-row bd-btn-row--products" data-products></div>
+          </div>
+          <div class="bd-panel bd-impact bd-impact--inline bd-impact--empty" data-impact-panel>
+            <div class="bd-impact-toolbar">
+              <h3>ACTION PREVIEW</h3>
+              <button type="button" class="bd-impact-close" data-impact-close aria-label="Close preview" hidden>×</button>
+            </div>
+            <p class="bd-impact-placeholder" data-impact-placeholder>
+              Click a product, strain, or prebiotic to see what it adds and how tissue metrics shift.
+            </p>
+            <div class="bd-impact-body" data-impact-body hidden></div>
+          </div>
         </div>
       </div>
       <footer class="bd-footer">
@@ -230,6 +254,11 @@ export class Dashboard {
     this.commensalRow = this.root.querySelector('[data-commensal-row]')!;
     this.biofilmRow = this.root.querySelector('[data-biofilm-row]')!;
     this.postbioticRow = this.root.querySelector('[data-postbiotic-row]')!;
+    this.impactPanel = this.root.querySelector('[data-impact-panel]')!;
+    this.impactCloseBtn = this.root.querySelector('[data-impact-close]')!;
+
+    this.impactCloseBtn.addEventListener('click', () => this.dismissImpactPreview());
+    document.addEventListener('keydown', this.boundImpactKeyDown);
 
     this.renderRegions();
     this.backBtn.addEventListener('click', () => this.callbacks.onBackToBody());
@@ -260,28 +289,174 @@ export class Dashboard {
     ).join('');
 
     this.strainRow.querySelectorAll('[data-strain]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const el = btn as HTMLButtonElement;
+      const el = btn as HTMLButtonElement;
+      const id = el.dataset.strain as StrainId;
+      this.bindPreviewButton(el, 'strain', id, () => {
         this.flashButton(el);
-        this.callbacks.onApplyStrain(el.dataset.strain as StrainId);
+        this.openImpactPreview('strain', id, true);
+        this.callbacks.onApplyStrain(id);
       });
     });
 
     this.prebioticRow.querySelectorAll('[data-prebiotic]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const el = btn as HTMLButtonElement;
+      const el = btn as HTMLButtonElement;
+      const id = el.dataset.prebiotic as PrebioticId;
+      this.bindPreviewButton(el, 'prebiotic', id, () => {
         this.flashButton(el);
-        this.callbacks.onApplyPrebiotic(el.dataset.prebiotic as PrebioticId);
+        this.openImpactPreview('prebiotic', id, true);
+        this.callbacks.onApplyPrebiotic(id);
       });
     });
 
     this.productRow.querySelectorAll('[data-product]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const el = btn as HTMLButtonElement;
+      const el = btn as HTMLButtonElement;
+      const id = el.dataset.product as ProductId;
+      this.bindPreviewButton(el, 'product', id, () => {
         this.flashButton(el);
-        this.callbacks.onApplyProduct(el.dataset.product as ProductId);
+        this.openImpactPreview('product', id, true);
+        this.callbacks.onApplyProduct(id);
       });
     });
+  }
+
+  private bindPreviewButton(
+    el: HTMLButtonElement,
+    kind: 'strain' | 'prebiotic' | 'product',
+    id: string,
+    onApply: () => void,
+  ) {
+    el.addEventListener('click', onApply);
+  }
+
+  private buildImpact(kind: 'strain' | 'prebiotic' | 'product', id: string): ActionImpact {
+    if (kind === 'strain') return buildStrainImpact(id as StrainId, this.currentRegion);
+    if (kind === 'prebiotic') return buildPrebioticImpact(id as PrebioticId, this.currentRegion);
+    return buildProductImpact(id as ProductId, this.currentRegion);
+  }
+
+  private renderImpactPanel(impact: ActionImpact) {
+    const body = this.impactPanel.querySelector('[data-impact-body]')!;
+    const efficacyClass =
+      impact.efficacyPct >= 100
+        ? 'bd-impact-efficacy--full'
+        : impact.efficacyPct >= 65
+          ? 'bd-impact-efficacy--reduced'
+          : 'bd-impact-efficacy--low';
+
+    const addsHtml = impact.adds
+      .map(
+        (a) =>
+          `<li class="bd-impact-add bd-impact-add--${a.type}"><span class="bd-impact-add__count">${a.count}×</span> ${a.label}</li>`,
+      )
+      .join('');
+
+    const deltasHtml = impact.deltas.length
+      ? impact.deltas
+          .map(
+            (d) =>
+              `<span class="bd-impact-delta bd-impact-delta--${d.direction} bd-impact-delta--${d.source}">${formatImpactDelta(d)}</span>`,
+          )
+          .join('')
+      : '<span class="bd-impact-delta bd-impact-delta--neutral">No immediate biome shift — substrate converts over time near probiotics</span>';
+
+    body.innerHTML = `
+      <div class="bd-impact-header">
+        <strong class="bd-impact-title">${impact.title}</strong>
+        ${impact.form ? `<span class="bd-impact-form">${impact.form}</span>` : ''}
+        <span class="bd-impact-efficacy ${efficacyClass}">${impact.efficacyPct}% efficacy</span>
+      </div>
+      ${impact.warning ? `<p class="bd-impact-warning">${impact.warning}</p>` : ''}
+      <div class="bd-impact-section">
+        <h4>Adds</h4>
+        <ul class="bd-impact-adds">${addsHtml}</ul>
+      </div>
+      <div class="bd-impact-section">
+        <h4>Biome shift</h4>
+        <div class="bd-impact-deltas">${deltasHtml}</div>
+      </div>
+      <p class="bd-impact-why"><strong>Why:</strong> ${impact.why}</p>
+    `;
+  }
+
+  private openImpactPreview(
+    kind: 'strain' | 'prebiotic' | 'product',
+    id: string,
+    flashMeters = false,
+  ) {
+    this.impactSource = { kind, id };
+    const impact = this.buildImpact(kind, id);
+    this.renderImpactPanel(impact);
+    this.setImpactPanelActive(true);
+    this.highlightPreviewButton(kind, id);
+    if (flashMeters) this.flashMeterDeltas(impact);
+  }
+
+  private closeImpactPreview() {
+    this.impactSource = null;
+    this.setImpactPanelActive(false);
+    this.clearPreviewButtonHighlights();
+  }
+
+  private dismissImpactPreview() {
+    this.closeImpactPreview();
+  }
+
+  private setImpactPanelActive(active: boolean) {
+    this.impactPanel.classList.toggle('bd-impact--empty', !active);
+    const placeholder = this.impactPanel.querySelector('[data-impact-placeholder]') as HTMLElement;
+    const body = this.impactPanel.querySelector('[data-impact-body]') as HTMLElement;
+    placeholder.hidden = active;
+    body.hidden = !active;
+    this.impactCloseBtn.hidden = !active;
+  }
+
+  private highlightPreviewButton(
+    kind: 'strain' | 'prebiotic' | 'product',
+    id: string,
+  ) {
+    this.clearPreviewButtonHighlights();
+    const attr =
+      kind === 'strain' ? 'data-strain' : kind === 'prebiotic' ? 'data-prebiotic' : 'data-product';
+    const btn = this.root.querySelector(`[${attr}="${id}"]`);
+    btn?.classList.add('bd-btn--preview-active');
+  }
+
+  private clearPreviewButtonHighlights() {
+    this.root.querySelectorAll('.bd-btn--preview-active').forEach((el) => {
+      el.classList.remove('bd-btn--preview-active');
+    });
+  }
+
+  private onImpactKeyDown(e: KeyboardEvent) {
+    if (e.key !== 'Escape' || !this.impactSource) return;
+    this.dismissImpactPreview();
+  }
+
+  private flashMeterDeltas(impact: ActionImpact) {
+    const metrics = deltasForMeters(impact.deltas);
+    const integrityWrap = this.integrityMeter.parentElement?.parentElement;
+    const inflammationWrap = this.inflammationMeter.parentElement?.parentElement;
+    integrityWrap?.classList.remove('bd-meter--flash-up', 'bd-meter--flash-down');
+    inflammationWrap?.classList.remove('bd-meter--flash-up', 'bd-meter--flash-down');
+
+    for (const m of metrics) {
+      const delta = impact.deltas.find((d) => d.metric === m);
+      if (!delta) continue;
+      const wrap = m === 'integrity' ? integrityWrap : inflammationWrap;
+      const cls = delta.direction === 'down' ? 'bd-meter--flash-down' : 'bd-meter--flash-up';
+      wrap?.classList.add(cls);
+    }
+
+    setTimeout(() => {
+      integrityWrap?.classList.remove('bd-meter--flash-up', 'bd-meter--flash-down');
+      inflammationWrap?.classList.remove('bd-meter--flash-up', 'bd-meter--flash-down');
+    }, 1200);
+  }
+
+  private refreshImpactIfVisible() {
+    if (!this.impactSource) return;
+    const impact = this.buildImpact(this.impactSource.kind, this.impactSource.id);
+    this.renderImpactPanel(impact);
   }
 
   getCanvas(): HTMLCanvasElement {
@@ -458,6 +633,7 @@ export class Dashboard {
     const region = getRegion(id);
     this.renderEnvControls(id);
     this.updateLegend(region);
+    this.refreshImpactIfVisible();
   }
 
   private updateLegend(region: RegionDef) {

@@ -10,7 +10,8 @@ import {
   type StrainId,
   type BiomeEffect,
 } from '../data/strains';
-import { applyBiomeEffects, scaleCount } from './bioticEffects';
+import { buildProductImpact, formatImpactEvent } from '../ui/actionImpact';
+import { applyBiomeEffects, scaleBiomeEffect, scaleCount } from './bioticEffects';
 import type { BiomeState, MicrobeNode, MicrobeType, SimSnapshot } from './types';
 
 const FIXED_DT = 1 / 30;
@@ -198,6 +199,9 @@ export class SimEngine {
       const strain = STRAINS[dose.id];
       const count = scaleCount(strain.spawnCount, dose.dose * mult);
       this.spawnBatch('probiotic', strain.name, count);
+      if (strain.effects) {
+        this.applyStrainBiomeEffects(scaleBiomeEffect(strain.effects, dose.dose * mult));
+      }
     }
 
     for (const pre of product.prebiotics ?? []) {
@@ -207,25 +211,11 @@ export class SimEngine {
     }
 
     if (product.effects) {
-      const scaled: BiomeEffect = { ...product.effects };
-      if (scaled.integrity) scaled.integrity *= mult;
-      if (scaled.inflammation) scaled.inflammation *= mult;
-      if (scaled.postbioticLevel) scaled.postbioticLevel *= mult;
-      if (scaled.ph) scaled.ph *= mult;
-      if (scaled.moisture) scaled.moisture *= mult;
-      if (scaled.biofilm) scaled.biofilm *= mult;
-      this.applyStrainBiomeEffects(scaled);
+      this.applyStrainBiomeEffects(scaleBiomeEffect(product.effects, mult));
     }
 
-    if (product.form === 'lozenge') {
-      this.events.push(
-        `${product.label} dissolving in situ — S. salivarius K12/M18 colonizing oral & airway mucosa`,
-      );
-    } else if (product.form === 'capsule') {
-      this.events.push(`${product.label} taken — strains released after swallowing (not a lozenge)`);
-    } else {
-      this.events.push(`${product.label} applied — ${product.description.split('.')[0]}`);
-    }
+    const impact = buildProductImpact(productId, this.region);
+    this.events.push(formatImpactEvent(impact));
     this.updateCounts();
   }
 

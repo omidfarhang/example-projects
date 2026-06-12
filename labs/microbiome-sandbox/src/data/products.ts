@@ -30,6 +30,8 @@ export interface ProductDef {
   category: ProductCategory;
   form: ProductForm;
   description: string;
+  /** Plain-language causal explanation for impact preview. */
+  why: string;
   /** Strains delivered by this product (scaled by dose × region multiplier). */
   strains: ProductStrainDose[];
   prebiotics?: ProductPrebioticDose[];
@@ -50,6 +52,7 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     form: 'capsule',
     description:
       'Eight-strain probiotic capsule with FOS prebiotic. Swallowed — not a lozenge.',
+    why: 'Swallowed capsule releases eight gut/oral strains plus FOS — combined anti-inflammatory and barrier support after delivery.',
     strains: [
       { id: 'lacid', dose: 0.55 },
       { id: 'lcasei', dose: 0.5 },
@@ -73,6 +76,7 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     form: 'lozenge',
     description:
       'S. salivarius K12 + M18 lozenge. Dissolves slowly in the mouth — targets oral, gum, throat, and ear niches; not swallowed as a capsule.',
+    why: 'Dissolving lozenge seeds K12/M18 in saliva film — biofilm clearance and moisture restore calm irritated oral and airway mucosa.',
     strains: [
       { id: 'ssaliv_k12', dose: 1 },
       { id: 'ssaliv_m18', dose: 1 },
@@ -88,6 +92,7 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     category: 'fermented',
     form: 'drink',
     description: 'Fermented milk drink with diverse Lactobacillus and Bifidobacterium species.',
+    why: 'Fermented milk delivers diverse lactic acid bacteria — acidifies gut, raises SCFA, and restores moisture.',
     strains: [
       { id: 'lcasei', dose: 0.7 },
       { id: 'lacid', dose: 0.6 },
@@ -107,6 +112,7 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     category: 'fermented',
     form: 'food',
     description: 'Cultured dairy with acidophilus, bulgaricus, thermophilus, and bifidobacteria.',
+    why: 'Cultured dairy acidifies the gut lumen, clears biofilm, and supports barrier integrity via starter cultures.',
     strains: [
       { id: 'lacid', dose: 0.75 },
       { id: 'lbulgaricus', dose: 0.65 },
@@ -125,6 +131,7 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     category: 'fermented',
     form: 'food',
     description: 'Fermented vegetables rich in L. plantarum, fiber, and lactic acid.',
+    why: 'Fermented vegetables deliver L. plantarum plus inulin fiber — acidifies gut, lowers inflammation, and feeds SCFA production.',
     strains: [
       { id: 'lplant', dose: 0.9 },
       { id: 'lcasei', dose: 0.55 },

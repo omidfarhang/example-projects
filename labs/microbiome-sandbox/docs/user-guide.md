@@ -91,11 +91,13 @@ Two rows per region under **Stressors & Region Actions**:
 - **Triggers** (warn styling) — stressors
 - **Inoculations** (action styling) — region-specific quick actions
 
-**Individual Strains** — all 13 probiotic strains; works in any region.
+**Individual Strains** — all 15 probiotic strains; works in any region.
 
 **Prebiotics** — + INULIN and + FOS buttons.
 
 **Products & Fermented Foods** — multi-strain synbiotic capsule, oral probiotic lozenge, kefir, yogurt, kimchi. See [Products](domain/products.md).
+
+**Action Preview** — sits in the same row as Products & Fermented Foods (side-by-side on desktop, stacked on narrow screens). Click any strain, prebiotic, or product to open a sticky preview of what it adds and how tissue metrics shift; the panel stays open until you press × or Escape, or click a different action.
 
 Triggers and region inoculations require micro view. Strain and product panels work globally.
 

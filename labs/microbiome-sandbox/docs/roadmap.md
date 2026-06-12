@@ -2,7 +2,7 @@
 
 Doc-driven improvement backlog: gaps between the documented ideal and the current implementation. Use this file to prioritize app work after reading the full documentation set.
 
-Last audited against source: documentation pass (2026).
+Last audited against source: June 2026 (roadmap sync + impact preview pass).
 
 ---
 
@@ -13,6 +13,35 @@ Last audited against source: documentation pass (2026).
 | P1 | High impact on educational clarity or maintainability |
 | P2 | Meaningful enhancement, moderate effort |
 | P3 | Nice-to-have or long-term |
+
+---
+
+## Shipped foundation
+
+Core educational lab features implemented and documented.
+
+| ID | Shipped | Key sources |
+| --- | --- | --- |
+| **CORE-01** | 7 active body regions, macro/micro 3D views, tissue callouts | `regions.ts`, `SceneManager.ts`, `tissueCallouts.ts` |
+| **CORE-02** | 3 educational presets + URL params (`preset`, `region`, `context`) | `presets.ts`, `user-guide.md` |
+| **CORE-03** | 18 stressor triggers + region-gated inoculations | `regions.ts`, `engine.ts` |
+| **CORE-04** | Individual strains panel — 15 strains, all regions | `strains.ts`, `Dashboard.ts` |
+| **CORE-05** | Prebiotics panel — inulin + FOS spawn + conversion loop | `strains.ts`, `engine.ts` |
+| **CORE-06** | Products & fermented foods — 5 products with region multipliers | `products.ts`, `engine.ts` |
+| **CORE-07** | 9 environment sliders with region subsets | `envVars.ts`, `environment.md` |
+| **CORE-08** | Domain documentation pass (biotics, products, actions, regions) | `docs/domain/*` |
+| **CORE-09** | Deterministic sim engine + real-time stats + event log | `engine.ts`, `Dashboard.ts` |
+
+---
+
+## Next up (P1)
+
+| ID | Priority | Current state | Target / gap |
+| --- | --- | --- | --- |
+| **UX-07** | P1 | Shipped in this pass | Action Impact Preview Panel — hover/select strains, prebiotics, products to see adds, biome deltas, region efficacy, and causal "why" |
+| **SIM-08** | P1 | Shipped in this pass | `applyProduct()` applies per-strain `BiomeEffect` from catalog (scaled by dose × region multiplier) in addition to product bonus |
+| **CONTENT-02** | P2 | Strain tooltips absent | Article-linked strain notes in impact preview |
+| **SIM-01** | P1 | No automated tests | Golden snapshot tests for deterministic engine (seed 42 + action sequence → expected biome) |
 
 ---
 
@@ -27,6 +56,7 @@ Last audited against source: documentation pass (2026).
 | SIM-05 | P3 | Single suppression radius (0.35) for all probiotics | Strain-specific competition strengths (L. acidophilus vs S. boulardii) |
 | SIM-06 | P3 | sugarLoad decays uniformly | Region-specific decay (oral faster, gut slower) |
 | SIM-07 | P2 | B. infantis listed in nose/gut labels but only inoculable on nose | Align default strain labels with inoculation availability or add gut inoculation |
+| SIM-08 | P1 | **Done** — per-strain effects on product apply | See Next up |
 
 ---
 
@@ -50,6 +80,7 @@ Last audited against source: documentation pass (2026).
 | UX-04 | P2 | Hint dismissed permanently per session | Contextual tips per preset (allergy vs candida vs lifecycle) |
 | UX-05 | P3 | English-only | i18n for labels and event log |
 | UX-06 | P2 | Population ×1000 unexplained in UI | Tooltip or footnote explaining display scale |
+| UX-07 | P1 | **Done** — Action Impact Preview Panel | See Next up |
 
 ---
 
@@ -111,18 +142,25 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 
 ## Suggested implementation order
 
-1. **SIM-01** (tests) — safety net for all other changes
-2. **ENG-01** (data-driven actions) — reduces doc/code drift
-3. **UX-01, UX-02** (accessibility) — broadens audience
-4. **SIM-03, VIZ-01** (postbiotic visualization) — lifecycle preset payoff
-5. **STATE-01** (shareable state) — classroom sharing
-6. **CONTENT-02** (strain tooltips) — connects lab to articles
+1. ~~**UX-07** (impact preview)~~ — shipped
+2. ~~**SIM-08** (product strain effects)~~ — shipped
+3. **SIM-01** (tests) — safety net for further sim changes
+4. **CONTENT-02** (article-linked strain notes) — extends impact preview
+5. **SIM-04** (prebiotic stats) — dashboard completeness
+6. **ENG-01** (data-driven actions) — reduces doc/code drift
+7. **UX-01, UX-02** (accessibility) — broadens audience
+8. **SIM-03, VIZ-01** (postbiotic visualization) — lifecycle preset payoff
+9. **STATE-01** (shareable state) — classroom sharing
 
 ---
 
 ## Completed
 
-_None yet — mark items here when shipped._
+| ID | Shipped | Notes |
+| --- | --- | --- |
+| CORE-01–09 | 2026 foundation | See Shipped foundation table |
+| UX-07 | June 2026 | Action Impact Preview Panel (`actionImpact.ts`, `Dashboard.ts`) |
+| SIM-08 | June 2026 | Per-strain biome effects on `applyProduct()` via `scaleBiomeEffect()` |
 
 ---
 

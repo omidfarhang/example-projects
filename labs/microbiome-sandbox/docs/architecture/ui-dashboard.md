@@ -34,7 +34,12 @@ The dashboard is a **vanilla DOM** overlay — no React/Vue/Svelte. `Dashboard` 
 │              │                          │ - Env sliders │
 │              │                          │ - Triggers    │
 │              │                          │ - Inoculations│
+│              │                          │ - Strains     │
+│              │                          │ - Prebiotics  │
+│              │                          │ - Event log   │
 ├──────────────┴──────────────────────────┴───────────────┤
+│ CONTROLS: env, triggers, strains | products + preview row │
+├─────────────────────────────────────────────────────────┤
 │ FOOTER: disclaimer, engine badge, FPS, links           │
 └─────────────────────────────────────────────────────────┘
 
@@ -56,6 +61,9 @@ Interface wired by App:
 | `onBackToBody()` | Back button | `backToBody()` |
 | `onTrigger(id)` | Trigger button | `handleTrigger()` |
 | `onInoculate(id)` | Inoculation button | `handleInoculate()` |
+| `onApplyStrain(id)` | Strain panel button | `handleApplyStrain()` |
+| `onApplyPrebiotic(id)` | Prebiotic button | `handleApplyPrebiotic()` |
+| `onApplyProduct(id)` | Product button | `handleApplyProduct()` |
 | `onEnvChange(env)` | Slider input | `engine.setEnv()` |
 
 ---
@@ -133,6 +141,23 @@ Sliders not in region subset are hidden/omitted.
 - **Inoculation row** — `def.inoculations`, action styling, `onInoculate`
 
 `flashAction('warn' | 'action')` — brief visual feedback on button press.
+
+---
+
+## Action Impact Preview panel
+
+Source: [`src/ui/actionImpact.ts`](../src/ui/actionImpact.ts) (pure preview builders), rendered by `Dashboard`.
+
+| Interaction | Behavior |
+| --- | --- |
+| Click strain, prebiotic, or product | Open sticky preview in products row (inline); apply action; flash meters |
+| Click a different action | Replace preview with new action |
+| Escape / × | Dismiss preview |
+| Region change while preview visible | Recompute efficacy and deltas for new region |
+
+Preview data is derived from [`strains.ts`](../src/data/strains.ts) and [`products.ts`](../src/data/products.ts) — no duplicated effect tables. Product previews aggregate product bonus + per-strain catalog effects (matching `applyProduct()` after SIM-08).
+
+`formatImpactEvent()` also builds structured event-log lines when products are applied.
 
 ---
 

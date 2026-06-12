@@ -68,6 +68,11 @@ export class EffectBurst {
       glycogen_spike: 0xf0abfc,
       lsaliv: 0x4ade80,
       sboul: 0xa3e635,
+      synbiotic_supplement: 0xa78bfa,
+      oral_probiotic_lozenge: 0x38bdf8,
+      kefir_drink: 0xfbbf24,
+      probiotic_yogurt: 0xfcd34d,
+      kimchi: 0xf97316,
     };
     this.color = colors[kind] ?? 0x38bdf8;
     const mat = this.ring.material as THREE.MeshBasicMaterial;

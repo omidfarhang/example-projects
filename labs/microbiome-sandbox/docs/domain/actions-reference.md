@@ -459,9 +459,62 @@ Actions are **region-gated**: calling a disallowed action logs `"Trigger/Inocula
 
 ---
 
+## Individual strain panel (all regions)
+
+Available via dashboard **Individual Strains** row. Source: [`src/data/strains.ts`](../../src/data/strains.ts), `inoculateStrain()`.
+
+| Action ID | Strain | Spawn | Primary effects |
+| --- | --- | --- | --- |
+| `lrham` | L. rhamnosus | 16 | inflammation −0.18, integrity +0.1 |
+| `lacid` | L. acidophilus | 18 | pH −0.5, biofilm −0.2 |
+| `lcasei` | L. casei | 14 | inflammation −0.12, integrity +0.08 |
+| `lsaliv` | L. salivarius | 18 | pH −0.2, biofilm −0.15 |
+| `lreuteri` | L. reuteri | 12 | inflammation −0.14, integrity +0.09, pH −0.15 |
+| `blactis` | B. lactis | 14 | commensal +0.15, postbiotic +0.04 |
+| `blongum` | B. longum | 12 | commensal +0.12, postbiotic +0.05 |
+| `bbifidum` | B. bifidum | 12 | commensal +0.14, postbiotic +0.04 |
+| `binf` | B. infantis | 14 | commensal +0.2, integrity +0.08 |
+| `lplant` | L. plantarum | 16 | inflammation −0.18, integrity +0.1 |
+| `lbulgaricus` | L. bulgaricus | 10 | pH −0.25, biofilm −0.1 |
+| `sthermo` | S. thermophilus | 10 | pH −0.15 |
+| `sboul` | S. boulardii | 14 | yeast −0.25, inflammation −0.12 |
+| `ssaliv_k12` | S. salivarius K12 | 16 | biofilm −0.18, inflammation −0.1, moisture +0.08 |
+| `ssaliv_m18` | S. salivarius M18 | 16 | biofilm −0.22, integrity +0.06 |
+
+Hover any strain button to preview effects in the **Action Preview** panel.
+
+---
+
+## Prebiotic panel (all regions)
+
+| Action ID | Substrate | Spawn | Effect |
+| --- | --- | --- | --- |
+| `inulin` | Inulin | 20 | Prebiotic nodes; convert to SCFA near probiotics (r=0.4) |
+| `fos` | FOS | 18 | Prebiotic nodes; convert to SCFA near probiotics (r=0.4) |
+
+Gut region also exposes `prebiotic` (inulin) and `prebiotic_fos` (FOS) as quick inoculations.
+
+---
+
+## Products & fermented foods (all regions)
+
+Source: [`src/data/products.ts`](../../src/data/products.ts), `applyProduct()`. See [Products](products.md) for full strain bundles.
+
+| Action ID | Label | Preferred regions |
+| --- | --- | --- |
+| `synbiotic_supplement` | Multi-strain synbiotic capsule | gut, oral |
+| `oral_probiotic_lozenge` | Oral probiotic lozenge | oral, nose, ear |
+| `kefir_drink` | Kefir drink | gut, oral |
+| `probiotic_yogurt` | Probiotic yogurt | gut, oral |
+| `kimchi` | Kimchi (fermented) | gut |
+
+Products spawn strains, apply per-strain biome effects (scaled), apply product bonus, and log a structured event summary.
+
+---
+
 ## Visual burst mapping
 
-[`SceneManager.playBurst()`](../src/scene/SceneManager.ts) maps action IDs to burst categories for micro-view feedback: `allergen`, `alkaline`, `stress`, `probiotic`, `default`.
+[`SceneManager.playBurst()`](../src/scene/SceneManager.ts) maps action IDs to burst categories for micro-view feedback: `allergen`, `alkaline`, `stress`, `probiotic`, `default`. Product IDs have distinct burst colors (lozenge = blue, fermented = amber/gold).
 
 ---
 
