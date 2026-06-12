@@ -115,6 +115,8 @@ export class TissueLayer {
       integrity: biome.integrity,
       biofilm: biome.biofilm,
       postbioticLevel: biome.postbioticLevel,
+      ph: biome.ph,
+      moisture: biome.moisture,
     });
 
     const bounds = LUMEN_BOUNDS[this.geometry];

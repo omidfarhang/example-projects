@@ -38,12 +38,24 @@ export class EffectBurst {
     this.life = 1;
     const colors: Record<string, number> = {
       allergen: 0x38bdf8,
+      histamine: 0xf472b6,
+      dry_air: 0x94a3b8,
       alkaline: 0xc084fc,
+      topical_antibiotic: 0xfbbf24,
+      friction_irritant: 0xfb923c,
       stress: 0xf97316,
+      enteropathogen_bloom: 0xef4444,
+      antibiotic_disruption: 0xa855f7,
       probiotic: 0x4ade80,
-      'L. acidophilus': 0x4ade80,
+      lrham: 0x4ade80,
+      binf: 0x4ade80,
+      lacid: 0x4ade80,
+      lplant: 0x4ade80,
+      s_epidermidis: 0x4ade80,
       prebiotic: 0xa3e635,
-      postbiotic: 0x2dd4bf,
+      scfa: 0x2dd4bf,
+      saline_mist: 0x7dd3fc,
+      ph_serum: 0x34d399,
     };
     this.color = colors[kind] ?? 0x38bdf8;
     const mat = this.ring.material as THREE.MeshBasicMaterial;

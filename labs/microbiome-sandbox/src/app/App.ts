@@ -18,7 +18,7 @@ export class App {
     this.preset = url.preset;
     this.region = url.region;
 
-    this.engine = new SimEngine(this.preset);
+    this.engine = new SimEngine(this.preset, this.region);
     const presetDef = PRESETS[this.preset];
     this.engine.setPreset(this.preset, presetDef.env);
 
@@ -29,13 +29,15 @@ export class App {
         onPresetChange: (id) => this.changePreset(id),
         onBackToBody: () => this.backToBody(),
         onTrigger: (id) => this.handleTrigger(id),
-        onInoculate: (strain) => this.handleInoculate(strain),
+        onInoculate: (id) => this.handleInoculate(id),
         onEnvChange: (ph, moisture) => this.engine.setEnv(ph, moisture),
       },
       url.context,
     );
 
     this.dashboard.setPreset(this.preset, this.region);
+    this.dashboard.setRegionActions(this.region);
+    this.dashboard.syncEnvSliders(this.engine.biome.ph, this.engine.biome.moisture);
 
     this.scene = new SceneManager(
       this.dashboard.getCanvas(),
@@ -64,18 +66,21 @@ export class App {
     this.scene.playBurst(id);
   }
 
-  private handleInoculate(strain: string) {
+  private handleInoculate(id: string) {
     this.ensureMicroView();
-    this.engine.inoculate(strain);
+    this.engine.inoculate(id);
     this.dashboard.flashAction('action');
-    this.scene.playBurst(strain);
+    this.scene.playBurst(id);
   }
 
   private selectRegion(id: RegionId) {
     const region = getRegion(id);
     if (!region.active) return;
     this.region = id;
+    this.engine.setRegion(id);
     this.dashboard.highlightRegion(id);
+    this.dashboard.setRegionActions(id);
+    this.dashboard.syncEnvSliders(this.engine.biome.ph, this.engine.biome.moisture);
     this.scene.selectRegion(id);
     this.dashboard.setMicroView(true, region);
   }
@@ -90,7 +95,11 @@ export class App {
     const def = PRESETS[id];
     this.engine.setPreset(id, def.env);
     this.region = def.defaultRegion;
+    this.engine.setRegion(this.region, true);
+    this.engine.setEnv(def.env.ph, def.env.moisture);
     this.dashboard.setPreset(id, this.region);
+    this.dashboard.setRegionActions(this.region);
+    this.dashboard.syncEnvSliders(this.engine.biome.ph, this.engine.biome.moisture);
     this.backToBody();
     if (getRegion(this.region).active) {
       requestAnimationFrame(() => this.selectRegion(this.region));

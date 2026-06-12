@@ -160,8 +160,17 @@ export class SceneManager {
   }
 
   playBurst(kind: string) {
+    const probioticIds = new Set(['lrham', 'binf', 'lacid', 'lplant', 's_epidermidis', 'prebiotic', 'scfa', 'saline_mist', 'ph_serum']);
     const burstKind =
-      kind === 'allergen' ? 'allergen' : kind === 'alkaline' ? 'alkaline' : kind === 'stress' ? 'stress' : 'default';
+      kind === 'allergen' || kind === 'histamine' || kind === 'friction_irritant'
+        ? 'allergen'
+        : kind === 'alkaline'
+          ? 'alkaline'
+          : kind === 'stress' || kind === 'enteropathogen_bloom' || kind === 'antibiotic_disruption'
+            ? 'stress'
+            : probioticIds.has(kind)
+              ? 'probiotic'
+              : 'default';
     this.tissue.playBurst(burstKind);
     this.burst.play(kind);
   }

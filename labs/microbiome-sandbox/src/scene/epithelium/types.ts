@@ -5,4 +5,6 @@ export interface EpitheliumState {
   integrity: number;
   biofilm: number;
   postbioticLevel: number;
+  ph: number;
+  moisture: number;
 }

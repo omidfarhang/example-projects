@@ -18,6 +18,7 @@ export interface BiomeState {
   integrity: number;
   inflammation: number;
   biofilm: number;
+  sugarLoad: number;
   probioticCount: number;
   pathogenCount: number;
   allergenCount: number;

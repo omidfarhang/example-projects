@@ -28,7 +28,7 @@ export interface DashboardCallbacks {
   onPresetChange: (id: PresetId) => void;
   onBackToBody: () => void;
   onTrigger: (id: string) => void;
-  onInoculate: (strain: string) => void;
+  onInoculate: (id: string) => void;
   onEnvChange: (ph: number, moisture: number) => void;
 }
 
@@ -70,6 +70,7 @@ export class Dashboard {
   private commensalRow!: HTMLElement;
   private biofilmRow!: HTMLElement;
   private postbioticRow!: HTMLElement;
+  private envDragging = false;
 
   private currentPreset: PresetId = 'allergy';
   private currentRegion: RegionId = 'nose';
@@ -220,8 +221,20 @@ export class Dashboard {
     this.presetSelect.addEventListener('change', () => {
       this.callbacks.onPresetChange(this.presetSelect.value as PresetId);
     });
-    this.phSlider.addEventListener('input', () => this.emitEnv());
-    this.moistureSlider.addEventListener('input', () => this.emitEnv());
+    this.phSlider.addEventListener('input', () => {
+      this.envDragging = true;
+      this.emitEnv();
+    });
+    this.moistureSlider.addEventListener('change', () => {
+      this.envDragging = false;
+    });
+    this.phSlider.addEventListener('change', () => {
+      this.envDragging = false;
+    });
+    this.moistureSlider.addEventListener('input', () => {
+      this.envDragging = true;
+      this.emitEnv();
+    });
     this.setMicroView(false);
   }
 
@@ -285,16 +298,26 @@ export class Dashboard {
     this.biofilmRow.hidden = presetId !== 'candida';
     this.postbioticRow.hidden = presetId !== 'lifecycle';
 
-    this.triggerRow.innerHTML = preset.triggers
-      .map((t) => `<button type="button" class="bd-btn bd-btn--warn" data-trigger="${t.id}">${t.label}</button>`)
-      .join('');
-    this.inoculationRow.innerHTML = preset.inoculations
-      .map((i) => `<button type="button" class="bd-btn bd-btn--action" data-inoc="${i.strain}">${i.label}</button>`)
-      .join('');
-
-    this.bindActionButtons();
     this.highlightRegion(regionId);
     this.updateLegend(getRegion(regionId));
+  }
+
+  setRegionActions(regionId: RegionId) {
+    const region = getRegion(regionId);
+    this.triggerRow.innerHTML = region.triggers
+      .map((t) => `<button type="button" class="bd-btn bd-btn--warn" data-trigger="${t.id}">${t.label}</button>`)
+      .join('');
+    this.inoculationRow.innerHTML = region.inoculations
+      .map((i) => `<button type="button" class="bd-btn bd-btn--action" data-inoc="${i.id}">${i.label}</button>`)
+      .join('');
+    this.bindActionButtons();
+  }
+
+  syncEnvSliders(ph: number, moisture: number) {
+    this.phSlider.value = String(ph);
+    this.moistureSlider.value = String(moisture);
+    this.phReadout.textContent = phLabel(ph);
+    this.moistureReadout.textContent = `${Math.round(moisture * 100)}%`;
   }
 
   private bindActionButtons() {
@@ -309,9 +332,9 @@ export class Dashboard {
     this.inoculationRow.querySelectorAll('[data-inoc]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const el = btn as HTMLButtonElement;
-        const strain = el.dataset.inoc!;
+        const id = el.dataset.inoc!;
         this.flashButton(el);
-        this.callbacks.onInoculate(strain);
+        this.callbacks.onInoculate(id);
       });
     });
   }
@@ -429,6 +452,19 @@ export class Dashboard {
     else this.scenarioText.textContent = this.staticScenario;
 
     this.callout.hidden = !this.microActive || b.inflammation < 0.35;
+
+    if (!this.envDragging) {
+      const phVal = b.ph.toFixed(1);
+      const moistVal = b.moisture.toFixed(2);
+      if (this.phSlider.value !== phVal) {
+        this.phSlider.value = phVal;
+        this.phReadout.textContent = phLabel(b.ph);
+      }
+      if (this.moistureSlider.value !== moistVal) {
+        this.moistureSlider.value = moistVal;
+        this.moistureReadout.textContent = `${Math.round(b.moisture * 100)}%`;
+      }
+    }
 
     this.eventLog.innerHTML = snap.events
       .slice()

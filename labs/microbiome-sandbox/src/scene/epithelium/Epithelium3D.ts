@@ -66,7 +66,8 @@ export class Epithelium3D {
       }
       if (overlay.userData.isMucus) {
         const m = overlay.material as THREE.MeshStandardMaterial;
-        m.opacity = 0.12 + state.postbioticLevel * 0.08 + t * 0.04;
+        const moistureBoost = (state.moisture - 0.4) * 0.15;
+        m.opacity = 0.08 + moistureBoost + state.postbioticLevel * 0.08 + t * 0.04;
       }
       if (overlay.userData.isScfa) {
         const m = overlay.material as THREE.MeshStandardMaterial;
@@ -74,7 +75,10 @@ export class Epithelium3D {
         m.emissiveIntensity = state.postbioticLevel * 0.4;
       }
       if (overlay.userData.isSheen) {
-        (overlay.material as THREE.MeshStandardMaterial).opacity = 0.06 + state.integrity * 0.12;
+        const dryPenalty = state.moisture < 0.35 ? (0.35 - state.moisture) * 0.3 : 0;
+        const phSheen = state.ph >= 5.5 && state.ph <= 7 ? 0.04 : 0;
+        (overlay.material as THREE.MeshStandardMaterial).opacity =
+          0.04 + state.integrity * 0.12 + phSheen - dryPenalty;
       }
     }
   }
