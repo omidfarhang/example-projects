@@ -5,13 +5,14 @@ import {
   type EnvVarId,
 } from '../data/envVars';
 import { PRESETS, type PresetId } from '../data/presets';
+import { regionExplorationBlurb } from '../data/presetRegionNarratives';
 import type { PostbioticId } from '../data/postbiotics';
 import { POSTBIOTIC_LIST, POSTBIOTICS } from '../data/postbiotics';
 import type { ProductId } from '../data/products';
 import { PRODUCT_LIST, PRODUCTS } from '../data/products';
 import { REGION_SUGGESTIONS } from '../data/regionSuggestions';
 import { getRegion, REGIONS, type RegionDef, type RegionId } from '../data/regions';
-import { PREBIOTIC_LIST, PREBIOTICS, STRAINS, STRAIN_LIST, type PrebioticId, type StrainId } from '../data/strains';
+import { PREBIOTIC_LIST, PREBIOTICS, STRAINS, STRAIN_LIST, formatStrainTooltip, type PrebioticId, type StrainId } from '../data/strains';
 
 type CatalogTab = 'products' | 'strains' | 'prebiotics' | 'postbiotics';
 import {
@@ -43,6 +44,7 @@ function formatPopulation(count: number): string {
 export interface DashboardCallbacks {
   onRegionSelect: (id: RegionId) => void;
   onPresetChange: (id: PresetId) => void;
+  onContextChange: (context?: string) => void;
   onBackToBody: () => void;
   onTrigger: (id: string) => void;
   onInoculate: (id: string) => void;
@@ -87,6 +89,8 @@ export class Dashboard {
   private callout!: HTMLElement;
   private backBtn!: HTMLButtonElement;
   private presetSelect!: HTMLSelectElement;
+  private contextSelect!: HTMLSelectElement;
+  private contextField!: HTMLElement;
   private viewport!: HTMLElement;
   private zoomTitle!: HTMLElement;
   private modeBadge!: HTMLElement;
@@ -94,6 +98,10 @@ export class Dashboard {
   private hint!: HTMLElement;
   private legendBox!: HTMLElement;
   private eventLog!: HTMLElement;
+  private eventLogList!: HTMLElement;
+  private eventLogExpandBtn!: HTMLButtonElement;
+  private eventLogExportBtn!: HTMLButtonElement;
+  private eventLogCount!: HTMLElement;
   private hotspotLayer!: HTMLElement;
   private tissueCalloutLayer!: HTMLElement;
   private tissuePictogram!: HTMLElement;
@@ -113,6 +121,9 @@ export class Dashboard {
   private microActive = false;
   private hintDismissed = false;
   private staticScenario = '';
+  private eventLogExpanded = false;
+  private lastEventCount = 0;
+  private cachedEvents: string[] = [];
 
   constructor(
     mount: HTMLElement,
@@ -193,6 +204,13 @@ export class Dashboard {
             <option value="candida">Candida & pH Balance</option>
             <option value="lifecycle">Biotic Lifecycle Sandbox</option>
           </select>
+          <div class="bd-context-field" data-context-field hidden>
+            <label class="bd-label">SCENARIO VARIANT</label>
+            <select class="bd-select" data-context>
+              <option value="">Standard scenario</option>
+              <option value="lifestage">Life-stage context</option>
+            </select>
+          </div>
           <h2 data-preset-title>Preset</h2>
           <p class="bd-scenario" data-scenario></p>
           <a class="bd-cta" data-blog-cta href="#" target="_blank" rel="noopener">Read full breakdown →</a>
@@ -215,7 +233,14 @@ export class Dashboard {
             <div class="bd-stat" data-postbiotic-row hidden><span>Postbiotic SCFA</span><strong data-postbiotic>0%</strong></div>
           </div>
           <div class="bd-event-log">
-            <h3>EVENT LOG</h3>
+            <div class="bd-event-log__header">
+              <h3>EVENT LOG</h3>
+              <div class="bd-event-log__actions">
+                <span class="bd-event-log__count" data-event-log-count></span>
+                <button type="button" class="bd-btn bd-btn--ghost bd-btn--tiny" data-event-log-expand hidden>Show all</button>
+                <button type="button" class="bd-btn bd-btn--ghost bd-btn--tiny" data-event-log-export title="Download full log for classroom use">Export</button>
+              </div>
+            </div>
             <ul data-event-log></ul>
           </div>
         </aside>
@@ -323,13 +348,19 @@ export class Dashboard {
     this.callout = this.root.querySelector('[data-callout]')!;
     this.backBtn = this.root.querySelector('[data-back]')!;
     this.presetSelect = this.root.querySelector('[data-preset]')!;
+    this.contextSelect = this.root.querySelector('[data-context]')!;
+    this.contextField = this.root.querySelector('[data-context-field]')!;
     this.viewport = this.root.querySelector('[data-viewport]')!;
     this.zoomTitle = this.root.querySelector('[data-zoom-title]')!;
     this.modeBadge = this.root.querySelector('[data-mode-badge]')!;
     this.scaleLabel = this.root.querySelector('[data-scale-label]')!;
     this.hint = this.root.querySelector('[data-hint]')!;
     this.legendBox = this.root.querySelector('[data-legend-box]')!;
-    this.eventLog = this.root.querySelector('[data-event-log]')!;
+    this.eventLog = this.root.querySelector('.bd-event-log')!;
+    this.eventLogList = this.root.querySelector('[data-event-log]')!;
+    this.eventLogExpandBtn = this.root.querySelector('[data-event-log-expand]')!;
+    this.eventLogExportBtn = this.root.querySelector('[data-event-log-export]')!;
+    this.eventLogCount = this.root.querySelector('[data-event-log-count]')!;
     this.hotspotLayer = this.root.querySelector('[data-hotspot-layer]')!;
     this.tissueCalloutLayer = this.root.querySelector('[data-tissue-callouts]')!;
     this.tissuePictogram = this.root.querySelector('[data-tissue-pictogram]')!;
@@ -349,6 +380,18 @@ export class Dashboard {
     this.presetSelect.addEventListener('change', () => {
       this.callbacks.onPresetChange(this.presetSelect.value as PresetId);
     });
+    this.contextSelect.addEventListener('change', () => {
+      const value = this.contextSelect.value || undefined;
+      this.context = value;
+      this.callbacks.onContextChange(value);
+      this.refreshPresetNarrative(this.currentRegion);
+    });
+    this.eventLogExpandBtn.addEventListener('click', () => {
+      this.eventLogExpanded = !this.eventLogExpanded;
+      this.eventLog.classList.toggle('bd-event-log--expanded', this.eventLogExpanded);
+      this.eventLogExpandBtn.textContent = this.eventLogExpanded ? 'Show recent' : 'Show all';
+    });
+    this.eventLogExportBtn.addEventListener('click', () => this.exportEventLog());
     this.renderEnvControls(this.currentRegion);
     this.renderCatalog();
     this.setMicroView(false);
@@ -372,7 +415,8 @@ export class Dashboard {
     this.strainRow.innerHTML = STRAIN_LIST.map((s) => {
       const kind = s.kind === 'commensal' ? 'commensal' : 'probiotic';
       const regions = s.commonRegions?.length ? s.commonRegions.join(', ') : 'all regions';
-      return `<button type="button" class="bd-btn bd-btn--strain bd-btn--${kind}" data-strain="${s.id}" title="${s.why}">${s.name}<span class="bd-product-form">${kind} · ${regions}</span></button>`;
+      const tooltip = formatStrainTooltip(s).replace(/"/g, '&quot;');
+      return `<button type="button" class="bd-btn bd-btn--strain bd-btn--${kind}" data-strain="${s.id}" title="${tooltip}">${s.name}<span class="bd-product-form">${kind} · ${regions}</span></button>`;
     }).join('');
 
     this.prebioticRow.innerHTML = PREBIOTIC_LIST.map((p) => {
@@ -500,6 +544,11 @@ export class Dashboard {
         <div class="bd-impact-deltas">${deltasHtml}</div>
       </div>
       <p class="bd-impact-why"><strong>Why:</strong> ${impact.why}</p>
+      ${
+        impact.article
+          ? `<p class="bd-impact-article"><strong>Article:</strong> ${impact.article.claim} — <a href="${impact.article.url}" target="_blank" rel="noopener">${impact.article.title} →</a></p>`
+          : ''
+      }
     `;
   }
 
@@ -692,14 +741,17 @@ export class Dashboard {
     this.currentPreset = presetId;
     const preset = PRESETS[presetId];
     this.presetSelect.value = presetId;
-    this.presetTitle.textContent = preset.title;
 
-    const scenario =
-      presetId === 'allergy' && this.context === 'lifestage' && preset.scenarioLifestage
-        ? preset.scenarioLifestage
-        : preset.scenario;
-    this.staticScenario = scenario;
-    this.scenarioText.textContent = scenario;
+    this.contextField.hidden = presetId !== 'allergy';
+    if (presetId !== 'allergy' && this.context === 'lifestage') {
+      this.context = undefined;
+      this.contextSelect.value = '';
+    } else {
+      this.contextSelect.value = this.context === 'lifestage' ? 'lifestage' : '';
+    }
+
+    this.presetTitle.textContent = preset.title;
+    this.refreshPresetNarrative(regionId);
 
     const article =
       presetId === 'allergy' && this.context === 'lifestage'
@@ -717,6 +769,30 @@ export class Dashboard {
     this.updateLegend(getRegion(regionId));
   }
 
+  applyContext(context?: string) {
+    this.context = context;
+    this.contextSelect.value = context === 'lifestage' ? 'lifestage' : '';
+    this.refreshPresetNarrative(this.currentRegion);
+    const preset = PRESETS[this.currentPreset];
+    const article =
+      this.currentPreset === 'allergy' && this.context === 'lifestage'
+        ? ARTICLES.lifestage
+        : ARTICLES[preset.articleKey];
+    this.blogCta.href = article.url;
+    this.blogCta.textContent = `Read: ${article.title} →`;
+  }
+
+  private refreshPresetNarrative(regionId: RegionId) {
+    const preset = PRESETS[this.currentPreset];
+    const baseScenario =
+      this.currentPreset === 'allergy' && this.context === 'lifestage' && preset.scenarioLifestage
+        ? preset.scenarioLifestage
+        : preset.scenario;
+    const regionBlurb = regionExplorationBlurb(this.currentPreset, regionId);
+    this.staticScenario = regionBlurb ? `${baseScenario} ${regionBlurb}` : baseScenario;
+    this.scenarioText.textContent = this.staticScenario;
+  }
+
   setRegionActions(regionId: RegionId) {
     const region = getRegion(regionId);
     const suggestions = REGION_SUGGESTIONS[regionId];
@@ -729,8 +805,9 @@ export class Dashboard {
 
     const chips: string[] = [];
     for (const id of suggestions.strains ?? []) {
+      const strain = STRAINS[id];
       chips.push(
-        `<button type="button" class="bd-btn bd-btn--suggested bd-btn--suggested-strain" data-suggest-strain="${id}">${STRAINS[id].name}</button>`,
+        `<button type="button" class="bd-btn bd-btn--suggested bd-btn--suggested-strain" data-suggest-strain="${id}" title="${formatStrainTooltip(strain).replace(/"/g, '&quot;')}">${strain.name}</button>`,
       );
     }
     for (const id of suggestions.prebiotics ?? []) {
@@ -873,6 +950,7 @@ export class Dashboard {
       btn.classList.toggle('bd-region--active', (btn as HTMLElement).dataset.region === id);
     });
     const region = getRegion(id);
+    this.refreshPresetNarrative(id);
     this.renderEnvControls(id);
     this.updateLegend(region);
     this.refreshImpactIfVisible();
@@ -1037,16 +1115,59 @@ export class Dashboard {
       this.updateLegendFromSimulation(getRegion(this.currentRegion), snap.nodes);
     }
 
-    this.eventLog.innerHTML = snap.events
-      .slice()
+    const allEvents = engine.getEvents();
+    this.cachedEvents = allEvents;
+    const visibleEvents = this.eventLogExpanded ? allEvents : allEvents.slice(-8);
+    const hiddenCount = allEvents.length - 8;
+
+    this.eventLogCount.textContent =
+      allEvents.length > 0 ? `${allEvents.length} events` : '';
+    this.eventLogExpandBtn.hidden = hiddenCount <= 0;
+    if (hiddenCount <= 0) {
+      this.eventLogExpanded = false;
+      this.eventLog.classList.remove('bd-event-log--expanded');
+      this.eventLogExpandBtn.textContent = 'Show all';
+    }
+
+    this.eventLogList.innerHTML = [...visibleEvents]
       .reverse()
       .map((e, i) => {
         const t = ((snap.tick - i * 10) / 30).toFixed(1);
-        return `<li class="${i === 0 ? 'bd-event--new' : ''}"><time>${t}s</time> ${e}</li>`;
+        const isNew = allEvents.length !== this.lastEventCount && i === 0;
+        return `<li class="${isNew ? 'bd-event--new' : ''}"><time>${t}s</time> ${e}</li>`;
       })
       .join('');
+    this.lastEventCount = allEvents.length;
 
     this.fpsBadge.textContent = `${fps} FPS`;
     this.engineBadge.textContent = `ENGINE: DETERMINISTIC · ${fps >= 55 ? '60' : fps} FPS TARGET`;
+  }
+
+  private exportEventLog() {
+    if (this.cachedEvents.length === 0) return;
+
+    const preset = PRESETS[this.currentPreset];
+    const region = getRegion(this.currentRegion);
+    const header = [
+      'Bio-Dynamics Event Log Export',
+      `Preset: ${preset.title}`,
+      `Region: ${region.label}`,
+      `Context: ${this.context ?? 'standard'}`,
+      `Exported: ${new Date().toISOString()}`,
+      '',
+    ];
+
+    const body = this.cachedEvents.map((text, i) => {
+      const t = ((i * 10) / 30).toFixed(1);
+      return `[${t}s] ${text}`;
+    });
+
+    const blob = new Blob([header.concat(body).join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `microbiome-lab-${this.currentPreset}-${this.currentRegion}.txt`;
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 }

@@ -641,6 +641,10 @@ export class SimEngine {
     return { ...this.trends };
   }
 
+  getEvents(): string[] {
+    return [...this.events];
+  }
+
   getDynamicScenario(): string {
     const b = this.biome;
     const last = this.events[this.events.length - 1];

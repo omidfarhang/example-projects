@@ -16,3 +16,5 @@ export const ARTICLES = {
     url: "https://omid.dev/2024/09/10/prebiotics-probiotics-postbiotics/",
   },
 } as const;
+
+export type ArticleKey = keyof typeof ARTICLES;

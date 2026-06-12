@@ -1,3 +1,4 @@
+import { ARTICLES, type ArticleKey } from './articles';
 import type { RegionId } from './regions';
 
 /** Canonical strain IDs used by inoculations, products, and the strain library. */
@@ -51,6 +52,9 @@ export interface StrainDef {
   commonRegions?: RegionId[];
   /** Plain-language causal explanation for impact preview. */
   why: string;
+  /** Optional blog article backing this strain (CONTENT-02). */
+  articleKey?: ArticleKey;
+  articleClaim?: string;
 }
 
 export interface PrebioticDef {
@@ -70,6 +74,8 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { inflammation: -0.18, integrity: 0.1 },
     commonRegions: ['ear', 'scalp', 'nose', 'vaginal'],
     why: 'Barrier-supporting strain that calms mucosal inflammation and strengthens epithelial integrity.',
+    articleKey: 'allergies',
+    articleClaim: 'Featured for calming allergen-driven inflammation and restoring mucosal barrier integrity',
   },
   lacid: {
     id: 'lacid',
@@ -78,6 +84,8 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { ph: -0.5, phMin: 3.8, phMax: 7, biofilm: -0.2 },
     commonRegions: ['oral', 'skin', 'vaginal', 'gut'],
     why: 'Acidifies local pH and disrupts pathogen biofilm — unfavorable environment for yeast and alkaliphiles.',
+    articleKey: 'candidiasis',
+    articleClaim: 'Acidifying lactobacillus cited for countering Candida-favoring alkaline niches',
   },
   lcasei: {
     id: 'lcasei',
@@ -94,6 +102,8 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { inflammation: -0.14, integrity: 0.09, postbioticLevel: 0.03 },
     commonRegions: ['gut', 'oral', 'nose'],
     why: 'Immune-modulatory strain with mild SCFA contribution — common in fermented dairy and supplements.',
+    articleKey: 'allergies',
+    articleClaim: 'Immune-modulatory strain discussed for balancing hypersensitive mucosal responses',
   },
   lsaliv: {
     id: 'lsaliv',
@@ -102,6 +112,8 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { ph: -0.2, phMin: 5.5, biofilm: -0.15 },
     commonRegions: ['oral'],
     why: 'Oral lactic acid producer — lowers pH and clears biofilm in saliva film.',
+    articleKey: 'candidiasis',
+    articleClaim: 'Oral lactobacillus cited for thrush recovery via saliva-film acidification',
   },
   lreuteri: {
     id: 'lreuteri',
@@ -134,6 +146,8 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { commensalVitality: 0.15, integrity: 0.07, postbioticLevel: 0.04 },
     commonRegions: ['gut'],
     why: 'Gut bifidobacterium that boosts commensal neighbors and contributes SCFA metabolites.',
+    articleKey: 'lifecycle',
+    articleClaim: 'Bifidobacterium strain that converts prebiotic fiber into postbiotic SCFA',
   },
   blongum: {
     id: 'blongum',
@@ -158,6 +172,8 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { commensalVitality: 0.16, integrity: 0.07, postbioticLevel: 0.05 },
     commonRegions: ['gut'],
     why: 'Early-life bifidobacterium — supports commensal ecology and SCFA output in infant-style niches.',
+    articleKey: 'lifestage',
+    articleClaim: 'Early-life bifidobacterium discussed for age-specific commensal support',
   },
   binf: {
     id: 'binf',
@@ -166,6 +182,8 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { commensalVitality: 0.2, integrity: 0.08 },
     commonRegions: ['nose', 'gut'],
     why: 'Early-life commensal booster — strengthens resident flora and barrier in airway niches.',
+    articleKey: 'lifestage',
+    articleClaim: 'Infant-associated bifidobacterium highlighted in early-life microbiome training',
   },
   lplant: {
     id: 'lplant',
@@ -174,6 +192,8 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { inflammation: -0.18, integrity: 0.1 },
     commonRegions: ['gut'],
     why: 'Fermentation workhorse — anti-inflammatory and barrier-supporting in gut lumen.',
+    articleKey: 'lifecycle',
+    articleClaim: 'Core probiotic in the prebiotic → probiotic → postbiotic lifecycle chain',
   },
   lbulgaricus: {
     id: 'lbulgaricus',
@@ -198,6 +218,8 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { yeastVitality: -0.25, inflammation: -0.12 },
     commonRegions: ['oral', 'gut'],
     why: 'Probiotic yeast competitor — suppresses Candida overgrowth and lowers inflammation.',
+    articleKey: 'candidiasis',
+    articleClaim: 'Probiotic yeast competitor cited for oral and gut Candida overgrowth',
   },
   ssaliv_k12: {
     id: 'ssaliv_k12',
@@ -206,6 +228,8 @@ export const STRAINS: Record<StrainId, StrainDef> = {
     effects: { biofilm: -0.18, ph: -0.12, phMin: 5.5, inflammation: -0.1, moisture: 0.08 },
     commonRegions: ['oral', 'nose', 'ear'],
     why: 'BLIS K12 colonizes saliva film — clears biofilm, restores moisture, and calms irritated mucosa.',
+    articleKey: 'allergies',
+    articleClaim: 'BLIS K12 discussed for airway and oral mucosa barrier support',
   },
   ssaliv_m18: {
     id: 'ssaliv_m18',
@@ -277,4 +301,13 @@ export const PREBIOTIC_LIST = Object.values(PREBIOTICS);
 
 export function getStrain(id: StrainId): StrainDef {
   return STRAINS[id];
+}
+
+/** Native title tooltip — article title appended when a claim is linked (CONTENT-02). */
+export function formatStrainTooltip(strain: StrainDef): string {
+  const parts = [strain.why];
+  if (strain.articleClaim && strain.articleKey) {
+    parts.push(`${strain.articleClaim} (${ARTICLES[strain.articleKey].title})`);
+  }
+  return parts.join(' · ');
 }

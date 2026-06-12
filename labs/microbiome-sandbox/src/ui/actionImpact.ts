@@ -1,3 +1,4 @@
+import { ARTICLES } from '../data/articles';
 import type { PostbioticId } from '../data/postbiotics';
 import { POSTBIOTICS, postbioticRegionMultiplier } from '../data/postbiotics';
 import type { ProductId } from '../data/products';
@@ -45,6 +46,7 @@ export interface ActionImpact {
   why: string;
   warning?: string;
   category?: ActionCategory;
+  article?: { title: string; url: string; claim: string };
 }
 
 const METRIC_LABELS: Record<ImpactMetric, string> = {
@@ -139,12 +141,21 @@ export function buildStrainImpact(strainId: StrainId, regionId: RegionId): Actio
   const strain = STRAINS[strainId];
   const count = strain.spawnCount;
   const microbeType = strain.kind === 'commensal' ? 'commensal' : 'probiotic';
+  const article =
+    strain.articleKey && strain.articleClaim
+      ? {
+          title: ARTICLES[strain.articleKey].title,
+          url: ARTICLES[strain.articleKey].url,
+          claim: strain.articleClaim,
+        }
+      : undefined;
   return {
     title: strain.name,
     efficacyPct: 100,
     adds: [{ label: strain.name, count, type: microbeType }],
     deltas: biomeToDeltas(strain.effects ?? {}, 'strain'),
     why: strain.why,
+    article,
     category: 'catalog',
   };
 }

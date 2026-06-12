@@ -41,7 +41,7 @@ Core educational lab features implemented and documented.
 | --- | --- | --- | --- |
 | **UX-07** | P1 | Shipped in this pass | Action Impact Preview Panel — hover/select strains, prebiotics, products to see adds, biome deltas, region efficacy, and causal "why" |
 | **SIM-08** | P1 | Shipped in this pass | `applyProduct()` applies per-strain `BiomeEffect` from catalog (scaled by dose × region multiplier) in addition to product bonus |
-| **CONTENT-02** | P2 | Strain tooltips absent | Article-linked strain notes in impact preview |
+| **CONTENT-02** | P2 | **Done** — article-linked strain notes | Hover tooltips + impact preview article links (`strains.ts`, `actionImpact.ts`) |
 | **SIM-01** | P1 | No automated tests | Golden snapshot tests for deterministic engine (seed 42 + action sequence → expected biome) |
 
 ---
@@ -89,10 +89,10 @@ Core educational lab features implemented and documented.
 
 | ID | Priority | Current state | Target / gap |
 | --- | --- | --- | --- |
-| CONTENT-01 | P2 | Scalp/ear not highlighted in preset narratives | Dedicated exploration blurbs in candida/allergy scenarios |
-| CONTENT-02 | P2 | Strain tooltips absent | Hover tooltips linking strains to article claims |
-| CONTENT-03 | P3 | Life-stage context only via URL param | Preset sub-variant selector in dashboard (not just `?context=lifestage`) |
-| CONTENT-04 | P2 | Event log shows last 8 only | Expandable full log or export for classroom use |
+| CONTENT-01 | P2 | **Done** — ear/scalp exploration blurbs | Region-specific narratives in allergy/candida (`presetRegionNarratives.ts`) |
+| CONTENT-02 | P2 | **Done** — article-linked strain notes | Hover tooltips + impact preview article links |
+| CONTENT-03 | P3 | **Done** — life-stage variant selector | Dashboard scenario variant (allergy preset) syncs `?context=lifestage` |
+| CONTENT-04 | P2 | **Done** — expandable event log + export | Show all / export `.txt` for classroom use (`Dashboard.ts`, `engine.getEvents()`) |
 
 ---
 
@@ -146,7 +146,7 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 1. ~~**UX-07** (impact preview)~~ — shipped
 2. ~~**SIM-08** (product strain effects)~~ — shipped
 3. **SIM-01** (tests) — safety net for further sim changes
-4. **CONTENT-02** (article-linked strain notes) — extends impact preview
+4. ~~**CONTENT-02** (article-linked strain notes)~~ — shipped
 5. ~~**SIM-04** (prebiotic stats)~~ — shipped
 6. **ENG-01** (data-driven actions) — reduces doc/code drift
 7. **UX-01, UX-02** (accessibility) — broadens audience
@@ -168,6 +168,10 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 | VIZ-02 | June 2026 | Distinct yeast / bacterium / allergen instanced meshes (`MicrobeMeshes.ts`) |
 | VIZ-03 | June 2026 | Non-linear biofilm overlay opacity (`biofilmVisualOpacity` in `Epithelium3D.ts`) |
 | VIZ-04 | June 2026 | Touch orbit/zoom/pan overlay for tablet users (`touchGestureHints.ts`, `Dashboard.ts`) |
+| CONTENT-01 | June 2026 | Ear/scalp exploration blurbs in allergy/candida presets (`presetRegionNarratives.ts`) |
+| CONTENT-02 | June 2026 | Article-linked strain tooltips + impact preview notes (`strains.ts`, `actionImpact.ts`) |
+| CONTENT-03 | June 2026 | Life-stage scenario variant selector in dashboard (`Dashboard.ts`, `App.ts`) |
+| CONTENT-04 | June 2026 | Expandable event log + classroom `.txt` export (`engine.getEvents()`, `Dashboard.ts`) |
 
 ---
 

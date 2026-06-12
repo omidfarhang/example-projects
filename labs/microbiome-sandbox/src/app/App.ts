@@ -13,6 +13,7 @@ export class App {
   private dashboard!: Dashboard;
   private preset: PresetId;
   private region: RegionId;
+  private context?: string;
   private lastTime = performance.now();
   private running = true;
 
@@ -20,6 +21,7 @@ export class App {
     const url = parseUrlState();
     this.preset = url.preset;
     this.region = url.region;
+    this.context = url.context;
 
     this.engine = new SimEngine(this.preset, this.region);
     const presetDef = PRESETS[this.preset];
@@ -30,6 +32,7 @@ export class App {
       {
         onRegionSelect: (id) => this.selectRegion(id),
         onPresetChange: (id) => this.changePreset(id),
+        onContextChange: (context) => this.changeContext(context),
         onBackToBody: () => this.backToBody(),
         onTrigger: (id) => this.handleTrigger(id),
         onInoculate: (id) => this.handleInoculate(id),
@@ -41,6 +44,8 @@ export class App {
       },
       url.context,
     );
+
+    this.dashboard.applyContext(this.context);
 
     this.dashboard.setPreset(this.preset, this.region);
     this.dashboard.setRegionActions(this.region);
@@ -116,6 +121,7 @@ export class App {
     this.dashboard.highlightRegion(id);
     this.dashboard.setRegionActions(id);
     this.dashboard.syncEnvSliders(this.engine.biome, this.region);
+    this.syncUrlParams();
     this.scene.selectRegion(id);
     this.dashboard.setMicroView(true, region);
   }
@@ -127,6 +133,7 @@ export class App {
 
   private changePreset(id: PresetId) {
     this.preset = id;
+    if (id !== 'allergy') this.context = undefined;
     const def = PRESETS[id];
     this.engine.setPreset(id, def.env);
     this.region = def.defaultRegion;
@@ -135,10 +142,27 @@ export class App {
     this.dashboard.setPreset(id, this.region);
     this.dashboard.setRegionActions(this.region);
     this.dashboard.syncEnvSliders(this.engine.biome, this.region);
+    this.syncUrlParams();
     this.backToBody();
     if (getRegion(this.region).active) {
       requestAnimationFrame(() => this.selectRegion(this.region));
     }
+  }
+
+  private changeContext(context?: string) {
+    this.context = context;
+    this.dashboard.applyContext(context);
+    this.syncUrlParams();
+  }
+
+  private syncUrlParams() {
+    const params = new URLSearchParams();
+    params.set('preset', this.preset);
+    params.set('region', this.region);
+    if (this.context) params.set('context', this.context);
+    const query = params.toString();
+    const next = `${window.location.pathname}${query ? `?${query}` : ''}`;
+    window.history.replaceState(null, '', next);
   }
 
   private loop() {
