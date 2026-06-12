@@ -1,0 +1,40 @@
+name: Microbiome Sandbox CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'labs/microbiome-sandbox/**'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'labs/microbiome-sandbox/**'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  test-and-build:
+    name: Test & build smoke
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: labs/microbiome-sandbox
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: labs/microbiome-sandbox/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests (SIM-01, ENG-05)
+        run: npm test
+
+      - name: Production build smoke (ENG-03)
+        run: npm run build

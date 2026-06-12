@@ -42,7 +42,7 @@ Core educational lab features implemented and documented.
 | **UX-07** | P1 | Shipped in this pass | Action Impact Preview Panel — hover/select strains, prebiotics, products to see adds, biome deltas, region efficacy, and causal "why" |
 | **SIM-08** | P1 | Shipped in this pass | `applyProduct()` applies per-strain `BiomeEffect` from catalog (scaled by dose × region multiplier) in addition to product bonus |
 | **CONTENT-02** | P2 | **Done** — article-linked strain notes | Hover tooltips + impact preview article links (`strains.ts`, `actionImpact.ts`) |
-| **SIM-01** | P1 | No automated tests | Golden snapshot tests for deterministic engine (seed 42 + action sequence → expected biome) |
+| **SIM-01** | P1 | **Done** — golden snapshot tests | `engine.golden.test.ts`, `fixtures/engine-golden.json`, seed 42 action sequences |
 
 ---
 
@@ -50,7 +50,7 @@ Core educational lab features implemented and documented.
 
 | ID | Priority | Current state | Target / gap |
 | --- | --- | --- | --- |
-| SIM-01 | P1 | No automated tests | Golden snapshot tests for deterministic engine (seed 42 + action sequence → expected biome) |
+| SIM-01 | P1 | **Done** — golden snapshot tests | `engine.golden.test.ts`, `fixtures/engine-golden.json`, `npm test` |
 | SIM-02 | P2 | **Done** — route-specific antibiotic spectra | `antibioticSpectra.ts` — otic, topical, gut_broad, vaginal_systemic |
 | SIM-03 | P2 | **Done** — SCFA lumen particles linked to tissue glow | Optional particle field when postbioticLevel ≥ 0.1; surge pulse syncs with epithelial SCFA overlay |
 | SIM-04 | P2 | **Done** — prebiotic substrate in stats + legend | Dashboard row (lifecycle) with particle count, % remaining, trend; legend always lists substrate on lifecycle |
@@ -113,9 +113,9 @@ Core educational lab features implemented and documented.
 | --- | --- | --- | --- |
 | ENG-01 | P1 | **Done** — data-driven inoculations | `inoculations.ts` shared by engine + impact preview |
 | ENG-02 | P2 | **Done** — dashboard template partials | `ui/dashboard/*` modules composed by `renderDashboardShell()` |
-| ENG-03 | P2 | No CI for lab | Playground build smoke test in GitHub Actions |
+| ENG-03 | P2 | **Done** — lab CI smoke test | `.github/workflows/microbiome-sandbox-ci.yml` — `npm test` + `npm run build` |
 | ENG-04 | P3 | **Done** — split per tissue builder | `epithelium/tissue/` modules + `tissueModels.ts` barrel re-export |
-| ENG-05 | P2 | Docs manually synced | CI check that action IDs in regions.ts match engine branches |
+| ENG-05 | P2 | **Done** — action ID sync check | `actionIds.test.ts` — regions.ts triggers → stressors, regionalCare → inoculations |
 
 ---
 
@@ -145,7 +145,7 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 
 1. ~~**UX-07** (impact preview)~~ — shipped
 2. ~~**SIM-08** (product strain effects)~~ — shipped
-3. **SIM-01** (tests) — safety net for further sim changes
+3. ~~**SIM-01** (tests)~~ — shipped
 4. ~~**CONTENT-02** (article-linked strain notes)~~ — shipped
 5. ~~**SIM-04** (prebiotic stats)~~ — shipped
 6. ~~**ENG-01** (data-driven actions)~~ — shipped
@@ -194,6 +194,9 @@ Items in this section must preserve [Assumptions and limits](../simulation/assum
 | DOC-01 | June 2026 | MkDocs Material config + docs site guide |
 | DOC-02 | June 2026 | CHANGELOG.md |
 | DOC-03 | June 2026 | Per-region tissue layer mermaid diagrams in `domain/regions.md` |
+| SIM-01 | June 2026 | Golden snapshot tests for deterministic engine (`engine.golden.test.ts`, vitest) |
+| ENG-03 | June 2026 | GitHub Actions lab CI — test + build smoke (`.github/workflows/microbiome-sandbox-ci.yml`) |
+| ENG-05 | June 2026 | Region action ID sync tests — triggers ↔ stressors, regionalCare ↔ inoculations |
 
 ---
 

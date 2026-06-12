@@ -6,6 +6,9 @@ All notable changes to the Bio-Dynamics microbiome sandbox lab. Format loosely f
 
 ### Added
 
+- **SIM-01** — Vitest golden snapshot tests for deterministic sim engine (seed 42, allergy/nose + lifecycle/gut sequences)
+- **ENG-03** — GitHub Actions CI workflow: `npm test` + production build smoke for the lab
+- **ENG-05** — Automated check that `regions.ts` trigger and regionalCare IDs resolve in stressors/inoculations catalogs
 - **STATE-01** — URL-encoded lab state via `?lab=` (base64 checkpoint) plus readable `integrity`, `inflammation`, `tick` params
 - **STATE-02** — “Copy lab link” button serializing preset, region, biome, tick, and microbe positions
 - **STATE-03** — Optional “Resume session” banner restoring the last autosaved snapshot from `localStorage`

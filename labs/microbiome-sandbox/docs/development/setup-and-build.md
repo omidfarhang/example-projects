@@ -33,6 +33,9 @@ Vite dev server starts (default `http://localhost:5173`) with hot module replace
 | `dev` | `vite` | Development server |
 | `build` | `vite build` | Production build → `dist/` |
 | `preview` | `vite preview` | Preview production build locally |
+| `test` | `vitest run` | Unit tests (golden snapshots + action ID sync) |
+| `test:watch` | `vitest` | Tests in watch mode |
+| `golden:update` | `UPDATE_GOLDEN=1 vitest run …` | Regenerate sim golden fixtures after intentional model changes |
 | `docs:serve` | `mkdocs serve` | Documentation site with live reload |
 | `docs:build` | `mkdocs build` | Static docs → `site/` |
 
