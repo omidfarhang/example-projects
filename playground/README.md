@@ -55,27 +55,18 @@ npx serve playground/dist
 
 ## Deploy
 
-**Production path:** GitHub Actions matrix build → assemble `playground/dist/` → Wrangler `pages deploy`.
+GitHub Actions builds `playground/dist/` and uploads it with Wrangler (`pages deploy`). Cloudflare Pages is **direct-upload only** — there is no Cloudflare-side build step.
 
-See [`.github/workflows/playground-deploy.yml`](../.github/workflows/playground-deploy.yml) and [`wrangler.toml`](../wrangler.toml).
+See [`.github/workflows/playground-deploy.yml`](../.github/workflows/playground-deploy.yml).
 
 Required GitHub secrets:
 
 | Secret | Purpose |
 | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Pages deploy token |
+| `CLOUDFLARE_API_TOKEN` | Wrangler `pages deploy` |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account |
 
-**Legacy fallback:** Cloudflare Pages native git build still works with:
-
-| Setting | Value |
-| --- | --- |
-| Root directory | `/` |
-| Build command | `node playground/scripts/cloudflare-build.mjs` |
-| Build output directory | `playground/dist` |
-| Production branch | `master` |
-
-Disable the native git hook once the GitHub Actions workflow is verified.
+In the Cloudflare dashboard (**Workers & Pages → omid-dev-playground → Settings → Builds & deployments**), leave the build command empty and disable automatic git deployments. Production updates come only from the GitHub Actions workflow.
 
 ## Manifest
 

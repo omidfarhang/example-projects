@@ -44,7 +44,7 @@ function findCoreScript(manifest) {
 
 /**
  * Qwik client-only build does not emit index.html without a full static adapter SSR pass.
- * Generate a minimal shell that bootstraps the prebuilt client bundle for Cloudflare Pages.
+ * Generate a minimal shell that bootstraps the prebuilt client bundle for static hosting.
  */
 export function writeQwikShellIndex(distDir, baseHref) {
   const manifestPath = path.join(distDir, 'q-manifest.json');

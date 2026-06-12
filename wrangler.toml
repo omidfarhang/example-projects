@@ -1,6 +1,2 @@
 name = "omid-dev-playground"
 compatibility_date = "2024-09-01"
-pages_build_output_dir = "playground/dist"
-
-[env.production]
-name = "omid-dev-playground"

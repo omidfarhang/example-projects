@@ -75,7 +75,7 @@ export function computeLockHash(target) {
   }
 
   // Include playground scripts hash for landing/seo changes
-  parts.push(hashFile(path.join(PLAYGROUND_ROOT, 'scripts', 'cloudflare-build.mjs')));
+  parts.push(hashFile(path.join(PLAYGROUND_ROOT, 'scripts', 'build.mjs')));
 
   return crypto.createHash('sha256').update(parts.join(':')).digest('hex').slice(0, 16);
 }

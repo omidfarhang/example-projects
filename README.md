@@ -25,7 +25,7 @@ Browser-only companion projects and interactive labs are published at **[playgro
 | [React Recoil Advanced State](https://playground.omid.dev/examples/react-recoil-advanced-state/) | [`examples/react-recoil-advanced-state`](./examples/react-recoil-advanced-state/) |
 | [Bootstrap to Tailwind Migration](https://playground.omid.dev/examples/bootstrap-to-tailwind-migration/) | [`examples/bootstrap-to-tailwind-migration`](./examples/bootstrap-to-tailwind-migration/) |
 
-Demos that need Firebase, a local API server, native Linux binaries, or other non-browser runtimes are **source-only** for now. See [playground/README.md](./playground/README.md) for the Cloudflare Pages build setup.
+Demos that need Firebase, a local API server, native Linux binaries, or other non-browser runtimes are **source-only** for now. See [playground/README.md](./playground/README.md) for the playground build and deploy setup.
 
 ## Start Here
 
@@ -90,7 +90,7 @@ npm install -g @angular/cli@18
 
 ## Project-Specific Setup
 
-- Live demos are built with `npm run build:playground` and deployed via Cloudflare Pages. See [playground/README.md](./playground/README.md).
+- Live demos are built with `npm run build:playground` and deployed by GitHub Actions to Cloudflare Pages. See [playground/README.md](./playground/README.md).
 - `angular-collaborative-editor-firebase-webrtc` needs a Firebase project with Anonymous Authentication and Cloud Firestore enabled.
 - `angular-graphql-apollo` and `graphql-express-angular-migration` include local API servers. Start the `server/` app before the Angular app.
 - `angular-stencil-web-components` has two parts. Build the Stencil component first, then run the Angular app.

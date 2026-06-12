@@ -74,7 +74,7 @@ jobs:
             playground-cache-${{ matrix.category }}-${{ matrix.slug }}-
 
       - name: Build target
-        run: node playground/scripts/cloudflare-build.mjs --only ${{ matrix.slug }} --skip-landing
+        run: node playground/scripts/build.mjs --only ${{ matrix.slug }} --skip-landing
 
       - name: Upload dist slice
         uses: actions/upload-artifact@v4
