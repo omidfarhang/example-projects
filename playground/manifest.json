@@ -122,7 +122,7 @@
         "sourcePath": "labs/microbiome-sandbox",
         "type": "vite",
         "kind": "lab",
-        "techBlogUrl": "https://omid.dev/posts/"
+        "techBlogUrl": "https://omid.dev/2026/06/10/deterministic-microbiome-simulation-without-overclaiming-science/"
       }
     ]
   },
