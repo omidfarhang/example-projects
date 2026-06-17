@@ -1,1 +1,47 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --bg: #eef1f8;
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --accent-main: #7c3aed;
+  --accent-main-soft: #ede9fe;
+  --accent-compute: #d97706;
+  --accent-compute-soft: #fef3c7;
+  --accent-canvas: #0891b2;
+  --accent-canvas-soft: #e0f2fe;
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --shadow-md: 0 8px 30px rgb(15 23 42 / 0.07);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, -apple-system, blinkmacsystemfont,
+    "Segoe UI", sans-serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, "Cascadia Code", "Segoe UI Mono", monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 0% 0%, rgb(124 58 237 / 0.07), transparent 40%),
+    radial-gradient(circle at 100% 0%, rgb(8 145 178 / 0.06), transparent 35%);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  margin: 0;
+  min-height: 100vh;
+}
+
+button {
+  font: inherit;
+}

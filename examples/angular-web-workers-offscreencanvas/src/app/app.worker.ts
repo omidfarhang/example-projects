@@ -1,14 +1,17 @@
 /// <reference lib="webworker" />
 
 addEventListener('message', ({ data }: MessageEvent<number>) => {
-  const result = performHeavyComputation(data);
-  postMessage(result);
-});
-
-function performHeavyComputation(data: number): number {
+  const iterations = data;
+  const start = performance.now();
   let result = 0;
-  for (let i = 0; i < data; i++) {
+
+  for (let i = 0; i < iterations; i += 1) {
     result += Math.sqrt(i);
   }
-  return result;
-}
+
+  postMessage({
+    result,
+    elapsedMs: performance.now() - start,
+    iterations,
+  });
+});

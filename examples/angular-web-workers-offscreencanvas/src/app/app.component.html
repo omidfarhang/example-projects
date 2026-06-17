@@ -1,27 +1,118 @@
 <main class="demo">
-  <section>
+  <header class="hero">
+    <p class="eyebrow">Angular performance</p>
     <h1>Web Workers + OffscreenCanvas</h1>
-    <p>Companion demo for the omid.dev Angular performance tutorial.</p>
+    <p class="lede">
+      Heavy math and canvas rendering run off the main thread so Angular can keep
+      the UI responsive. Watch the heartbeat counter — it keeps ticking while
+      workers do the expensive work.
+    </p>
+  </header>
+
+  <section class="panel panel--overview">
+    <h2>Three threads in this demo</h2>
+    <ul class="thread-list">
+      <li class="thread-card thread-card--main">
+        <span class="thread-card__label">Main thread</span>
+        <strong>Angular UI</strong>
+        <span class="thread-card__detail">Controls, layout, heartbeat counter</span>
+      </li>
+      <li class="thread-card thread-card--compute">
+        <span class="thread-card__label">Web Worker</span>
+        <strong>Compute worker</strong>
+        <span class="thread-card__detail">1M-iteration √i loop</span>
+      </li>
+      <li class="thread-card thread-card--canvas">
+        <span class="thread-card__label">Web Worker</span>
+        <strong>Canvas worker</strong>
+        <span class="thread-card__detail">OffscreenCanvas animation</span>
+      </li>
+    </ul>
+    <p class="heartbeat">
+      Main-thread heartbeat:
+      <strong>{{ mainThreadTicks }}</strong>
+      <span class="heartbeat__hint">(increments every 100 ms — should never freeze)</span>
+    </p>
   </section>
 
-  <section>
-    <h2>Heavy computation worker</h2>
-    @if (computationResult !== null) {
-      <p>Result: {{ computationResult | number:'1.0-2' }}</p>
-    } @else {
-      <p>Computing...</p>
+  <section class="panel panel--compute">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow eyebrow--compute">Compute worker</p>
+        <h2>Heavy computation offloaded</h2>
+      </div>
+      <span class="status-badge" [class.status-badge--running]="computeRunning" [class.status-badge--done]="!computeRunning && computationResult !== null">
+        @if (computeRunning) {
+          Running…
+        } @else if (computationResult !== null) {
+          Complete
+        } @else {
+          Idle
+        }
+      </span>
+    </div>
+    <p class="panel__lede">
+      On load, a worker sums <code>√i</code> for one million values. The main
+      thread never blocks — it keeps updating the heartbeat above.
+    </p>
+    @if (computationResult !== null && computeElapsedMs !== null) {
+      <dl class="result-grid">
+        <div class="result-grid__item">
+          <dt>Result</dt>
+          <dd>{{ computationResult | number: '1.0-2' }}</dd>
+        </div>
+        <div class="result-grid__item">
+          <dt>Worker time</dt>
+          <dd>{{ computeElapsedMs | number: '1.0-1' }} ms</dd>
+        </div>
+        <div class="result-grid__item">
+          <dt>Iterations</dt>
+          <dd>{{ computeIterations | number }}</dd>
+        </div>
+      </dl>
+    } @else if (computeRunning) {
+      <p class="pending">Worker is crunching numbers…</p>
     }
+    <div class="panel__actions">
+      <button type="button" class="btn btn--compute" (click)="startComputation()" [disabled]="computeRunning">
+        Run computation again
+      </button>
+    </div>
     @if (workerMessage) {
-      <p>{{ workerMessage }}</p>
+      <p class="error-note">{{ workerMessage }}</p>
     }
   </section>
 
-  <section>
-    <h2>OffscreenCanvas animation</h2>
-    <canvas id="myCanvas" width="800" height="400"></canvas>
-    <div class="controls">
-      <button type="button" (click)="startAnimation()">Start</button>
-      <button type="button" (click)="stopAnimation()">Stop</button>
+  <section class="panel panel--canvas">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow eyebrow--canvas">OffscreenCanvas worker</p>
+        <h2>Animation on a background thread</h2>
+      </div>
+      <span class="status-badge" [class.status-badge--running]="animationRunning" [class.status-badge--done]="!animationRunning && frameCount > 0">
+        @if (animationRunning) {
+          Animating
+        } @else if (frameCount > 0) {
+          Stopped
+        } @else {
+          Ready
+        }
+      </span>
+    </div>
+    <p class="panel__lede">
+      The canvas is transferred to a worker with
+      <code>transferControlToOffscreen()</code>. Drawing and
+      <code>requestAnimationFrame</code> happen entirely off the main thread.
+    </p>
+    <div class="canvas-frame">
+      <canvas id="myCanvas" width="800" height="400"></canvas>
+    </div>
+    <div class="canvas-meta">
+      <span>Frames rendered: <strong>{{ frameCount | number }}</strong></span>
+    </div>
+    <div class="panel__actions">
+      <button type="button" class="btn btn--canvas" (click)="startAnimation()">Start animation</button>
+      <button type="button" class="btn btn--ghost" (click)="stopAnimation()">Stop</button>
     </div>
   </section>
 </main>
