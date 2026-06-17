@@ -8,6 +8,8 @@ export class HighlightDirective implements OnInit {
   private readonly element = inject(ElementRef<HTMLElement>);
 
   ngOnInit(): void {
-    this.element.nativeElement.style.outline = '2px solid #0b5ed7';
+    const host = this.element.nativeElement;
+    host.style.boxShadow = 'inset 0 0 0 2px #0891b2';
+    host.style.borderRadius = '10px';
   }
 }

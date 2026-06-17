@@ -1,5 +1,130 @@
-<main class="layout" libHighlight>
-  <h1>Shared Library Demo</h1>
-  <lib-my-shared-ui></lib-my-shared-ui>
-  <p>{{ message }}</p>
+<main class="demo">
+  <header class="hero">
+    <p class="eyebrow">Angular workspace</p>
+    <h1>Shared library in a monorepo</h1>
+    <p class="lede">
+      <code>my-shared-ui</code> is a publishable library consumed by
+      <code>demo-app</code> through TypeScript path mapping — the same setup
+      you'd use before publishing to npm.
+    </p>
+  </header>
+
+  <section class="panel panel--architecture">
+    <h2>How the workspace fits together</h2>
+    <ol class="flow-list">
+      <li class="flow-step flow-step--library">
+        <span class="flow-step__label">Library project</span>
+        <strong>projects/my-shared-ui</strong>
+        <span class="flow-step__detail">
+          Standalone component, directive, and service exported from
+          <code>public-api.ts</code>
+        </span>
+      </li>
+      <li class="flow-step flow-step--build">
+        <span class="flow-step__label">Build output</span>
+        <strong>ng build my-shared-ui</strong>
+        <span class="flow-step__detail">
+          ng-packagr writes consumable bundles to <code>dist/my-shared-ui</code>
+        </span>
+      </li>
+      <li class="flow-step flow-step--app">
+        <span class="flow-step__label">Demo application</span>
+        <strong>import from 'my-shared-ui'</strong>
+        <span class="flow-step__detail">
+          Path alias in root <code>tsconfig.json</code> points at the built library
+        </span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="panel panel--api">
+    <h2>Public API surface</h2>
+    <div class="api-grid">
+      <div class="api-card">
+        <span class="api-card__type">Component</span>
+        <code>MySharedUiComponent</code>
+        <span class="api-card__usage">Selector: <code>lib-my-shared-ui</code></span>
+      </div>
+      <div class="api-card">
+        <span class="api-card__type">Directive</span>
+        <code>HighlightDirective</code>
+        <span class="api-card__usage">Attribute: <code>libHighlight</code></span>
+      </div>
+      <div class="api-card">
+        <span class="api-card__type">Service</span>
+        <code>MySharedUiService</code>
+        <span class="api-card__usage"><code>providedIn: 'root'</code></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel panel--playground">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow eyebrow--playground">Live playground</p>
+        <h2>Consume all three exports</h2>
+      </div>
+      @if (highlightOn()) {
+        <span class="status-badge status-badge--on">Highlight on</span>
+      } @else {
+        <span class="status-badge">Highlight off</span>
+      }
+    </div>
+
+    <div class="playground-grid">
+      <article class="playground-card">
+        <h3>Component</h3>
+        <p class="playground-card__hint">
+          Rendered from the library — styles ship with the component.
+        </p>
+        <div class="playground-stage">
+          <lib-my-shared-ui />
+        </div>
+      </article>
+
+      <article class="playground-card">
+        <h3>Directive</h3>
+        <p class="playground-card__hint">
+          <code>libHighlight</code> adds an inset outline to the host element on init.
+        </p>
+        @if (highlightOn()) {
+          <div class="playground-stage" libHighlight>
+            <span class="playground-stage__label">Highlighted host</span>
+            <p>Directive applied via <code>libHighlight</code></p>
+          </div>
+        } @else {
+          <div class="playground-stage">
+            <span class="playground-stage__label">Plain host</span>
+            <p>Directive removed — same markup, no outline</p>
+          </div>
+        }
+        <button type="button" class="btn btn--ghost" (click)="toggleHighlight()">
+          {{ highlightOn() ? 'Remove highlight' : 'Apply highlight' }}
+        </button>
+      </article>
+
+      <article class="playground-card">
+        <h3>Service</h3>
+        <p class="playground-card__hint">
+          Injected in <code>AppComponent</code> — one root singleton for the app.
+        </p>
+        <dl class="stat-grid">
+          <div class="stat-grid__item">
+            <dt>Method</dt>
+            <dd>getMessage()</dd>
+          </div>
+          <div class="stat-grid__item">
+            <dt>Returned value</dt>
+            <dd>{{ serviceMessage }}</dd>
+          </div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <p class="note">
+    <strong>Local dev tip:</strong> run <code>ng build my-shared-ui</code> after
+    library changes, or use <code>ng build my-shared-ui --watch</code> in a second
+    terminal while serving <code>demo-app</code>.
+  </p>
 </main>
