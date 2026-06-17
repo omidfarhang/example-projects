@@ -18,6 +18,10 @@ export class AudioPlayerComponent implements OnDestroy, OnInit {
   faStop = faStop;
   isPlaying = false;
   hasAudioSource = false;
+  trackName = '';
+  currentTime = 0;
+  duration = 0;
+  private isSeeking = false;
   private objectUrl?: string;
 
   constructor(private audioService: AudioService) {}
@@ -49,7 +53,48 @@ export class AudioPlayerComponent implements OnDestroy, OnInit {
     const audioElement = this.audioRef.nativeElement;
     audioElement.pause();
     audioElement.currentTime = 0;
+    this.currentTime = 0;
     this.isPlaying = false;
+  }
+
+  onTimeUpdate(): void {
+    if (!this.isSeeking) {
+      this.currentTime = this.audioRef.nativeElement.currentTime;
+    }
+  }
+
+  onMetadataLoaded(): void {
+    this.duration = this.audioRef.nativeElement.duration || 0;
+  }
+
+  onEnded(): void {
+    this.isPlaying = false;
+    this.currentTime = this.duration;
+  }
+
+  onSeek(event: Event): void {
+    const value = Number((event.target as HTMLInputElement).value);
+    this.audioRef.nativeElement.currentTime = value;
+    this.currentTime = value;
+  }
+
+  onSeekStart(): void {
+    this.isSeeking = true;
+  }
+
+  onSeekEnd(): void {
+    this.isSeeking = false;
+    this.currentTime = this.audioRef.nativeElement.currentTime;
+  }
+
+  formatTime(seconds: number): string {
+    if (!Number.isFinite(seconds) || seconds < 0) {
+      return '0:00';
+    }
+
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
   onFileSelected(event: Event): void {
@@ -61,7 +106,10 @@ export class AudioPlayerComponent implements OnDestroy, OnInit {
       this.objectUrl = URL.createObjectURL(file);
       audioElement.src = this.objectUrl;
       this.hasAudioSource = true;
+      this.trackName = file.name;
       this.isPlaying = false;
+      this.currentTime = 0;
+      this.duration = 0;
     }
   }
 

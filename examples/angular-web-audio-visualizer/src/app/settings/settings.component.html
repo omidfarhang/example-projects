@@ -1,12 +1,21 @@
 <div class="settings">
-  <label for="styleSelect">Visualization Style:</label>
-  <select
-    id="styleSelect"
-    [(ngModel)]="selectedStyle"
-    (ngModelChange)="onStyleChange($event)"
+  <span class="settings__label" id="styleSelectLabel">Visualization style</span>
+  <div
+    class="style-picker"
+    role="radiogroup"
+    aria-labelledby="styleSelectLabel"
   >
     @for (style of styles; track style) {
-      <option [ngValue]="style">{{ style }}</option>
+      <button
+        type="button"
+        role="radio"
+        class="style-picker__option"
+        [class.style-picker__option--active]="selectedStyle === style"
+        [attr.aria-checked]="selectedStyle === style"
+        (click)="onStyleChange(style)"
+      >
+        {{ style }}
+      </button>
     }
-  </select>
+  </div>
 </div>

@@ -1,6 +1,23 @@
-<div class="app-container">
-  <h1>Music Visualizer</h1>
-  <app-settings (styleChange)="onStyleChange($event)"></app-settings>
-  <app-audio-player></app-audio-player>
-  <app-visualizer [style]="selectedStyle"></app-visualizer>
-</div>
+<main class="demo">
+  <header class="hero">
+    <p class="eyebrow">Web Audio API</p>
+    <h1>Music Visualizer</h1>
+    <p class="lede">
+      Upload a track and switch between bar, circular, and waveform views powered
+      by the Web Audio API analyser node.
+    </p>
+  </header>
+
+  <section class="panel controls-panel">
+    <app-settings (styleChange)="onStyleChange($event)"></app-settings>
+    <app-audio-player></app-audio-player>
+  </section>
+
+  <section class="panel visualizer-panel">
+    <div class="panel-heading">
+      <span class="panel-heading__label">Live output</span>
+      <span class="panel-heading__style">{{ selectedStyle }}</span>
+    </div>
+    <app-visualizer [style]="selectedStyle"></app-visualizer>
+  </section>
+</main>

@@ -1,11 +1,53 @@
 .settings {
-  margin: 20px;
+  display: grid;
+  gap: 0.65rem;
 }
 
-label {
-  margin-right: 10px;
+.settings__label {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-select {
-  padding: 4px 8px;
+.style-picker {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0.35rem;
+}
+
+.style-picker__option {
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--radius-md) - 4px);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.625rem 0.75rem;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.style-picker__option:hover {
+  color: var(--text);
+}
+
+.style-picker__option--active {
+  background: var(--accent);
+  box-shadow: 0 4px 16px var(--accent-glow);
+  color: white;
+}
+
+@media (max-width: 480px) {
+  .style-picker {
+    grid-template-columns: 1fr;
+  }
 }
