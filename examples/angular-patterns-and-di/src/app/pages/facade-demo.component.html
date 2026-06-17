@@ -1,0 +1,32 @@
+<section class="page page--facade">
+  <header class="page__header">
+    <p class="eyebrow">Design pattern</p>
+    <h2>Facade over DataService</h2>
+    <p class="page__lede">
+      The component talks to <code>DashboardFacade</code> instead of
+      <code>DataService</code> directly. The facade exposes a narrow API while
+      reusing the same observable underneath.
+    </p>
+  </header>
+
+  <pre class="arch-flow" aria-hidden="true">Component → DashboardFacade → DataService → BehaviorSubject</pre>
+
+  <section class="panel">
+    <div class="value-box">
+      <span class="value-box__label">Value via facade.data$</span>
+      <span class="value-box__value">{{ facade.data$ | async }}</span>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Update through facade</span>
+      <input [(ngModel)]="value" placeholder="Update through facade" />
+    </label>
+
+    <button type="button" class="btn" (click)="update()">Call facade.update()</button>
+  </section>
+
+  <p class="note">
+    <strong>Same data:</strong> if you updated the stream on the Observer route,
+    that value appears here too — one singleton service, two presentation patterns.
+  </p>
+</section>

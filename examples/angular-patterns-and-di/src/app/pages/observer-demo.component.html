@@ -1,0 +1,30 @@
+<section class="page page--observer">
+  <header class="page__header">
+    <p class="eyebrow">Design pattern</p>
+    <h2>Observer with a singleton service</h2>
+    <p class="page__lede">
+      <code>DataService</code> wraps a <code>BehaviorSubject</code>. Components
+      subscribe to <code>currentData$</code> and publish updates with
+      <code>changeData()</code> — every subscriber sees the same stream.
+    </p>
+  </header>
+
+  <section class="panel">
+    <div class="value-box">
+      <span class="value-box__label">Current stream value</span>
+      <span class="value-box__value">{{ dataService.currentData$ | async }}</span>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Publish new value</span>
+      <input [(ngModel)]="value" placeholder="Update shared data" />
+    </label>
+
+    <button type="button" class="btn" (click)="update()">Publish to subscribers</button>
+  </section>
+
+  <p class="note">
+    <strong>Try this:</strong> publish a value here, then switch to the Facade route —
+    both demos share the same root <code>DataService</code> instance.
+  </p>
+</section>

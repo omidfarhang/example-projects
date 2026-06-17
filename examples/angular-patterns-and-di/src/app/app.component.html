@@ -1,10 +1,31 @@
-<main class="layout">
-  <h1>Angular Patterns and DI</h1>
-  <nav>
-    <a routerLink="/observer">Observer</a>
-    <a routerLink="/facade">Facade</a>
-    <a routerLink="/tokens">Injection tokens</a>
-    <a routerLink="/config">Config token</a>
+<main class="demo">
+  <header class="hero">
+    <p class="eyebrow">Angular patterns &amp; DI</p>
+    <h1>Design patterns and dependency injection</h1>
+    <p class="lede">
+      Four small routes, each showing one idea from the companion blog posts —
+      observer streams, facades, injection tokens, and app-wide config.
+    </p>
+  </header>
+
+  <nav class="nav" aria-label="Demo routes">
+    <a routerLink="/observer" routerLinkActive="nav__link--active" class="nav__link">
+      Observer
+      <span class="nav__hint">Shared service stream</span>
+    </a>
+    <a routerLink="/facade" routerLinkActive="nav__link--active" class="nav__link">
+      Facade
+      <span class="nav__hint">Hide DataService</span>
+    </a>
+    <a routerLink="/tokens" routerLinkActive="nav__link--active" class="nav__link">
+      Tokens
+      <span class="nav__hint">Factory provider</span>
+    </a>
+    <a routerLink="/config" routerLinkActive="nav__link--active" class="nav__link">
+      Config
+      <span class="nav__hint">APP_CONFIG token</span>
+    </a>
   </nav>
+
   <router-outlet />
 </main>

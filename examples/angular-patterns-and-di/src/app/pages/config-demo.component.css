@@ -1,0 +1,27 @@
+.page--config {
+  --page-accent: var(--accent);
+}
+
+.config-json {
+  background: #0f172a;
+  border-radius: var(--radius-sm);
+  padding: 0.875rem 1rem;
+}
+
+.config-json__label {
+  color: #94a3b8;
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.config-json pre {
+  color: #e2e8f0;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  margin: 0;
+  overflow-x: auto;
+}

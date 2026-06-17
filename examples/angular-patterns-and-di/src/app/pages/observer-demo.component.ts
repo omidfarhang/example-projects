@@ -1,18 +1,14 @@
-import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { DataService } from '../core/data.service';
 
 @Component({
-    selector: 'app-observer-demo',
-    imports: [AsyncPipe, FormsModule],
-    template: `
-    <h2>Observer pattern</h2>
-    <p>Current value: {{ dataService.currentData$ | async }}</p>
-    <input [(ngModel)]="value" placeholder="Update shared data" />
-    <button type="button" (click)="update()">Publish</button>
-  `
+  selector: 'app-observer-demo',
+  imports: [AsyncPipe, FormsModule],
+  templateUrl: './observer-demo.component.html',
+  styleUrl: './observer-demo.component.css',
 })
 export class ObserverDemoComponent {
   readonly dataService = inject(DataService);

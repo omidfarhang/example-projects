@@ -1,0 +1,38 @@
+<section class="page page--config">
+  <header class="page__header">
+    <p class="eyebrow">Dependency injection</p>
+    <h2>App config injection token</h2>
+    <p class="page__lede">
+      Environment-specific settings are provided once at bootstrap via
+      <code>APP_CONFIG</code> and injected anywhere without importing concrete
+      values.
+    </p>
+  </header>
+
+  <section class="panel">
+    <dl class="stat-grid">
+      <div class="stat-grid__item">
+        <dt>API base URL</dt>
+        <dd>{{ config.apiBaseUrl }}</dd>
+      </div>
+      <div class="stat-grid__item">
+        <dt>Beta dashboard</dt>
+        <dd>{{ config.featureFlags.betaDashboard ? 'enabled' : 'disabled' }}</dd>
+      </div>
+      <div class="stat-grid__item">
+        <dt>Provider</dt>
+        <dd>useValue in app.config</dd>
+      </div>
+    </dl>
+
+    <div class="config-json">
+      <span class="config-json__label">Injected object</span>
+      <pre>{{ config | json }}</pre>
+    </div>
+  </section>
+
+  <p class="note">
+    <strong>In production:</strong> swap <code>appConfigValue</code> per environment
+    file or load config from the server before bootstrapping Angular.
+  </p>
+</section>
