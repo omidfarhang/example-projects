@@ -4,6 +4,8 @@ Companion project for [Real-Time Data in Frontend Applications](https://omid.dev
 
 Local demo comparing WebSocket and Server-Sent Events side by side.
 
+**Live demo:** https://playground.omid.dev/examples/realtime-frontend-patterns/ (simulated WebSocket and SSE; server code stays in this repo)
+
 ## Run
 
 ```bash

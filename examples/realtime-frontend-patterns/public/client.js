@@ -1,22 +1,18 @@
+import { appendLog, setStatus } from './log-ui.js';
+
 const wsStatus = document.getElementById('ws-status');
 const wsLog = document.getElementById('ws-log');
 const wsInput = document.getElementById('ws-input');
-const wsSend = document.getElementById('ws-send');
+const wsForm = document.getElementById('ws-form');
 
 const sseStatus = document.getElementById('sse-status');
 const sseLog = document.getElementById('sse-log');
-
-function appendLog(list, text) {
-  const item = document.createElement('li');
-  item.textContent = text;
-  list.prepend(item);
-}
 
 const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 const socket = new WebSocket(`${protocol}://${location.host}/ws`);
 
 socket.onopen = () => {
-  wsStatus.textContent = 'Connected';
+  setStatus(wsStatus, 'connected', 'Connected');
 };
 
 socket.onmessage = (event) => {
@@ -24,20 +20,25 @@ socket.onmessage = (event) => {
 };
 
 socket.onclose = () => {
-  wsStatus.textContent = 'Disconnected';
+  setStatus(wsStatus, 'disconnected', 'Disconnected');
 };
 
-wsSend.addEventListener('click', () => {
+function sendWsMessage() {
   if (socket.readyState === WebSocket.OPEN && wsInput.value.trim()) {
     socket.send(wsInput.value.trim());
     wsInput.value = '';
   }
+}
+
+wsForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  sendWsMessage();
 });
 
 const source = new EventSource('/events');
 
 source.onopen = () => {
-  sseStatus.textContent = 'Connected';
+  setStatus(sseStatus, 'connected', 'Connected');
 };
 
 source.onmessage = (event) => {
@@ -45,5 +46,5 @@ source.onmessage = (event) => {
 };
 
 source.onerror = () => {
-  sseStatus.textContent = 'Error / reconnecting';
+  setStatus(sseStatus, 'reconnecting', 'Reconnecting');
 };

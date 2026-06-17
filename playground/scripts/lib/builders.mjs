@@ -192,6 +192,25 @@ export function buildStaticHtml(demo, category) {
   const dest = distDemoDir(demo.slug, category);
   ensureDir(dest);
 
+  if (demo.staticHtmlDir) {
+    const srcDir = path.join(cwd, demo.staticHtmlDir);
+    if (!dirExists(srcDir)) {
+      throw new Error(`Missing ${demo.staticHtmlDir}/ for ${demo.slug}`);
+    }
+    copyDir(srcDir, dest);
+
+    const playgroundIndex = path.join(srcDir, demo.playgroundIndex ?? 'index.playground.html');
+    if (fileExists(playgroundIndex)) {
+      copyFile(playgroundIndex, path.join(dest, 'index.html'));
+    }
+
+    const playgroundClient = path.join(srcDir, demo.playgroundClient ?? 'client.playground.js');
+    if (fileExists(playgroundClient)) {
+      copyFile(playgroundClient, path.join(dest, 'client.js'));
+    }
+    return;
+  }
+
   for (const folder of ['before-bootstrap', 'after-tailwind']) {
     const src = path.join(cwd, folder);
     if (!dirExists(src)) {

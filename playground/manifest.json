@@ -123,6 +123,17 @@
         "angularConfiguration": "playground",
         "legacyPeerDeps": true,
         "articleUrl": "https://omid.dev/2024/06/01/integrating-graphql-with-angular-a-practical-guide/"
+      },
+      {
+        "slug": "realtime-frontend-patterns",
+        "title": "Real-Time Frontend Patterns",
+        "description": "WebSocket vs SSE side by side — simulated transports for the live demo.",
+        "articleTitle": "Real-Time Data in Frontend Applications",
+        "projectDir": "examples/realtime-frontend-patterns",
+        "sourcePath": "examples/realtime-frontend-patterns",
+        "type": "static-html",
+        "staticHtmlDir": "public",
+        "articleUrl": "https://omid.dev/2024/06/08/real-time-data-in-frontend-applications/"
       }
     ],
     "labs": [
@@ -156,15 +167,6 @@
       "sourcePath": "examples/graphql-express-angular-migration",
       "reason": "API server",
       "articleUrl": "https://omid.dev/2024/08/07/migrating-from-rest-to-graphql-a-step-by-step-guide-for-expressjs-and-angular/"
-    },
-    {
-      "slug": "realtime-frontend-patterns",
-      "title": "Real-Time Frontend Patterns",
-      "description": "Node examples for WebSocket and Server-Sent Events patterns.",
-      "articleTitle": "Real-Time Data in Frontend Applications",
-      "sourcePath": "examples/realtime-frontend-patterns",
-      "reason": "Node server",
-      "articleUrl": "https://omid.dev/2024/06/08/real-time-data-in-frontend-applications/"
     },
     {
       "slug": "angular-custom-schematics",
