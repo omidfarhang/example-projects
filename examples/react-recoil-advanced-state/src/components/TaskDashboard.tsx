@@ -6,6 +6,7 @@ import {
   taskSuggestionSelector,
   taskSummarySelector,
 } from '../state/tasks';
+import './TaskDashboard.css';
 
 interface TaskItemProps {
   taskId: string;
@@ -18,24 +19,47 @@ export function TaskItem({ taskId }: TaskItemProps) {
 
   return (
     <li className="task-item">
-      <label>
-        <input
-          type="checkbox"
-          checked={task.completed}
-          onChange={(event) => setTask({ ...task, completed: event.target.checked })}
-        />
-        <input
-          value={task.title}
-          placeholder="Task title"
-          onChange={(event) => setTask({ ...task, title: event.target.value })}
-        />
-      </label>
-      <p className="summary">{summary}</p>
-      <p className="suggestion">
-        {suggestion.state === 'loading' && 'Loading suggestion...'}
-        {suggestion.state === 'hasValue' && `Async suggestion: ${suggestion.contents}`}
-        {suggestion.state === 'hasError' && 'Suggestion failed'}
-      </p>
+      <div className="task-item__top">
+        <label className="task-item__label">
+          <input
+            type="checkbox"
+            checked={task.completed}
+            onChange={(event) => setTask({ ...task, completed: event.target.checked })}
+          />
+          <input
+            className="task-item__input"
+            value={task.title}
+            placeholder="Task title"
+            onChange={(event) => setTask({ ...task, title: event.target.value })}
+          />
+        </label>
+        <span className={`status-badge ${task.completed ? 'status-badge--done' : ''}`}>
+          {task.completed ? 'Done' : 'Open'}
+        </span>
+      </div>
+
+      <div className="task-item__derived">
+        <div className="derived-row">
+          <span className="derived-row__tag">selectorFamily</span>
+          <span className="derived-row__value">{summary}</span>
+        </div>
+        <div className="derived-row">
+          <span className="derived-row__tag derived-row__tag--async">async</span>
+          {suggestion.state === 'loading' && (
+            <span className="derived-row__value derived-row__value--loading">
+              Loading suggestion…
+            </span>
+          )}
+          {suggestion.state === 'hasValue' && (
+            <span className="derived-row__value">{suggestion.contents}</span>
+          )}
+          {suggestion.state === 'hasError' && (
+            <span className="derived-row__value derived-row__value--error">
+              Suggestion failed
+            </span>
+          )}
+        </div>
+      </div>
     </li>
   );
 }
@@ -64,17 +88,37 @@ export function TaskDashboard() {
   };
 
   return (
-    <section>
-      <header className="dashboard-header">
-        <h2>Task board</h2>
-        <p>
-          Completed: {completedCount} / {taskIds.length}
-        </p>
-        <button type="button" onClick={addTask}>
-          Add task
-        </button>
-      </header>
+    <section className="panel panel--playground">
+      <div className="panel-heading">
+        <div>
+          <p className="eyebrow eyebrow--playground">Live playground</p>
+          <h2>Task board</h2>
+        </div>
+        <span className="status-badge status-badge--count">
+          {completedCount} / {taskIds.length} complete
+        </span>
+      </div>
+
+      <dl className="stat-grid">
+        <div className="stat-grid__item">
+          <dt>Atom family</dt>
+          <dd>taskState(id)</dd>
+        </div>
+        <div className="stat-grid__item">
+          <dt>Selector</dt>
+          <dd>completedTaskCountSelector</dd>
+        </div>
+        <div className="stat-grid__item">
+          <dt>Tasks in list</dt>
+          <dd>{taskIds.length}</dd>
+        </div>
+      </dl>
+
       <TaskList taskIds={taskIds} />
+
+      <button type="button" className="btn" onClick={addTask}>
+        Add task
+      </button>
     </section>
   );
 }

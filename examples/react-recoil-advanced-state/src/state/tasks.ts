@@ -8,15 +8,20 @@ export interface Task {
 
 export const taskIdsState = atomFamily<string[], string>({
   key: 'taskIdsState',
-  default: [],
+  default: ['task-1', 'task-2'],
 });
 
 export const taskState = atomFamily<Task, string>({
   key: 'taskState',
   default: (taskId) => ({
     id: taskId,
-    title: '',
-    completed: false,
+    title:
+      taskId === 'task-1'
+        ? 'Review Recoil atom families'
+        : taskId === 'task-2'
+          ? 'Wire up async selector'
+          : '',
+    completed: taskId === 'task-1',
   }),
 });
 

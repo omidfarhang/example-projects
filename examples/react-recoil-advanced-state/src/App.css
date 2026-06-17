@@ -1,54 +1,209 @@
-.app {
-  max-width: 720px;
+.demo {
+  display: grid;
+  gap: 1.25rem;
   margin: 0 auto;
-  padding: 2rem 1rem;
-  font-family: system-ui, sans-serif;
+  max-width: 800px;
+  padding: 2.5rem 1.25rem 3.5rem;
 }
 
-.dashboard-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 1rem;
+.hero {
+  display: grid;
+  gap: 0.75rem;
 }
 
-.task-list {
-  list-style: none;
-  padding: 0;
+.hero h1,
+.hero p {
   margin: 0;
 }
 
-.task-item {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 0.75rem;
+.hero h1 {
+  font-size: clamp(1.875rem, 4vw, 2.5rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
-.task-item label {
-  display: flex;
-  gap: 0.5rem;
+.eyebrow {
+  color: var(--accent-react);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.lede {
+  color: var(--text-muted);
+  max-width: 58ch;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  display: grid;
+  gap: 1rem;
+  overflow: hidden;
+  padding: 1.25rem;
+  position: relative;
+}
+
+.panel::before {
+  background: var(--panel-accent, var(--accent-recoil));
+  content: "";
+  height: 3px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.panel--architecture::before {
+  background: linear-gradient(90deg, var(--accent-react), var(--accent-recoil));
+}
+
+.panel--concepts {
+  --panel-accent: var(--accent-recoil);
+}
+
+.panel h2 {
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.flow-list {
+  counter-reset: flow;
+  display: grid;
+  gap: 0.65rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.flow-step {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  counter-increment: flow;
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.875rem 1rem 0.875rem 2.75rem;
+  position: relative;
+  text-align: left;
+}
+
+.flow-step::before {
   align-items: center;
+  background: var(--step-accent, var(--accent-recoil));
+  border-radius: 999px;
+  color: white;
+  content: counter(flow);
+  display: flex;
+  font-size: 0.75rem;
+  font-weight: 800;
+  height: 1.5rem;
+  justify-content: center;
+  left: 0.875rem;
+  position: absolute;
+  top: 0.875rem;
+  width: 1.5rem;
 }
 
-.task-item input[type='text'] {
-  flex: 1;
-  padding: 0.4rem 0.6rem;
+.flow-step--root {
+  --step-accent: var(--accent-react);
 }
 
-.summary {
-  margin: 0.5rem 0 0;
-  color: #444;
+.flow-step--atom {
+  --step-accent: #0891b2;
 }
 
-.suggestion {
-  margin: 0.25rem 0 0;
-  color: #666;
-  font-size: 0.9rem;
+.flow-step--selector {
+  --step-accent: var(--accent-recoil);
 }
 
-button {
-  padding: 0.5rem 1rem;
-  cursor: pointer;
+.flow-step--async {
+  --step-accent: #6366f1;
+}
+
+.flow-step__label {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.flow-step strong {
+  font-size: 0.9375rem;
+}
+
+.flow-step__detail {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.concept-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.concept-card {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.875rem 1rem;
+  text-align: left;
+}
+
+.concept-card__type {
+  color: var(--accent-recoil);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.concept-card code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.concept-card__hook {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.note {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  margin: 0;
+  padding: 0.875rem 1rem;
+  text-align: left;
+}
+
+.note strong {
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .demo {
+    gap: 1rem;
+    padding: 1rem 0.875rem 1.75rem;
+  }
+
+  .hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .panel {
+    padding: 1rem;
+  }
 }
