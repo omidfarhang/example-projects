@@ -138,26 +138,28 @@ export default component$(() => {
   });
 
   return (
-    <main class="shell">
-      <section class="hero">
+    <main class="demo">
+      <section class="panel panel--qwik">
         <p class="eyebrow">Qwik shell application</p>
         <h1>Qwik composing Angular, React, and Rust</h1>
-        <p>
+        <p class="panel__lede">
           The shell owns routing and shared state. Angular and React are loaded
           as custom elements, and Rust WebAssembly handles CPU work inside the
           shell.
         </p>
-        <button type="button" onClick$={updateFromShell}>
-          Update shared message from Qwik
-        </button>
+        <div class="panel__actions">
+          <button type="button" onClick$={updateFromShell}>
+            Update shared message from Qwik
+          </button>
+        </div>
       </section>
 
-      <section class="status">
-        <strong>Shared message:</strong>
-        <span>{message.value}</span>
-      </section>
+      <div class="shared-state">
+        <span class="shared-state__label">Shared message</span>
+        <span class="shared-state__value">{message.value}</span>
+      </div>
 
-      <section class="grid">
+      <section class="mfe-grid">
         {assetsReady.value ? (
           <>
             <angular-microfrontend
@@ -166,29 +168,33 @@ export default component$(() => {
             <react-microfrontend message={message.value}></react-microfrontend>
           </>
         ) : (
-          <p>Loading micro frontend bundles...</p>
+          <p class="mfe-grid__loading">Loading micro frontend bundles...</p>
         )}
       </section>
 
-      <section class="wasm-card">
+      <section class="panel panel--rust">
         <p class="eyebrow">Rust WebAssembly</p>
         <h2>Compute from WebAssembly</h2>
-        <p>
+        <p class="panel__lede">
           Unlike Angular and React, Rust is not rendered as a custom element.
           The Qwik shell imports a WASM module when it needs fast native code.
         </p>
-        <p>
-          <strong>Shared message analysis:</strong>{' '}
-          <span>{rustStats.value}</span>
+        <p class="wasm-stats">
+          <strong>Shared message analysis</strong>
+          {rustStats.value}
         </p>
-        <button
-          type="button"
-          disabled={!rustReady.value}
-          onClick$={runPrimeBenchmark}
-        >
-          Run prime sieve in Rust WASM
-        </button>
-        {rustBenchmark.value ? <p>{rustBenchmark.value}</p> : null}
+        <div class="panel__actions">
+          <button
+            type="button"
+            disabled={!rustReady.value}
+            onClick$={runPrimeBenchmark}
+          >
+            Run prime sieve in Rust WASM
+          </button>
+        </div>
+        {rustBenchmark.value ? (
+          <p class="wasm-benchmark">{rustBenchmark.value}</p>
+        ) : null}
       </section>
     </main>
   );
