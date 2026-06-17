@@ -2,48 +2,165 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Rust WASM Performance Demo</title>
-    <style>
-      body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
-      pre { background: #111; color: #eee; padding: 1rem; border-radius: 8px; }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <h1>Rust WASM Performance Demo</h1>
-    <p>Compare JavaScript vs WebAssembly for the same CPU-heavy loop.</p>
-    <button id="run">Run benchmark</button>
-    <pre id="output">Waiting...</pre>
-    <script type="module">
-      import init, { sum_squares } from './pkg/rust_wasm_performance_demo.js';
+    <main class="demo">
+      <header class="hero">
+        <p class="eyebrow">WebAssembly benchmark</p>
+        <h1>JavaScript vs Rust WASM</h1>
+        <p class="lede">
+          Both implementations run the exact same CPU-heavy loop in your browser.
+          Compare wall-clock time and see how WebAssembly handles number crunching.
+        </p>
+      </header>
 
-      const iterations = 5_000_000;
-      const output = document.getElementById('output');
-      const run = document.getElementById('run');
+      <section class="panel panel--explain">
+        <h2>What is being measured?</h2>
+        <p>
+          Each run sums <code>i²</code> for every integer from
+          <code>0</code> to <code>N − 1</code> in a tight loop — no DOM updates,
+          no network, just pure computation.
+        </p>
+        <pre class="code-block" aria-hidden="true"><code>total = 0
+for i in 0..N:
+    total += i * i</code></pre>
+        <p class="note">
+          The JavaScript version runs on the main thread. The Rust code is compiled
+          to WebAssembly and called through <code>wasm-bindgen</code>.
+          At <strong>1M</strong> and <strong>5M</strong>, we use the original blog timing
+          (one JS run, then one WASM run). Larger workloads add warmup and multiple samples.
+        </p>
+      </section>
 
-      function jsSumSquares(n) {
-        let total = 0;
-        for (let i = 0; i < n; i += 1) {
-          total += i * i;
-        }
-        return total;
-      }
+      <section class="panel panel--controls">
+        <div class="control-group">
+          <span class="control-label" id="workloadLabel">Workload size</span>
+          <div class="workload-picker" role="radiogroup" aria-labelledby="workloadLabel">
+            <button type="button" class="workload-option" data-iterations="1000000" aria-pressed="false">
+              1M
+              <span class="workload-option__hint">Quick</span>
+            </button>
+            <button type="button" class="workload-option workload-option--active" data-iterations="5000000" aria-pressed="true">
+              5M
+              <span class="workload-option__hint">Default</span>
+            </button>
+            <button type="button" class="workload-option" data-iterations="10000000" aria-pressed="false">
+              10M
+              <span class="workload-option__hint">Heavy</span>
+            </button>
+            <button type="button" class="workload-option" data-iterations="100000000" aria-pressed="false">
+              100M
+              <span class="workload-option__hint">Stress</span>
+            </button>
+            <button type="button" class="workload-option" data-iterations="1000000000" aria-pressed="false">
+              1000M
+              <span class="workload-option__hint">Extreme</span>
+            </button>
+          </div>
+          <p class="workload-limit">
+            Hard limit: ~4,294M iterations (Rust <code>u32</code> max). 1000M can freeze the tab for minutes.
+          </p>
+        </div>
 
-      run.addEventListener('click', async () => {
-        await init();
-        const jsStart = performance.now();
-        const jsResult = jsSumSquares(iterations);
-        const jsMs = performance.now() - jsStart;
+        <div class="control-group">
+          <span class="control-label">Module status</span>
+          <p class="module-status" id="moduleStatus">Loading Rust WASM module…</p>
+        </div>
 
-        const wasmStart = performance.now();
-        const wasmResult = sum_squares(iterations);
-        const wasmMs = performance.now() - wasmStart;
+        <button type="button" class="run-button" id="run" disabled>Run benchmark</button>
+      </section>
 
-        output.textContent = [
-          `iterations: ${iterations}`,
-          `javascript: ${jsMs.toFixed(2)} ms, result=${jsResult}`,
-          `wasm:       ${wasmMs.toFixed(2)} ms, result=${wasmResult}`,
-        ].join('\n');
-      });
-    </script>
+      <section class="panel panel--results" id="resultsPanel" hidden>
+        <div class="results-header">
+          <h2>Results</h2>
+          <p class="run-status" id="runStatus" aria-live="polite">Ready</p>
+        </div>
+
+        <div class="speedup-card" id="speedupCard" hidden>
+          <span class="speedup-card__label">Speedup</span>
+          <strong class="speedup-card__value" id="speedupValue">—</strong>
+          <span class="speedup-card__detail" id="speedupDetail"></span>
+        </div>
+
+        <div class="compare-chart" id="compareChart" hidden>
+          <div class="compare-row">
+            <div class="compare-row__header">
+              <span class="compare-row__label compare-row__label--js">JavaScript</span>
+              <span class="compare-row__time" id="jsTime">—</span>
+            </div>
+            <div class="bar-track" aria-hidden="true">
+              <div class="bar bar--js" id="jsBar"></div>
+            </div>
+          </div>
+
+          <div class="compare-row">
+            <div class="compare-row__header">
+              <span class="compare-row__label compare-row__label--wasm">Rust WASM</span>
+              <span class="compare-row__time" id="wasmTime">—</span>
+            </div>
+            <div class="bar-track" aria-hidden="true">
+              <div class="bar bar--wasm" id="wasmBar"></div>
+            </div>
+          </div>
+        </div>
+
+        <dl class="result-details" id="resultDetails" hidden>
+          <div class="result-details__item">
+            <dt>Iterations</dt>
+            <dd id="iterationCount">—</dd>
+          </div>
+          <div class="result-details__item">
+            <dt>JavaScript result</dt>
+            <dd id="jsResult">—</dd>
+          </div>
+          <div class="result-details__item">
+            <dt>WASM result</dt>
+            <dd id="wasmResult">—</dd>
+          </div>
+          <div class="result-details__item">
+            <dt>JavaScript samples</dt>
+            <dd id="jsSamples">—</dd>
+          </div>
+          <div class="result-details__item">
+            <dt>WASM samples</dt>
+            <dd id="wasmSamples">—</dd>
+          </div>
+          <div class="result-details__item">
+            <dt>Time difference</dt>
+            <dd id="timeDifference">—</dd>
+          </div>
+          <div class="result-details__item">
+            <dt>Timing method</dt>
+            <dd id="timingMethod">—</dd>
+          </div>
+          <div class="result-details__item">
+            <dt>Outputs match</dt>
+            <dd id="resultsMatch">—</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="panel panel--footnote">
+        <h2>How to read this</h2>
+        <ul class="footnote-list">
+          <li>At <strong>1M</strong> and <strong>5M</strong>, timing matches the original blog demo — one JS run, then WASM. That often shows a larger gap because WASM is native code while V8 is still optimizing the JS loop.</li>
+          <li>At <strong>10M+</strong>, we warmup and take multiple samples for stabler numbers. Ties or small gaps there are normal on modern V8.</li>
+          <li>At <strong>100M+</strong>, each runtime is measured in its own block (WASM first, then JS) so a hot CPU does not skew results.</li>
+          <li><strong>1000M</strong> runs once per runtime only — it can freeze the tab for minutes. The code limit is ~4,294M (<code>u32</code>).</li>
+          <li>Both implementations must return the same numeric result — that confirms the comparison is fair.</li>
+        </ul>
+      </section>
+    </main>
+
+    <script type="module" src="./demo.js"></script>
   </body>
 </html>
