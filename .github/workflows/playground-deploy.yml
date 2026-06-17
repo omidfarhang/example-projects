@@ -57,6 +57,8 @@ jobs:
             category: examples
           - slug: angular-graphql-apollo
             category: examples
+          - slug: realtime-frontend-patterns
+            category: examples
           - slug: microbiome-sandbox
             category: labs
     steps:
