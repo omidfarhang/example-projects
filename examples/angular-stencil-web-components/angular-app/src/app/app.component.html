@@ -1,10 +1,91 @@
-<main class="container">
-  <h1>Stencil Web Component in Angular</h1>
-  <p>Companion demo for the omid.dev Stencil + Angular tutorial.</p>
-  <my-button text="Click Me" (buttonClick)="onButtonClick()"></my-button>
-  @if (clickCount > 0) {
-    <p class="feedback" role="status">
-      Button clicked {{ clickCount }} time{{ clickCount === 1 ? '' : 's' }}.
+<main class="demo">
+  <header class="hero">
+    <p class="eyebrow">Web Components</p>
+    <h1>Stencil component in Angular</h1>
+    <p class="lede">
+      A Stencil-built custom element works in Angular like any native HTML tag.
+      Properties flow in, DOM events flow out — no wrapper component required.
     </p>
-  }
+  </header>
+
+  <section class="panel panel--architecture">
+    <h2>How the pieces connect</h2>
+    <ol class="flow-list">
+      <li class="flow-step flow-step--stencil">
+        <span class="flow-step__label">Stencil library</span>
+        <strong>stencil-my-button</strong>
+        <span class="flow-step__detail">Compiles to standards-based custom elements</span>
+      </li>
+      <li class="flow-step flow-step--bridge">
+        <span class="flow-step__label">Loader</span>
+        <strong>defineCustomElements()</strong>
+        <span class="flow-step__detail">Registers <code>&lt;my-button&gt;</code> in the browser</span>
+      </li>
+      <li class="flow-step flow-step--angular">
+        <span class="flow-step__label">Angular host</span>
+        <strong>CUSTOM_ELEMENTS_SCHEMA</strong>
+        <span class="flow-step__detail">Lets Angular templates use unknown tags</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="panel panel--contract">
+    <h2>Component contract</h2>
+    <div class="contract-grid">
+      <div class="contract-card">
+        <span class="contract-card__type">&#64;Prop()</span>
+        <code>text</code>
+        <span class="contract-card__bind">Bound as <code>[text]="buttonText"</code></span>
+      </div>
+      <div class="contract-card">
+        <span class="contract-card__type">&#64;Event()</span>
+        <code>buttonClick</code>
+        <span class="contract-card__bind">Listened as <code>(buttonClick)="onButtonClick()"</code></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel panel--playground">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow eyebrow--playground">Live playground</p>
+        <h2>Try the custom element</h2>
+      </div>
+      @if (clickCount > 0) {
+        <span class="status-badge">{{ clickCount }} click{{ clickCount === 1 ? '' : 's' }}</span>
+      }
+    </div>
+
+    <label class="field" for="buttonText">
+      <span class="field__label">Button label (<code>text</code> prop)</span>
+      <input id="buttonText" type="text" [(ngModel)]="buttonText" maxlength="48" />
+    </label>
+
+    <div class="component-stage">
+      <my-button [text]="buttonText" (buttonClick)="onButtonClick()"></my-button>
+    </div>
+
+    @if (clickCount > 0) {
+      <p class="feedback" role="status">
+        Angular received <strong>{{ clickCount }}</strong>
+        {{ clickCount === 1 ? 'event' : 'events' }} from the Stencil component.
+      </p>
+    } @else {
+      <p class="hint">Click the button — Angular listens for the Stencil <code>buttonClick</code> event.</p>
+    }
+
+    @if (eventLog.length > 0) {
+      <div class="event-log">
+        <span class="event-log__label">Event log</span>
+        <ul>
+          @for (entry of eventLog; track $index) {
+            <li>
+              <time>{{ entry.time }}</time>
+              <span>{{ entry.message }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </section>
 </main>
