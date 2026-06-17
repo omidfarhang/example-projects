@@ -45,9 +45,10 @@ export function buildAngular(demo, category) {
     );
   }
   const projectFlag = demo.angularProject ? ['--project', demo.angularProject] : [];
+  const configuration = demo.angularConfiguration ?? 'production';
   run(
     'npx',
-    ['ng', 'build', ...projectFlag, '--configuration', 'production', `--base-href=${baseHref}`],
+    ['ng', 'build', ...projectFlag, '--configuration', configuration, `--base-href=${baseHref}`],
     { cwd, env: angularCliEnv, label: `ng build ${demo.slug}` },
   );
   const outName = demo.angularProject ?? path.basename(cwd);

@@ -4,6 +4,8 @@ Companion project for [Integrating GraphQL with Angular: A Practical Guide](http
 
 Includes a minimal GraphQL server and an Angular 20 client using Apollo.
 
+**Live demo:** https://playground.omid.dev/examples/angular-graphql-apollo/ (in-browser GraphQL mock; server code stays in this repo)
+
 ## Run
 
 Terminal 1 — GraphQL server:

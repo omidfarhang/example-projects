@@ -24,6 +24,7 @@ Browser-only companion projects and interactive labs are published at **[playgro
 | [Angular Shared Library Workspace](https://playground.omid.dev/examples/angular-shared-library-workspace/) | [`examples/angular-shared-library-workspace`](./examples/angular-shared-library-workspace/) |
 | [React Recoil Advanced State](https://playground.omid.dev/examples/react-recoil-advanced-state/) | [`examples/react-recoil-advanced-state`](./examples/react-recoil-advanced-state/) |
 | [Bootstrap to Tailwind Migration](https://playground.omid.dev/examples/bootstrap-to-tailwind-migration/) | [`examples/bootstrap-to-tailwind-migration`](./examples/bootstrap-to-tailwind-migration/) |
+| [GraphQL with Angular & Apollo](https://playground.omid.dev/examples/angular-graphql-apollo/) | [`examples/angular-graphql-apollo`](./examples/angular-graphql-apollo/) |
 
 Demos that need Firebase, a local API server, native Linux binaries, or other non-browser runtimes are **source-only** for now. See [playground/README.md](./playground/README.md) for the playground build and deploy setup.
 
@@ -61,7 +62,7 @@ Most frontend examples are Angular apps and open on `http://localhost:4200`. Som
 | [`examples/qwik-angular-react-rust`](./examples/qwik-angular-react-rust/) | Qwik shell app that hosts Angular and React micro frontends, with optional Rust WASM | [Open](https://playground.omid.dev/examples/qwik-angular-react-rust/) | [Micro Frontends: Working Example](https://omid.dev/2024/05/11/micro-frontends-working-example/) |
 | [`examples/angular-collaborative-editor-firebase-webrtc`](./examples/angular-collaborative-editor-firebase-webrtc/) | Real-time Angular editor using Firebase, Firestore, and WebRTC signaling ideas | Source only (Firebase) | [Building a Real-Time Collaborative Editor with Angular, Firebase, and WebRTC](https://omid.dev/2024/06/24/realtime-collaborative-editor-with-angular-firebase-webrtc/) |
 | [`examples/angular-web-workers-offscreencanvas`](./examples/angular-web-workers-offscreencanvas/) | Moving canvas work off the main thread with Web Workers and OffscreenCanvas | [Open](https://playground.omid.dev/examples/angular-web-workers-offscreencanvas/) | [Optimizing Angular Applications with Web Workers and OffscreenCanvas](https://omid.dev/2024/06/23/optimizing-angular-applications-with-web-workers-and-offscreencanvas/) |
-| [`examples/angular-graphql-apollo`](./examples/angular-graphql-apollo/) | Angular app connected to a local GraphQL API with Apollo Client | Source only (API server) | [Integrating GraphQL with Angular: A Practical Guide](https://omid.dev/2024/06/01/integrating-graphql-with-angular-a-practical-guide/) |
+| [`examples/angular-graphql-apollo`](./examples/angular-graphql-apollo/) | Angular app connected to a local GraphQL API with Apollo Client | [Open](https://playground.omid.dev/examples/angular-graphql-apollo/) | [Integrating GraphQL with Angular: A Practical Guide](https://omid.dev/2024/06/01/integrating-graphql-with-angular-a-practical-guide/) |
 | [`examples/angular-stencil-web-components`](./examples/angular-stencil-web-components/) | Stencil web component consumed by an Angular app | [Open](https://playground.omid.dev/examples/angular-stencil-web-components/) | [Implementing Custom Web Components in Angular with Stencil.js](https://omid.dev/2024/06/26/implementing-custom-web-components-in-angular-with-stenciljs/) |
 | [`examples/typescript-advanced-types`](./examples/typescript-advanced-types/) | Small TypeScript examples for mapped, conditional, recursive, and utility types | Source only | [Advanced TypeScript types](https://omid.dev/2024/06/14/advanced-typeScript-types/) |
 | [`examples/react-recoil-advanced-state`](./examples/react-recoil-advanced-state/) | React task dashboard demonstrating atoms, selectors, and derived state with Recoil | [Open](https://playground.omid.dev/examples/react-recoil-advanced-state/) | [Advanced state management in React with Recoil](https://omid.dev/2024/06/14/advanced-state-management-in-react-with-recoil/) |
@@ -92,7 +93,7 @@ npm install -g @angular/cli@20
 
 - Live demos are built with `npm run build:playground` and deployed by GitHub Actions to Cloudflare Pages. See [playground/README.md](./playground/README.md).
 - `angular-collaborative-editor-firebase-webrtc` needs a Firebase project with Anonymous Authentication and Cloud Firestore enabled.
-- `angular-graphql-apollo` and `graphql-express-angular-migration` include local API servers. Start the `server/` app before the Angular app.
+- `angular-graphql-apollo` uses an in-browser GraphQL mock on the live playground; clone the repo and start the `server/` app for the full HTTP + Apollo setup. `graphql-express-angular-migration` includes a local API server — start the `server/` app before the Angular app.
 - `angular-stencil-web-components` has two parts. Build the Stencil component first, then run the Angular app.
 - `qwik-angular-react-rust` is a multi-app demo. Run the Qwik shell, Angular app, and React app in separate terminals.
 - `jupyter-blog-starter` supports either `uv sync` or a standard Python virtual environment.

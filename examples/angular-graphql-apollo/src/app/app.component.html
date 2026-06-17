@@ -1,25 +1,173 @@
-<main class="container">
-  <h1>GraphQL + Angular (Apollo)</h1>
-  <p>Companion demo for the omid.dev GraphQL integration guide.</p>
+<main class="demo">
+  <header class="hero">
+    <p class="eyebrow">GraphQL &amp; Apollo</p>
+    <h1>GraphQL with Angular and Apollo Client</h1>
+    <p class="lede">
+      A minimal CRUD screen wired through Apollo — <code>query</code> to read the list,
+      <code>mutate</code> for create/update/delete, and <code>refetchQueries</code> to refresh.
+    </p>
+  </header>
 
-  @if (errorMessage) {
-    <p class="error">{{ errorMessage }}</p>
-  }
-
-  <section>
-    <h2>Items</h2>
-    <ul>
-      @for (item of items; track item.id) {
-        <li>{{ item.name }}</li>
-      }
-    </ul>
+  <section class="panel panel--architecture">
+    <h2>How the pieces connect</h2>
+    <ol class="flow-list">
+      <li class="flow-step flow-step--graphql">
+        <span class="flow-step__label">GraphQL API</span>
+        @if (isPlayground) {
+          <strong>In-browser SchemaLink mock</strong>
+          <span class="flow-step__detail">Same schema and resolvers as the repo server — no HTTP round trip</span>
+        } @else {
+          <strong>Express + Apollo Server</strong>
+          <span class="flow-step__detail">In-memory store at <code>localhost:4000/graphql</code></span>
+        }
+      </li>
+      <li class="flow-step flow-step--apollo">
+        <span class="flow-step__label">Apollo Client</span>
+        <strong>{{ isPlayground ? 'SchemaLink' : 'HttpLink' }}</strong>
+        <span class="flow-step__detail">
+          @if (isPlayground) {
+            Executes operations against the in-browser schema
+          } @else {
+            Sends GraphQL over HTTP to the local server
+          }
+        </span>
+      </li>
+      <li class="flow-step flow-step--angular">
+        <span class="flow-step__label">Angular service</span>
+        <strong>GraphqlService</strong>
+        <span class="flow-step__detail"><code>gql</code> documents, typed results, and cache updates</span>
+      </li>
+    </ol>
   </section>
 
-  <section>
-    <h2>Add item</h2>
-    <form (submit)="addItem(); $event.preventDefault()">
-      <input [(ngModel)]="newItemName" name="newItemName" placeholder="Item name" />
-      <button type="submit">Add</button>
+  <section class="panel panel--contract">
+    <h2>Apollo operations</h2>
+    <div class="contract-grid">
+      <div class="contract-card">
+        <span class="contract-card__type">query</span>
+        <code>Items</code>
+        <span class="contract-card__bind">Read via <code>getItems()</code></span>
+      </div>
+      <div class="contract-card">
+        <span class="contract-card__type">mutation</span>
+        <code>AddItem</code>
+        <span class="contract-card__bind">Create via <code>addItem()</code></span>
+      </div>
+      <div class="contract-card">
+        <span class="contract-card__type">mutation</span>
+        <code>UpdateItem</code>
+        <span class="contract-card__bind">Update via <code>updateItem()</code></span>
+      </div>
+      <div class="contract-card">
+        <span class="contract-card__type">mutation</span>
+        <code>DeleteItem</code>
+        <span class="contract-card__bind">Delete via <code>deleteItem()</code></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel panel--playground">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow eyebrow--playground">Live playground</p>
+        <h2>Try the CRUD flow</h2>
+      </div>
+      @if (items.length > 0) {
+        <span class="status-badge">{{ items.length }} item{{ items.length === 1 ? '' : 's' }}</span>
+      }
+    </div>
+
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
+
+    <div class="items-stage">
+      <span class="items-stage__label">Query result — <code>items</code></span>
+      @if (items.length === 0 && !loading) {
+        <p class="hint">No items yet. Add one below.</p>
+      } @else if (loading && items.length === 0) {
+        <p class="hint">Loading items…</p>
+      } @else {
+        <ul class="item-list">
+          @for (item of items; track item.id) {
+            <li [class.item-list__row--editing]="editingId === item.id">
+              @if (editingId === item.id) {
+                <form class="item-list__edit" (submit)="saveEdit(); $event.preventDefault()">
+                  <span class="item-list__id">#{{ item.id }}</span>
+                  <input
+                    [(ngModel)]="editingName"
+                    name="editingName-{{ item.id }}"
+                    class="item-list__input"
+                    maxlength="48"
+                    [disabled]="updating"
+                  />
+                  <div class="item-list__actions">
+                    <button class="btn btn--small" type="submit" [disabled]="updating || !editingName.trim()">
+                      {{ updating ? 'Saving…' : 'Save' }}
+                    </button>
+                    <button class="btn btn--small btn--ghost" type="button" (click)="cancelEdit()" [disabled]="updating">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              } @else {
+                <span class="item-list__id">#{{ item.id }}</span>
+                <span class="item-list__name">{{ item.name }}</span>
+                <div class="item-list__actions">
+                  <button
+                    class="btn btn--small btn--ghost"
+                    type="button"
+                    (click)="startEdit(item)"
+                    [disabled]="!!deletingId || !!editingId"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    class="btn btn--small btn--danger"
+                    type="button"
+                    (click)="deleteItem(item)"
+                    [disabled]="!!deletingId || !!editingId"
+                  >
+                    {{ deletingId === item.id ? 'Deleting…' : 'Delete' }}
+                  </button>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <form class="add-form" (submit)="addItem(); $event.preventDefault()">
+      <label class="field" for="newItemName">
+        <span class="field__label">New item (<code>addItem</code> mutation)</span>
+        <input
+          id="newItemName"
+          type="text"
+          [(ngModel)]="newItemName"
+          name="newItemName"
+          placeholder="e.g. Apollo Client"
+          maxlength="48"
+          [disabled]="adding || !!editingId"
+        />
+      </label>
+      <button class="btn" type="submit" [disabled]="adding || !!editingId || !newItemName.trim()">
+        {{ adding ? 'Adding…' : 'Add item' }}
+      </button>
     </form>
+
+    @if (statusMessage) {
+      <p class="feedback" role="status">
+        {{ statusMessage }} List refreshed via <code>refetchQueries</code>.
+      </p>
+    } @else {
+      <p class="hint">
+        @if (isPlayground) {
+          Add, edit, or delete items — Apollo runs each mutation against the in-browser mock.
+        } @else {
+          Start the GraphQL server (<code>cd server && npm start</code>) if the list fails to load.
+        }
+      </p>
+    }
   </section>
 </main>

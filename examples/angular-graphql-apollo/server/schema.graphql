@@ -9,4 +9,6 @@ type Query {
 
 type Mutation {
   addItem(name: String!): Item!
+  updateItem(id: ID!, name: String!): Item!
+  deleteItem(id: ID!): Item!
 }

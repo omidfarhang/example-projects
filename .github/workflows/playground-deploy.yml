@@ -53,6 +53,8 @@ jobs:
             category: examples
           - slug: bootstrap-to-tailwind-migration
             category: examples
+          - slug: angular-graphql-apollo
+            category: examples
           - slug: microbiome-sandbox
             category: labs
     steps:

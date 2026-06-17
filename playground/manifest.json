@@ -111,6 +111,18 @@
         "sourcePath": "examples/bootstrap-to-tailwind-migration",
         "type": "static-html",
         "articleUrl": "https://omid.dev/2024/05/22/migrate-css-bootstrap-to-tailwind/"
+      },
+      {
+        "slug": "angular-graphql-apollo",
+        "title": "GraphQL with Angular & Apollo",
+        "description": "Angular CRUD via Apollo query and mutate — in-browser GraphQL mock for the live demo.",
+        "articleTitle": "Integrating GraphQL with Angular: A Practical Guide",
+        "projectDir": "examples/angular-graphql-apollo",
+        "sourcePath": "examples/angular-graphql-apollo",
+        "type": "angular",
+        "angularConfiguration": "playground",
+        "legacyPeerDeps": true,
+        "articleUrl": "https://omid.dev/2024/06/01/integrating-graphql-with-angular-a-practical-guide/"
       }
     ],
     "labs": [
@@ -135,15 +147,6 @@
       "sourcePath": "examples/angular-collaborative-editor-firebase-webrtc",
       "reason": "Firebase",
       "articleUrl": "https://omid.dev/2024/06/24/realtime-collaborative-editor-with-angular-firebase-webrtc/"
-    },
-    {
-      "slug": "angular-graphql-apollo",
-      "title": "GraphQL with Angular & Apollo",
-      "description": "Angular app connected to a local GraphQL API with Apollo Client.",
-      "articleTitle": "Integrating GraphQL with Angular: A Practical Guide",
-      "sourcePath": "examples/angular-graphql-apollo",
-      "reason": "API server",
-      "articleUrl": "https://omid.dev/2024/06/01/integrating-graphql-with-angular-a-practical-guide/"
     },
     {
       "slug": "graphql-express-angular-migration",
