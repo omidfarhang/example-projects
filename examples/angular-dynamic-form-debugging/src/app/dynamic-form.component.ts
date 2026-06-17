@@ -4,77 +4,10 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FormFieldMetadata, buildControlsBuggy, buildControlsFixed, sampleMetadata } from './form-builder';
 
 @Component({
-    selector: 'app-dynamic-form',
-    imports: [ReactiveFormsModule],
-    template: `
-    <section class="debug-panel" aria-live="polite">
-      <strong>{{ modeLabel }}</strong>
-      <span>Metadata fields: {{ fields.length }}</span>
-      <span>Form controls: {{ controlNames.length || 'none' }}</span>
-      @if (missingFields.length) {
-        <span class="warning">Missing controls: {{ missingFieldNames }}</span>
-      }
-    </section>
-
-    @if (form) {
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        @for (field of fields; track field.name) {
-          @if (form.get(field.name)) {
-            <label>
-              {{ field.label }}
-              <input [formControlName]="field.name" [type]="field.type" />
-            </label>
-            @if (submitted && controlInvalid(field.name)) {
-              <p class="error">{{ field.errorMessage }}</p>
-            }
-          } @else {
-            <div class="missing-control">
-              <strong>{{ field.label }}</strong>
-              <span>Metadata arrived, but no Angular control was registered for "{{ field.name }}".</span>
-            </div>
-          }
-        }
-        <button type="submit" [disabled]="!canSubmit">Submit</button>
-      </form>
-    } @else {
-      <p>Loading metadata...</p>
-    }
-  `,
-    styles: [
-        `
-      form {
-        display: grid;
-        gap: 0.75rem;
-        max-width: 420px;
-      }
-      .debug-panel {
-        display: grid;
-        gap: 0.35rem;
-        max-width: 420px;
-        margin: 1rem 0;
-        padding: 0.75rem;
-        border: 1px solid #d6d6d6;
-        border-radius: 0.5rem;
-        background: #fafafa;
-      }
-      .error {
-        color: #b00020;
-        margin: 0;
-      }
-      .warning,
-      .missing-control {
-        color: #8a4b00;
-      }
-      .missing-control {
-        display: grid;
-        gap: 0.25rem;
-        padding: 0.75rem;
-        border: 1px dashed #c47f00;
-        border-radius: 0.5rem;
-        background: #fff8ed;
-      }
-    `,
-    ]
+  selector: 'app-dynamic-form',
+  imports: [ReactiveFormsModule],
+  templateUrl: './dynamic-form.component.html',
+  styleUrl: './dynamic-form.component.css',
 })
 export class DynamicFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
@@ -93,6 +26,8 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
   fields: FormFieldMetadata[] = [];
   form: FormGroup | null = null;
   submitted = false;
+  metadataPending = true;
+  submitSummary = '';
 
   ngOnInit(): void {
     this.initialized = true;
@@ -103,10 +38,12 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
     this.clearLoadTimer();
   }
 
+  get isBuggyFlow(): boolean {
+    return this.useBuggyFlowValue;
+  }
+
   get modeLabel(): string {
-    return this.useBuggyFlowValue
-      ? 'Buggy flow: controls are built before metadata arrives'
-      : 'Fixed flow: controls are built after metadata arrives';
+    return this.useBuggyFlowValue ? 'Buggy flow' : 'Fixed flow';
   }
 
   get controlNames(): string[] {
@@ -125,22 +62,39 @@ export class DynamicFormComponent implements OnInit, OnDestroy {
     return !!this.form && this.fields.length > 0 && this.missingFields.length === 0 && this.form.valid;
   }
 
+  get hasMismatch(): boolean {
+    return !this.metadataPending && this.fields.length > 0 && this.missingFields.length > 0;
+  }
+
+  get isHealthy(): boolean {
+    return !this.metadataPending && this.fields.length > 0 && this.missingFields.length === 0;
+  }
+
   controlInvalid(fieldName: string): boolean {
     return !!this.form?.get(fieldName)?.invalid;
   }
 
   onSubmit(): void {
     this.submitted = true;
+    if (!this.form || !this.canSubmit) {
+      this.submitSummary = '';
+      return;
+    }
+
+    this.submitSummary = JSON.stringify(this.form.getRawValue(), null, 2);
   }
 
   private restartDemo(): void {
     this.clearLoadTimer();
     this.fields = [];
-    this.form = this.useBuggyFlowValue ? this.fb.group(buildControlsBuggy(this.fields)) : null;
+    this.metadataPending = true;
     this.submitted = false;
+    this.submitSummary = '';
+    this.form = this.useBuggyFlowValue ? this.fb.group(buildControlsBuggy(this.fields)) : null;
 
     this.loadTimer = setTimeout(() => {
       this.fields = sampleMetadata.fields;
+      this.metadataPending = false;
       if (!this.useBuggyFlowValue) {
         this.form = this.fb.group(buildControlsFixed(this.fields));
       }

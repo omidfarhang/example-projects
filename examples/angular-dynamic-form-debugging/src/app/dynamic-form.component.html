@@ -1,0 +1,104 @@
+<section class="panel" [class.panel--buggy]="isBuggyFlow" [class.panel--fixed]="!isBuggyFlow">
+  <div class="panel-heading">
+    <div>
+      <p class="eyebrow">Live demo</p>
+      <h2>{{ modeLabel }}</h2>
+    </div>
+    <span
+      class="status-badge"
+      [class.status-badge--pending]="metadataPending"
+      [class.status-badge--error]="hasMismatch"
+      [class.status-badge--ok]="isHealthy"
+    >
+      @if (metadataPending) {
+        Loading metadata…
+      } @else if (hasMismatch) {
+        Control mismatch
+      } @else {
+        Controls in sync
+      }
+    </span>
+  </div>
+
+  <ol class="timeline">
+    <li class="timeline__step timeline__step--done">
+      <span class="timeline__label">Demo started</span>
+      <span class="timeline__detail">Form build attempted</span>
+    </li>
+    <li class="timeline__step" [class.timeline__step--done]="!metadataPending">
+      <span class="timeline__label">Metadata arrives</span>
+      <span class="timeline__detail">Simulated API (~300 ms)</span>
+    </li>
+    <li class="timeline__step" [class.timeline__step--done]="isHealthy" [class.timeline__step--error]="hasMismatch">
+      <span class="timeline__label">Controls registered</span>
+      <span class="timeline__detail">
+        @if (metadataPending) {
+          Waiting…
+        } @else if (hasMismatch) {
+          {{ controlNames.length }} of {{ fields.length }} controls
+        } @else {
+          All {{ fields.length }} fields matched
+        }
+      </span>
+    </li>
+  </ol>
+
+  <dl class="debug-grid" aria-live="polite">
+    <div class="debug-grid__item">
+      <dt>Metadata fields</dt>
+      <dd>{{ fields.length || '—' }}</dd>
+    </div>
+    <div class="debug-grid__item">
+      <dt>Form controls</dt>
+      <dd>{{ controlNames.length || 'none' }}</dd>
+    </div>
+    <div class="debug-grid__item">
+      <dt>Control names</dt>
+      <dd>{{ controlNames.join(', ') || '—' }}</dd>
+    </div>
+    <div class="debug-grid__item">
+      <dt>Form valid</dt>
+      <dd>{{ form?.valid ? 'yes' : 'no' }}</dd>
+    </div>
+  </dl>
+
+  @if (hasMismatch) {
+    <p class="alert alert--warning">
+      Metadata includes <strong>{{ missingFieldNames }}</strong>, but the Angular
+      form has no matching controls — exactly the bug from the blog post.
+    </p>
+  }
+
+  @if (metadataPending) {
+    <p class="pending">Waiting for simulated API metadata…</p>
+  } @else if (form) {
+    <form class="dynamic-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      @for (field of fields; track field.name) {
+        @if (form.get(field.name)) {
+          <label class="field">
+            <span class="field__label">{{ field.label }}</span>
+            <input [formControlName]="field.name" [type]="field.type" />
+          </label>
+          @if (submitted && controlInvalid(field.name)) {
+            <p class="field-error">{{ field.errorMessage }}</p>
+          }
+        } @else {
+          <div class="missing-control">
+            <strong>{{ field.label }}</strong>
+            <span>No <code>FormControl</code> for <code>{{ field.name }}</code> — UI cannot bind.</span>
+          </div>
+        }
+      }
+      <button type="submit" class="submit-btn" [disabled]="!canSubmit">Submit form</button>
+    </form>
+
+    @if (submitSummary) {
+      <div class="submit-result">
+        <span class="submit-result__label">Submitted values</span>
+        <pre>{{ submitSummary }}</pre>
+      </div>
+    } @else if (submitted && !canSubmit) {
+      <p class="alert alert--warning">Submit blocked — fix missing controls or validation errors first.</p>
+    }
+  }
+</section>
