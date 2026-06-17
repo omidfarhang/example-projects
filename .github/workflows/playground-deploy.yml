@@ -8,6 +8,7 @@ on:
       - 'labs/**'
       - 'playground/**'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/playground-deploy.yml'
   pull_request:
     branches: [master]
@@ -16,6 +17,7 @@ on:
       - 'labs/**'
       - 'playground/**'
       - 'package.json'
+      - 'package-lock.json'
   workflow_dispatch:
 
 concurrency:
@@ -96,6 +98,11 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install deploy dependencies
+        run: npm ci
 
       - name: Download all dist slices
         uses: actions/download-artifact@v8
