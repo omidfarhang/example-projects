@@ -26,6 +26,7 @@ Browser-only companion projects and interactive labs are published at **[playgro
 | [Bootstrap to Tailwind Migration](https://playground.omid.dev/examples/bootstrap-to-tailwind-migration/) | [`examples/bootstrap-to-tailwind-migration`](./examples/bootstrap-to-tailwind-migration/) |
 | [GraphQL with Angular & Apollo](https://playground.omid.dev/examples/angular-graphql-apollo/) | [`examples/angular-graphql-apollo`](./examples/angular-graphql-apollo/) |
 | [Real-Time Frontend Patterns](https://playground.omid.dev/examples/realtime-frontend-patterns/) | [`examples/realtime-frontend-patterns`](./examples/realtime-frontend-patterns/) |
+| [Chaos Resilience Lab](https://playground.omid.dev/examples/chaos-resilience-lab/) | [`examples/chaos-resilience-lab`](./examples/chaos-resilience-lab/) |
 
 Demos that need Firebase, a local API server, native Linux binaries, or other non-browser runtimes are **source-only** for now. See [playground/README.md](./playground/README.md) for the playground build and deploy setup.
 
@@ -51,6 +52,7 @@ Most frontend examples are Angular apps and open on `http://localhost:4200`. Som
 | Linux desktop and kernel-adjacent tooling | [`examples/latency-lens`](./examples/latency-lens/) |
 | APIs and data fetching | [`examples/angular-graphql-apollo`](./examples/angular-graphql-apollo/), [`examples/graphql-express-angular-migration`](./examples/graphql-express-angular-migration/) |
 | Real-time applications | [`examples/angular-collaborative-editor-firebase-webrtc`](./examples/angular-collaborative-editor-firebase-webrtc/), [`examples/realtime-frontend-patterns`](./examples/realtime-frontend-patterns/) |
+| Resilience and fault tolerance | [`examples/chaos-resilience-lab`](./examples/chaos-resilience-lab/) |
 | Micro frontends and web components | [`examples/qwik-angular-react-rust`](./examples/qwik-angular-react-rust/), [`examples/angular-stencil-web-components`](./examples/angular-stencil-web-components/) |
 | TypeScript and state management | [`examples/typescript-advanced-types`](./examples/typescript-advanced-types/), [`examples/react-recoil-advanced-state`](./examples/react-recoil-advanced-state/) |
 | Tooling and migration | [`examples/angular-custom-schematics`](./examples/angular-custom-schematics/), [`examples/bootstrap-to-tailwind-migration`](./examples/bootstrap-to-tailwind-migration/), [`examples/jupyter-blog-starter`](./examples/jupyter-blog-starter/) |
@@ -68,6 +70,7 @@ Most frontend examples are Angular apps and open on `http://localhost:4200`. Som
 | [`examples/typescript-advanced-types`](./examples/typescript-advanced-types/) | Small TypeScript examples for mapped, conditional, recursive, and utility types | Source only | [Advanced TypeScript types](https://omid.dev/2024/06/14/advanced-typeScript-types/) |
 | [`examples/react-recoil-advanced-state`](./examples/react-recoil-advanced-state/) | React task dashboard demonstrating atoms, selectors, and derived state with Recoil | [Open](https://playground.omid.dev/examples/react-recoil-advanced-state/) | [Advanced state management in React with Recoil](https://omid.dev/2024/06/14/advanced-state-management-in-react-with-recoil/) |
 | [`examples/realtime-frontend-patterns`](./examples/realtime-frontend-patterns/) | Node examples for WebSocket and Server-Sent Events patterns | [Open](https://playground.omid.dev/examples/realtime-frontend-patterns/) | [Real-time data in frontend applications](https://omid.dev/2024/06/08/real-time-data-in-frontend-applications/) |
+| [`examples/chaos-resilience-lab`](./examples/chaos-resilience-lab/) | Side-by-side checkout demo comparing fragile vs resilient UI under injected payment faults | [Open](https://playground.omid.dev/examples/chaos-resilience-lab/) | [Chaos engineering for frontend applications](https://omid.dev/2024/07/01/chaos-engineering-in-frontend-development/) |
 | [`examples/angular-patterns-and-di`](./examples/angular-patterns-and-di/) | Angular design patterns, dependency injection, providers, and injection tokens | [Open](https://playground.omid.dev/examples/angular-patterns-and-di/) | [Design patterns in Angular](https://omid.dev/2024/05/31/design-patterns-in-angular-enhancing-code-quality-and-maintainability/), [Advanced DI techniques](https://omid.dev/2024/06/17/advanced-dependency-injection-techniques-in-angular-tree-shakable-providers-and-injection-tokens/) |
 | [`examples/angular-dynamic-form-debugging`](./examples/angular-dynamic-form-debugging/) | Reactive form debugging scenario for Angular applications | [Open](https://playground.omid.dev/examples/angular-dynamic-form-debugging/) | [Debugging Angular](https://omid.dev/2024/05/22/debugging-angular-a-tale-of-two-developers/) |
 | [`examples/angular-shared-library-workspace`](./examples/angular-shared-library-workspace/) | Angular workspace containing a reusable UI library and demo app | [Open](https://playground.omid.dev/examples/angular-shared-library-workspace/) | [Reusable shared module in Angular](https://omid.dev/2024/05/12/reusable-shared-module-in-angular/) |
@@ -94,7 +97,10 @@ npm install -g @angular/cli@20
 
 - Live demos are built with `npm run build:playground` and deployed by GitHub Actions to Cloudflare Pages. See [playground/README.md](./playground/README.md).
 - `angular-collaborative-editor-firebase-webrtc` needs a Firebase project with Anonymous Authentication and Cloud Firestore enabled.
-- `angular-graphql-apollo` uses an in-browser GraphQL mock on the live playground; clone the repo and start the `server/` app for the full HTTP + Apollo setup. `realtime-frontend-patterns` uses simulated WebSocket and SSE on the live playground; clone the repo and run `npm start` for the Express server. `graphql-express-angular-migration` includes a local API server — start the `server/` app before the Angular app.
+- `angular-graphql-apollo` uses an in-browser GraphQL mock on the live playground; clone the repo and start the `server/` app for the full HTTP + Apollo setup. 
+- `realtime-frontend-patterns` uses simulated WebSocket and SSE on the live playground; clone the repo and run `npm start` for the Express server. 
+- `chaos-resilience-lab` runs entirely in the browser on the live playground; `npm start` serves `public/` locally.
+- `graphql-express-angular-migration` includes a local API server — start the `server/` app before the Angular app.
 - `angular-stencil-web-components` has two parts. Build the Stencil component first, then run the Angular app.
 - `qwik-angular-react-rust` is a multi-app demo. Run the Qwik shell, Angular app, and React app in separate terminals.
 - `jupyter-blog-starter` supports either `uv sync` or a standard Python virtual environment.
