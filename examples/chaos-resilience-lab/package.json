@@ -1,0 +1,8 @@
+{
+  "name": "chaos-resilience-lab",
+  "private": true,
+  "description": "Fragile vs resilient checkout — live chaos engineering demo for omid.dev",
+  "scripts": {
+    "start": "npx --yes serve public -p 3456"
+  }
+}

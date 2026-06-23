@@ -59,6 +59,8 @@ jobs:
             category: examples
           - slug: realtime-frontend-patterns
             category: examples
+          - slug: chaos-resilience-lab
+            category: examples
           - slug: microbiome-sandbox
             category: labs
     steps:

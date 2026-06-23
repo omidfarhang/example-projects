@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chaos Resilience Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="demo">
+      <header class="hero">
+        <p class="eyebrow">Chaos engineering</p>
+        <h1>Fragile vs resilient checkout</h1>
+        <p class="lede">
+          Inject a fault, then click Pay. Same failure on both sides — different user outcomes. That gap
+          is what chaos experiments are meant to find and fix.
+        </p>
+      </header>
+
+      <section class="panel panel--controls" aria-label="Fault injection controls">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow eyebrow--chaos">Inject chaos</p>
+            <h2>Pick a failure mode</h2>
+          </div>
+          <p class="inject-label" id="inject-label">All systems healthy</p>
+        </div>
+        <div class="fault-grid" id="fault-buttons" role="toolbar" aria-label="Failure modes"></div>
+        <p class="hint" id="hint">Pick a fault, then interact with both checkout panels.</p>
+      </section>
+
+      <section class="pipeline" aria-label="Request path">
+        <div class="pipeline__node pipeline__node--ok" id="pipeline-checkout">
+          <span class="pipeline__label">Checkout UI</span>
+        </div>
+        <div class="pipeline__arrow" aria-hidden="true">→</div>
+        <div class="pipeline__node pipeline__node--ok" id="pipeline-payment">
+          <span class="pipeline__label">Payment API</span>
+        </div>
+      </section>
+
+      <aside class="verdict" id="verdict" data-kind="idle" aria-live="polite">
+        <span class="verdict__tag">Ready</span>
+        <p class="verdict__detail">Pick a fault, then interact with both checkout panels.</p>
+      </aside>
+
+      <div class="compare-grid">
+        <section class="checkout checkout--fragile" id="fragile-app" aria-label="Fragile checkout">
+          <header class="checkout__header">
+            <div>
+              <p class="eyebrow eyebrow--fragile">Fragile app</p>
+              <h2>Minimal error handling</h2>
+            </div>
+            <span class="mode-badge mode-badge--fragile" id="fragile-badge">No guards</span>
+          </header>
+          <ul class="checkout-items" id="fragile-items"></ul>
+          <div class="checkout-total-row">
+            <span>Total</span>
+            <strong id="fragile-total">—</strong>
+          </div>
+          <button type="button" class="btn btn--fragile" id="fragile-pay">Pay now</button>
+          <div class="checkout-status" id="fragile-status"></div>
+        </section>
+
+        <section class="checkout checkout--resilient" id="resilient-app" aria-label="Resilient checkout">
+          <header class="checkout__header">
+            <div>
+              <p class="eyebrow eyebrow--resilient">Resilient app</p>
+              <h2>Graceful degradation</h2>
+            </div>
+            <span class="mode-badge mode-badge--resilient" id="resilient-badge">Resilient</span>
+          </header>
+          <ul class="checkout-items" id="resilient-items"></ul>
+          <div class="checkout-total-row">
+            <span>Total</span>
+            <strong id="resilient-total">—</strong>
+          </div>
+          <button type="button" class="btn btn--resilient" id="resilient-pay">Pay now</button>
+          <div class="checkout-status" id="resilient-status"></div>
+        </section>
+      </div>
+
+      <p class="note">
+        Local dev copy — run <code>npm start</code> from the project root. Live demo:
+        <a href="https://playground.omid.dev/examples/chaos-resilience-lab/">playground.omid.dev</a>
+      </p>
+    </main>
+    <script type="module" src="client.playground.js"></script>
+  </body>
+</html>
