@@ -4,10 +4,12 @@ import { getActiveDistRoot } from './paths.mjs';
 import { ensureDir } from './fs-utils.mjs';
 import {
   getArticleTitle,
+  getCompanionArticles,
   getRepoUrl,
   getSourcePath,
   getSourceUrl,
 } from './manifest-utils.mjs';
+import { renderArticleActionControl, renderCardArticleLine } from './article-links.mjs';
 import {
   getOgImageUrl,
   landingSchema,
@@ -42,6 +44,7 @@ function renderCompanionCard(target, manifest) {
   const badge = typeLabel(target.type, target.kind);
   const sourcePath = getSourcePath(target);
   const sourceUrl = getSourceUrl(target, manifest);
+  const articles = getCompanionArticles(target);
 
   return `
         <article class="card card--companion" data-type="${escapeHtml(target.type)}">
@@ -56,12 +59,18 @@ function renderCompanionCard(target, manifest) {
               <span class="card__badge">${escapeHtml(badge)}</span>
             </div>
             <h3 class="card__title"><a href="${escapeHtml(href)}">${escapeHtml(target.title)}</a></h3>
-            <p class="card__article">Article: <a href="${escapeHtml(target.articleUrl)}">${escapeHtml(getArticleTitle(target))}</a></p>
+            ${renderCardArticleLine(articles)}
             <p class="card__description">${escapeHtml(target.description)}</p>
             <code class="card__path">${escapeHtml(sourcePath)}</code>
             <div class="card__actions">
               <a class="btn btn--primary" href="${escapeHtml(href)}">Open demo</a>
-              <a class="btn btn--secondary" href="${escapeHtml(target.articleUrl)}">Read article</a>
+              ${renderArticleActionControl(articles, {
+                single: 'btn btn--secondary',
+                menu: 'card__menu',
+                summary: 'btn btn--secondary',
+                panel: 'card__menu-panel',
+                item: 'card__menu-item',
+              })}
               <a class="btn btn--ghost" href="${escapeHtml(sourceUrl)}">Source</a>
             </div>
           </div>

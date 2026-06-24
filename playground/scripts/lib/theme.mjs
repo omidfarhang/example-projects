@@ -203,6 +203,62 @@ export function companionFrameCss() {
       box-shadow: var(--shadow-accent);
     }
 
+    .pg-companion__menu {
+      position: relative;
+    }
+
+    .pg-companion__menu > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .pg-companion__menu > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .pg-companion__menu > summary::after {
+      content: "▾";
+      margin-left: 0.35rem;
+      font-size: 0.65rem;
+      opacity: 0.85;
+    }
+
+    .pg-companion__menu[open] > summary::after {
+      content: "▴";
+    }
+
+    .pg-companion__menu-panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      min-width: min(22rem, 80vw);
+      padding: 0.35rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--theme);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .pg-companion__menu-item {
+      display: block;
+      padding: 0.55rem 0.75rem;
+      border-radius: calc(var(--radius) - 2px);
+      color: var(--content);
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.35;
+      text-decoration: none;
+      white-space: normal;
+    }
+
+    .pg-companion__menu-item:hover {
+      color: var(--accent-hover);
+      background: var(--surface-tint);
+    }
+
     html.pg-has-companion-bar,
     html.pg-has-companion-bar body {
       scroll-padding-top: var(--pg-companion-height);
@@ -801,6 +857,62 @@ export function landingPageCss() {
 
     .btn--secondary:hover {
       border-color: var(--accent);
+      background: var(--surface-tint);
+    }
+
+    .card__menu {
+      position: relative;
+    }
+
+    .card__menu > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .card__menu > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .card__menu > summary::after {
+      content: "▾";
+      margin-left: 0.35rem;
+      font-size: 0.65rem;
+      opacity: 0.85;
+    }
+
+    .card__menu[open] > summary::after {
+      content: "▴";
+    }
+
+    .card__menu-panel {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      min-width: min(22rem, 80vw);
+      padding: 0.35rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--theme);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card__menu-item {
+      display: block;
+      padding: 0.55rem 0.75rem;
+      border-radius: calc(var(--radius) - 2px);
+      color: var(--content);
+      font-size: 0.82rem;
+      font-weight: 600;
+      line-height: 1.35;
+      text-decoration: none;
+      white-space: normal;
+    }
+
+    .card__menu-item:hover {
+      color: var(--accent-hover);
       background: var(--surface-tint);
     }
 

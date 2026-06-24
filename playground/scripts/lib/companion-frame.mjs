@@ -4,11 +4,13 @@ import { fileExists } from './fs-utils.mjs';
 import {
   getArticleContext,
   getArticleTitle,
+  getCompanionArticles,
   getDemoPublicUrl,
   getLandingUrl,
   getSourceUrl,
   SITE_URL,
 } from './manifest-utils.mjs';
+import { renderArticleActionControl, renderArticleContextLine } from './article-links.mjs';
 import { distDemoDir } from './paths.mjs';
 import {
   demoDescription,
@@ -55,10 +57,7 @@ function renderCompanionBar(demo, category, manifest) {
   </header>`;
   }
 
-  const articleTitle = getArticleTitle(demo);
-  const articleUrl = demo.articleUrl;
-  const seeAlsoUrl = demo.seeAlsoArticleUrl;
-  const seeAlsoTitle = demo.seeAlsoArticleTitle ?? 'Related article';
+  const articles = getCompanionArticles(demo);
 
   return `
   <header class="pg-companion" data-playground-companion-bar aria-label="Article companion demo">
@@ -70,11 +69,16 @@ function renderCompanionBar(demo, category, manifest) {
       </div>
       <div class="pg-companion__content">
         <div class="pg-companion__title">${escapeHtml(demo.title)}</div>
-        <div class="pg-companion__context">From article: ${escapeHtml(articleTitle)}</div>
+        <div class="pg-companion__context">${renderArticleContextLine(articles)}</div>
       </div>
       <nav class="pg-companion__actions" aria-label="Companion links">
-        <a class="pg-companion__btn pg-companion__btn--primary" href="${escapeHtml(articleUrl)}">Read article</a>
-        ${seeAlsoUrl ? `<a class="pg-companion__btn" href="${escapeHtml(seeAlsoUrl)}">${escapeHtml(seeAlsoTitle)}</a>` : ''}
+        ${renderArticleActionControl(articles, {
+          single: 'pg-companion__btn pg-companion__btn--primary',
+          menu: 'pg-companion__menu',
+          summary: 'pg-companion__btn pg-companion__btn--primary',
+          panel: 'pg-companion__menu-panel',
+          item: 'pg-companion__menu-item',
+        })}
         <a class="pg-companion__btn pg-companion__btn--secondary" href="${escapeHtml(sourceUrl)}">View source</a>
         <a class="pg-companion__btn" href="${escapeHtml(landingUrl)}">All demos</a>
       </nav>

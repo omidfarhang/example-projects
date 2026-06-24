@@ -28,6 +28,34 @@ export function getArticleTitle(demo) {
   return demo.articleTitle ?? demo.title;
 }
 
+/** Normalized article links for companion bar and landing cards. */
+export function getCompanionArticles(demo) {
+  if (Array.isArray(demo.articles) && demo.articles.length > 0) {
+    return demo.articles.map((entry) => ({
+      label: entry.label ?? entry.title,
+      title: entry.title,
+      url: entry.url,
+    }));
+  }
+
+  const articles = [];
+  if (demo.articleUrl) {
+    articles.push({
+      label: demo.articleShortLabel ?? 'Article',
+      title: getArticleTitle(demo),
+      url: demo.articleUrl,
+    });
+  }
+  if (demo.seeAlsoArticleUrl) {
+    articles.push({
+      label: demo.seeAlsoShortLabel ?? 'Related',
+      title: demo.seeAlsoArticleTitle ?? 'Related article',
+      url: demo.seeAlsoArticleUrl,
+    });
+  }
+  return articles;
+}
+
 export function getArticleContext(demo) {
   return demo.articleContext ?? demo.description;
 }
