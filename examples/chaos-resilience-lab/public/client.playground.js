@@ -77,6 +77,29 @@ function resetApps() {
   initCheckout('resilient', els.resilient);
 }
 
+function resetCheckout() {
+  resetApps();
+  const fault = FAULTS[activeFault];
+  if (activeFault === 'corruptCart') {
+    setVerdict(
+      'warn',
+      'Fault injected',
+      'Cart reloaded — fragile still breaks, resilient still recovers.',
+    );
+  } else if (activeFault === 'normal') {
+    setVerdict('idle', 'Ready', 'Checkout reset — pick a fault or click Pay to try again.');
+  } else {
+    setVerdict('warn', 'Fault injected', `${fault.hint} Checkout reset — click Pay to re-run.`);
+  }
+  els.hint.textContent = fault.hint;
+  els.fragile.root.classList.add('checkout--flash');
+  els.resilient.root.classList.add('checkout--flash');
+  window.setTimeout(() => {
+    els.fragile.root.classList.remove('checkout--flash');
+    els.resilient.root.classList.remove('checkout--flash');
+  }, 700);
+}
+
 function initCheckout(mode, ui) {
   const cart = loadCart(mode, activeFault);
   ui.pay.disabled = false;
@@ -270,8 +293,7 @@ els.resilient.pay.addEventListener('click', () => {
 });
 
 $('#reset-demo')?.addEventListener('click', () => {
-  els.fragile.root.classList.remove('checkout--crash');
-  applyFault('normal');
+  resetCheckout();
 });
 
 applyFault('normal');

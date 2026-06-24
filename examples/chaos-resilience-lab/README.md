@@ -62,7 +62,7 @@ Specs:
 3. Click **Empty response** — Fragile treats it as success with `$0.00`; resilient refuses to confirm.
 4. Click **Corrupt cart cache** — Fragile renders broken data; resilient resets to a safe cart.
 5. Click **Double-click Pay** — Double-click Pay on fragile quickly for duplicate charges; resilient disables the button.
-6. Click **Reset checkout** — Clears state and returns to normal.
+6. Click **Reset checkout** — Clears Pay results and keeps the current fault so you can run the experiment again.
 
 ## Backend-style faults (docker-compose)
 

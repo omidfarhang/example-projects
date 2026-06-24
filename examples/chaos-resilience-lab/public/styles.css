@@ -348,6 +348,22 @@ a {
   outline: 2px dashed var(--fragile);
 }
 
+.checkout--flash {
+  animation: checkout-flash 0.7s ease-out;
+}
+
+@keyframes checkout-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgb(99 102 241 / 0.45);
+  }
+  40% {
+    box-shadow: 0 0 0 6px rgb(99 102 241 / 0.2);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
 .checkout__header {
   align-items: start;
   display: flex;
