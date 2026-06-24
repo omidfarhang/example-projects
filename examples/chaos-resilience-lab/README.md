@@ -1,9 +1,10 @@
 # Chaos Resilience Lab
 
-Companion project for:
+Companion project for the [Chaos Engineering](/2024/06/06/chaos-engineering/) series:
 
-- [Chaos Engineering for Backend and Infrastructure](https://omid.dev/2024/06/06/chaos-engineering/)
+- [Chaos Engineering: Principles and Practice](https://omid.dev/2024/06/06/chaos-engineering/) — overview
 - [Chaos Engineering for Frontend Applications](https://omid.dev/2024/07/01/chaos-engineering-in-frontend-development/)
+- [Chaos Engineering for Backend and Infrastructure](https://omid.dev/2024/07/07/chaos-engineering-backend-and-infrastructure/)
 
 Side-by-side checkout demo: inject a fault, click Pay, and compare fragile vs resilient UI behavior.
 
@@ -122,5 +123,6 @@ The live playground runs entirely in the browser with the fetch shim — no back
 
 ## Blog posts
 
-- https://omid.dev/2024/06/06/chaos-engineering/
+- https://omid.dev/2024/06/06/chaos-engineering/ — series overview
 - https://omid.dev/2024/07/01/chaos-engineering-in-frontend-development/
+- https://omid.dev/2024/07/07/chaos-engineering-backend-and-infrastructure/
