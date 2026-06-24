@@ -57,6 +57,8 @@ function renderCompanionBar(demo, category, manifest) {
 
   const articleTitle = getArticleTitle(demo);
   const articleUrl = demo.articleUrl;
+  const seeAlsoUrl = demo.seeAlsoArticleUrl;
+  const seeAlsoTitle = demo.seeAlsoArticleTitle ?? 'Related article';
 
   return `
   <header class="pg-companion" data-playground-companion-bar aria-label="Article companion demo">
@@ -72,6 +74,7 @@ function renderCompanionBar(demo, category, manifest) {
       </div>
       <nav class="pg-companion__actions" aria-label="Companion links">
         <a class="pg-companion__btn pg-companion__btn--primary" href="${escapeHtml(articleUrl)}">Read article</a>
+        ${seeAlsoUrl ? `<a class="pg-companion__btn" href="${escapeHtml(seeAlsoUrl)}">${escapeHtml(seeAlsoTitle)}</a>` : ''}
         <a class="pg-companion__btn pg-companion__btn--secondary" href="${escapeHtml(sourceUrl)}">View source</a>
         <a class="pg-companion__btn" href="${escapeHtml(landingUrl)}">All demos</a>
       </nav>

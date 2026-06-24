@@ -1,6 +1,6 @@
 import {
   FAULTS,
-  callPaymentApi,
+  postPayment,
   cartTotal,
   formatMoney,
   loadCart,
@@ -140,7 +140,7 @@ async function payFragile() {
   ui.pay.dataset.charges = String(chargeCount);
 
   try {
-    const result = await callPaymentApi(activeFault);
+    const result = await postPayment(activeFault);
     if (activeFault === 'emptyBody' || !result.chargeId) {
       ui.total.textContent = '$0.00';
       ui.status.className = 'checkout-status checkout-status--fail';
@@ -203,7 +203,7 @@ async function payResilient() {
   }
 
   try {
-    const result = await callPaymentApi(activeFault);
+    const result = await postPayment(activeFault);
 
     if (activeFault === 'emptyBody' || !result.chargeId) {
       ui.status.className = 'checkout-status checkout-status--warn';
@@ -267,6 +267,11 @@ els.fragile.pay.addEventListener('click', () => {
 els.resilient.pay.addEventListener('click', () => {
   if (activeFault === 'corruptCart') return;
   payResilient();
+});
+
+$('#reset-demo')?.addEventListener('click', () => {
+  els.fragile.root.classList.remove('checkout--crash');
+  applyFault('normal');
 });
 
 applyFault('normal');

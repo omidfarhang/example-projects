@@ -99,7 +99,7 @@ npm install -g @angular/cli@20
 - `angular-collaborative-editor-firebase-webrtc` needs a Firebase project with Anonymous Authentication and Cloud Firestore enabled.
 - `angular-graphql-apollo` uses an in-browser GraphQL mock on the live playground; clone the repo and start the `server/` app for the full HTTP + Apollo setup. 
 - `realtime-frontend-patterns` uses simulated WebSocket and SSE on the live playground; clone the repo and run `npm start` for the Express server. 
-- `chaos-resilience-lab` runs entirely in the browser on the live playground; `npm start` serves `public/` locally.
+- `chaos-resilience-lab` runs entirely in the browser on the live playground (`npm start`); use `npm run dev` for MSW and `npm run test:e2e` for Cypress tests.
 - `graphql-express-angular-migration` includes a local API server — start the `server/` app before the Angular app.
 - `angular-stencil-web-components` has two parts. Build the Stencil component first, then run the Angular app.
 - `qwik-angular-react-rust` is a multi-app demo. Run the Qwik shell, Angular app, and React app in separate terminals.

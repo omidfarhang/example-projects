@@ -150,6 +150,28 @@ a {
   gap: 0.5rem;
 }
 
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn--reset {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.45rem 0.95rem;
+}
+
+.btn--reset:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .fault-btn {
   align-items: center;
   background: var(--surface-muted);

@@ -140,6 +140,8 @@
         "title": "Chaos Resilience Lab",
         "description": "Inject payment faults and compare fragile vs resilient checkout side by side.",
         "articleTitle": "Chaos Engineering for Frontend Applications",
+        "seeAlsoArticleTitle": "Chaos Engineering for Backend and Infrastructure",
+        "seeAlsoArticleUrl": "https://omid.dev/2024/06/06/chaos-engineering/",
         "projectDir": "examples/chaos-resilience-lab",
         "sourcePath": "examples/chaos-resilience-lab",
         "type": "static-html",

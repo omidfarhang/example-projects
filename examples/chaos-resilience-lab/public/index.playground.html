@@ -32,6 +32,9 @@
           <p class="inject-label" id="inject-label">All systems healthy</p>
         </div>
         <div class="fault-grid" id="fault-buttons" role="toolbar" aria-label="Failure modes"></div>
+        <div class="controls-row">
+          <button type="button" class="btn btn--reset" id="reset-demo">Reset checkout</button>
+        </div>
         <p class="hint" id="hint">Pick a fault, then interact with both checkout panels.</p>
       </section>
 
@@ -87,10 +90,11 @@
       </div>
 
       <p class="note">
-        Simulated payment API for the live playground — no backend required. Clone the repo for source
-        and Cypress resilience tests.
+        Simulated payment API for the live playground — no backend required. Clone the repo for MSW
+        handlers, Cypress resilience tests, and optional docker-compose backend faults.
       </p>
     </main>
+    <script type="module" src="fetch-shim.js"></script>
     <script type="module" src="client.js"></script>
   </body>
 </html>

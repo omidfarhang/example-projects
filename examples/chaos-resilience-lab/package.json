@@ -1,8 +1,26 @@
 {
   "name": "chaos-resilience-lab",
   "private": true,
+  "type": "module",
   "description": "Fragile vs resilient checkout — live chaos engineering demo for omid.dev",
   "scripts": {
-    "start": "npx --yes serve public -p 3456"
+    "start": "npx --yes serve public -p 3456",
+    "dev": "vite",
+    "postinstall": "node scripts/sync-payment-core.mjs && msw init public/ --save",
+    "test:e2e": "start-server-and-test dev http://localhost:5173/index.dev.html 'cypress run'",
+    "test:e2e:open": "start-server-and-test dev http://localhost:5173/index.dev.html 'cypress open'",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "cypress": "^14.3.0",
+    "msw": "^2.7.0",
+    "start-server-and-test": "^2.0.11",
+    "vite": "^6.2.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

@@ -1,0 +1,24 @@
+services:
+  payment-api:
+    build: ./docker/payment-api
+    expose:
+      - "3001"
+
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.11.0
+    command: ["-host", "0.0.0.0"]
+    ports:
+      - "8474:8474"
+      - "9090:9090"
+    depends_on:
+      - payment-api
+
+  checkout-api:
+    build: ./docker/checkout-api
+    ports:
+      - "3000:3000"
+    environment:
+      PAYMENT_URL: http://toxiproxy:20001
+    depends_on:
+      - payment-api
+      - toxiproxy

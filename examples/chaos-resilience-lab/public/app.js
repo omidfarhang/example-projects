@@ -77,31 +77,27 @@ export function formatMoney(amount) {
   return `$${amount.toFixed(2)}`;
 }
 
-/** Simulated payment API — same fault for both apps; UI layer differs. */
-export async function callPaymentApi(faultId) {
-  if (faultId === 'slow') {
-    await delay(3000);
-    return { ok: true, chargeId: `ch_${Date.now()}` };
-  }
-  if (faultId === 'error503') {
-    const err = new Error('Service Unavailable');
-    err.status = 503;
+export { simulatePayment } from './payment-core.js';
+
+/** POST /api/payment — used by checkout UI (shim, MSW, or real backend). */
+export async function postPayment(faultId) {
+  const res = await fetch('/api/payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fault: faultId }),
+  });
+
+  if (!res.ok) {
+    const err = new Error(res.statusText || 'Payment failed');
+    err.status = res.status;
     throw err;
   }
-  if (faultId === 'emptyBody') {
-    return { ok: true, chargeId: undefined, raw: '' };
-  }
-  if (faultId === 'doubleSubmit') {
-    await delay(1200);
-    return { ok: true, chargeId: `ch_${Date.now()}` };
-  }
-  await delay(400);
-  return { ok: true, chargeId: `ch_${Date.now()}` };
+
+  return res.json();
 }
 
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+/** @deprecated Use postPayment — kept for tests importing the old name. */
+export const callPaymentApi = postPayment;
 
 export function loadCart(mode, faultId) {
   const key = `chaos-cart-${mode}`;
