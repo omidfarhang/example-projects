@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
+import { DEPTH, histologyVeil, livingSlab, mat, mucusSheet, organic, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 /**
  * SKIN — unmistakable layer cake with rete ridges + hair follicle.
@@ -21,7 +21,7 @@ export function buildSkinTissue(): TissueBuildResult {
 
   let y = 0;
   for (const layer of layers) {
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(W, layer.h, DEPTH), mat(layer.color));
+    const slab = livingSlab(W, layer.h, DEPTH, layer.color, {}, y + layer.h);
     slab.position.set(0, y + layer.h / 2, 0);
     group.add(slab, outline(slab, 0x9a6868, 0.35));
 
@@ -37,14 +37,19 @@ export function buildSkinTissue(): TissueBuildResult {
             roughness: layer.name === 'corneum' ? 0.32 : 0.55,
           }),
         );
-        bump.position.set(cx + stagger, y + layer.h / 2 + (layer.name === 'corneum' ? 0.01 : 0), DEPTH * 0.24);
+        bump.position.set(
+          cx + stagger + organic(i + layer.h * 10, pitch * 0.06),
+          y + layer.h / 2 + (layer.name === 'corneum' ? 0.01 : 0) + organic(i + 7.3, 0.004),
+          DEPTH * 0.24,
+        );
+        bump.rotation.z = organic(i + 2.8, 0.08);
         group.add(bump);
         if (layer.name === 'spinous') {
           trackInflamed(bump, P.spinous, inflamedMeshes);
         }
         if (layer.name !== 'corneum' && layer.name !== 'granulosum') {
           const nuc = new THREE.Mesh(
-            new THREE.SphereGeometry(layer.h * 0.2, 8, 6),
+            new THREE.SphereGeometry(layer.h * 0.2, 10, 8),
             mat(P.nucleus),
           );
           nuc.position.set(cx, y + layer.h * 0.48, DEPTH * 0.34);
@@ -85,7 +90,7 @@ export function buildSkinTissue(): TissueBuildResult {
   const follicleH = follicleTop + 0.08;
   const follicle = new THREE.Mesh(
     new THREE.CylinderGeometry(0.07, 0.1, follicleH, 12),
-    mat(P.basale),
+    mat(P.basale, { roughness: 0.72 }),
   );
   follicle.position.set(follicleX, follicleH / 2 - 0.04, 0.02);
   group.add(follicle, outline(follicle, 0xc08070, 0.4));
@@ -95,6 +100,7 @@ export function buildSkinTissue(): TissueBuildResult {
     mat(0x2a1a10, { roughness: 0.9 }),
   );
   hair.position.set(follicleX, follicleTop + 0.22, DEPTH * 0.35);
+  hair.rotation.z = -0.08;
   group.add(hair);
 
   const sebaceous = new THREE.Mesh(
@@ -104,6 +110,15 @@ export function buildSkinTissue(): TissueBuildResult {
   sebaceous.position.set(follicleX + 0.14, follicleH * 0.42, 0.06);
   sebaceous.scale.set(1.1, 0.75, 0.85);
   group.add(sebaceous, outline(sebaceous, 0xd8c878, 0.35));
+
+  for (let i = 0; i < 18; i++) {
+    const pore = new THREE.Mesh(
+      new THREE.SphereGeometry(0.009 + (i % 2) * 0.002, 6, 4),
+      mat(P.nucleusDark, { roughness: 0.95 }),
+    );
+    pore.position.set(-W / 2 + 0.2 + (i * 0.29) % (W - 0.4), follicleTop - 0.015 + organic(i + 11, 0.01), DEPTH * 0.31);
+    group.add(pore);
+  }
 
   const sheen = new THREE.Mesh(
     new THREE.PlaneGeometry(W, 0.025),
@@ -122,6 +137,11 @@ export function buildSkinTissue(): TissueBuildResult {
   biofilm.userData.isBiofilm = true;
   group.add(biofilm);
   overlays.push(biofilm);
+
+  const veil = histologyVeil('skin', W * 0.92, 0.68, follicleTop + 0.18, DEPTH * 0.49);
+  veil.userData.histologyBaseOpacity = 0.22;
+  group.add(veil);
+  overlays.push(veil);
 
   return { group, inflamedMeshes, overlays, kind: 'skin' };
 }

@@ -19,6 +19,7 @@ export class CameraRig {
   readonly camera: THREE.PerspectiveCamera;
   readonly controls: OrbitControls;
   private mode: ViewMode = 'macro';
+  private focusDistance = 3;
   private tween = { active: false, t: 0, duration: 1.2, from: new THREE.Vector3(), to: new THREE.Vector3(), lookFrom: new THREE.Vector3(), lookTo: new THREE.Vector3() };
 
   private macroPos = new THREE.Vector3(0, 1.1, 3.2);
@@ -93,20 +94,33 @@ export class CameraRig {
   update(dt: number) {
     if (!this.tween.active) {
       this.controls.update();
-      return;
+    } else {
+      this.tween.t += dt / this.tween.duration;
+      const ease = 1 - Math.pow(1 - Math.min(this.tween.t, 1), 3);
+
+      this.camera.position.lerpVectors(this.tween.from, this.tween.to, ease);
+      const look = new THREE.Vector3().lerpVectors(this.tween.lookFrom, this.tween.lookTo, ease);
+      this.camera.lookAt(look);
+      this.controls.target.copy(look);
+
+      if (this.tween.t >= 1) {
+        this.tween.active = false;
+        this.controls.enabled = true;
+      }
     }
 
-    this.tween.t += dt / this.tween.duration;
-    const ease = 1 - Math.pow(1 - Math.min(this.tween.t, 1), 3);
-
-    this.camera.position.lerpVectors(this.tween.from, this.tween.to, ease);
-    const look = new THREE.Vector3().lerpVectors(this.tween.lookFrom, this.tween.lookTo, ease);
-    this.camera.lookAt(look);
-    this.controls.target.copy(look);
-
-    if (this.tween.t >= 1) {
-      this.tween.active = false;
-      this.controls.enabled = true;
+    if (this.mode === 'micro') {
+      this.focusDistance = THREE.MathUtils.lerp(this.focusDistance, 2.35, dt * 2.5);
+      this.camera.focus = this.focusDistance;
+      (this.camera as THREE.PerspectiveCamera).setFocalLength(
+        THREE.MathUtils.lerp((this.camera as THREE.PerspectiveCamera).getFocalLength(), 43, dt * 2),
+      );
+    } else {
+      this.focusDistance = THREE.MathUtils.lerp(this.focusDistance, 4.8, dt * 1.5);
+      this.camera.focus = this.focusDistance;
+      (this.camera as THREE.PerspectiveCamera).setFocalLength(
+        THREE.MathUtils.lerp((this.camera as THREE.PerspectiveCamera).getFocalLength(), 50, dt * 1.2),
+      );
     }
   }
 }

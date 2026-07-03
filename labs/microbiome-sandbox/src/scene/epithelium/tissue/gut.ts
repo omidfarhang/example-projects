@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
+import { DEPTH, histologyVeil, livingSlab, mat, mucusSheet, organic, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 
 /**
@@ -22,7 +22,7 @@ export function buildGutTissue(): TissueBuildResult {
 
   let y = 0;
   for (const layer of layers) {
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(W, layer.h, DEPTH), mat(layer.color, { roughness: layer.name === 'muscularis' ? 0.78 : 0.55 }));
+    const slab = livingSlab(W, layer.h, DEPTH, layer.color, { roughness: layer.name === 'muscularis' ? 0.88 : 0.78 }, y + layer.h);
     slab.position.set(0, y + layer.h / 2, 0);
     group.add(slab, outline(slab, layer.name === 'muscularis' ? 0x8a5868 : 0xa07068, 0.35));
 
@@ -54,24 +54,26 @@ export function buildGutTissue(): TissueBuildResult {
   }
 
   const mucosalSurfaceY = y;
-  const villusCount = 11;
+  const villusCount = 13;
   const margin = 0.32;
   const pitch = (W - margin * 2) / (villusCount - 1);
   let maxVillusTop = mucosalSurfaceY;
 
   for (let i = 0; i < villusCount; i++) {
-    const vx = -W / 2 + margin + i * pitch;
-    const villusH = 0.3 + (i % 3) * 0.07;
-    const villusR = 0.052;
+    const vx = -W / 2 + margin + i * pitch + organic(i + 0.23, 0.055);
+    const villusH = 0.28 + (i % 4) * 0.045 + organic(i + 2.1, 0.05);
+    const villusR = 0.045 + (i % 3) * 0.004 + organic(i + 3.7, 0.006);
     const tipY = mucosalSurfaceY + villusR * 2 + villusH;
     maxVillusTop = Math.max(maxVillusTop, tipY);
 
     const villus = new THREE.Mesh(
-      new THREE.CapsuleGeometry(villusR, villusH, 10, 14),
-      mat(P.villusEpi),
+      new THREE.CapsuleGeometry(villusR, villusH, 12, 16),
+      mat(P.villusEpi, { roughness: 0.74 }),
     );
     villus.position.set(vx, mucosalSurfaceY + villusR + villusH * 0.5, 0.06);
-    group.add(villus, outline(villus, 0xe89090, 0.38));
+    villus.rotation.z = organic(i + 8.4, 0.14);
+    villus.scale.x = 0.9 + organic(i + 5.8, 0.14);
+    group.add(villus);
     trackInflamed(villus, P.villusEpi, inflamedMeshes);
 
     const brushBorder = new THREE.Mesh(
@@ -84,7 +86,7 @@ export function buildGutTissue(): TissueBuildResult {
 
     const lacteal = new THREE.Mesh(
       new THREE.CapsuleGeometry(0.018, villusH * 0.72, 6, 8),
-      mat(P.lacteal, { roughness: 0.22 }),
+      mat(P.lacteal, { roughness: 0.32, transparent: true, opacity: 0.86 }),
     );
     lacteal.position.set(vx, mucosalSurfaceY + villusR + villusH * 0.44, 0.08);
     group.add(lacteal);
@@ -100,12 +102,23 @@ export function buildGutTissue(): TissueBuildResult {
     if (i % 2 === 1) {
       const cx = vx - pitch * 0.5;
       const crypt = new THREE.Mesh(
-        new THREE.BoxGeometry(pitch * 0.55, 0.055, DEPTH * 0.55),
-        mat(P.crypt),
+        new THREE.CapsuleGeometry(0.045, pitch * 0.38, 8, 10),
+        mat(P.crypt, { roughness: 0.82 }),
       );
+      crypt.rotation.z = Math.PI / 2;
       crypt.position.set(cx, mucosalSurfaceY - 0.028, 0.04);
-      group.add(crypt, outline(crypt, 0x6a3848, 0.3));
+      group.add(crypt);
     }
+  }
+
+  for (let i = 0; i < 30; i++) {
+    const speck = new THREE.Mesh(
+      new THREE.SphereGeometry(0.008 + (i % 3) * 0.002, 6, 4),
+      mat(i % 4 === 0 ? P.nucleus : 0xf0c0b8, { roughness: 0.9 }),
+    );
+    speck.position.set(-W / 2 + 0.2 + (i * 0.173) % (W - 0.4), mucosalSurfaceY + 0.02 + organic(i + 14, 0.12), DEPTH * 0.25 + organic(i + 19, 0.05));
+    speck.scale.y = 0.65;
+    group.add(speck);
   }
 
   const lumenFloor = maxVillusTop + 0.04;
@@ -119,6 +132,11 @@ export function buildGutTissue(): TissueBuildResult {
   const mucus = mucusSheet(W * 0.88, 0.22, lumenFloor + 0.06, 0.1);
   group.add(mucus);
   overlays.push(mucus);
+
+  const veil = histologyVeil('gut', W * 0.92, 0.72, mucosalSurfaceY + 0.23, DEPTH * 0.5);
+  veil.userData.histologyBaseOpacity = 0.24;
+  group.add(veil);
+  overlays.push(veil);
 
   const scfa = new THREE.Mesh(
     new THREE.PlaneGeometry(W * 0.82, 0.38),

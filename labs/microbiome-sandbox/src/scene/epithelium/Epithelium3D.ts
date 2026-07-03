@@ -87,6 +87,14 @@ export class Epithelium3D {
     }
 
     for (const overlay of this.overlays) {
+      if (overlay.userData.isHistology) {
+        const material = overlay.material as THREE.ShaderMaterial;
+        const uniforms = material.uniforms;
+        uniforms.uInflammation.value = t;
+        uniforms.uMoisture.value = state.moisture;
+        uniforms.uIntegrity.value = state.integrity;
+        uniforms.uOpacity.value = overlay.userData.histologyBaseOpacity ?? 0.2;
+      }
       if (overlay.userData.isBiofilm) {
         (overlay.material as THREE.MeshStandardMaterial).opacity =
           biofilmVisualOpacity(state.biofilm);

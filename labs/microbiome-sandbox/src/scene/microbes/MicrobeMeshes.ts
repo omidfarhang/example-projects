@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import type { MicrobeType } from '../../sim/types';
 
 export const TYPE_COLORS: Record<MicrobeType, number> = {
-  probiotic: 0x4ade80,
-  commensal: 0x94a3b8,
-  pathogen: 0xf87171,
-  allergen: 0xfbbf24,
-  yeast: 0xc084fc,
-  prebiotic: 0xa3e635,
-  postbiotic: 0x2dd4bf,
+  probiotic: 0x22ff66,
+  commensal: 0x58ff8a,
+  pathogen: 0xff3344,
+  allergen: 0xffd21f,
+  yeast: 0xff66ff,
+  prebiotic: 0xb8ff24,
+  postbiotic: 0x2dfff0,
 };
 
 export type InstanceBucket =
@@ -32,12 +32,12 @@ export function bucketForType(type: MicrobeType): InstanceBucket {
 
 /** Distinct hues within each microbe family so multi-strain products read clearly in tissue view. */
 const PROBIOTIC_PALETTE = [
-  0x4ade80, 0x34d399, 0x6ee7b7, 0x2dd4bf, 0xa3e635, 0x86efac, 0x5eead4, 0x22c55e,
-  0x10b981, 0x14b8a6,
+  0x22ff66, 0x00e676, 0x66ff99, 0x00f5d4, 0xb8ff24, 0x7cff7c, 0x44ffd2, 0x00d85a,
+  0x00c853, 0x00e5b0,
 ];
-const PATHOGEN_PALETTE = [0xf87171, 0xfb7185, 0xf472b6, 0xc084fc, 0xfbbf24];
-const YEAST_PALETTE = [0xc084fc, 0xd8b4fe, 0xa855f7, 0xe879f9, 0xf0abfc];
-const PREBIOTIC_PALETTE = [0xa3e635, 0xbef264, 0x84cc16, 0x65a30d];
+const PATHOGEN_PALETTE = [0xff3344, 0xff1744, 0xff4081, 0xff6d00, 0xff5252];
+const YEAST_PALETTE = [0xff66ff, 0xea80fc, 0xd500f9, 0xff4fd8, 0xf500d8];
+const PREBIOTIC_PALETTE = [0xb8ff24, 0xccff33, 0x9cff00, 0x76ff03];
 
 function hashStrain(strain: string): number {
   let h = 0;
@@ -117,17 +117,18 @@ export interface MicrobeMeshSet {
 
 export function createMicrobeMeshSet(maxPerBucket = 120): MicrobeMeshSet {
   const make = (geo: THREE.BufferGeometry, color: number) => {
-    const mat = new THREE.MeshStandardMaterial({
+    const mat = new THREE.MeshBasicMaterial({
       color,
-      emissive: color,
-      emissiveIntensity: 0.15,
-      roughness: 0.4,
-      metalness: 0.1,
-      vertexColors: true,
+      vertexColors: false,
+      toneMapped: false,
+      fog: false,
     });
     const mesh = new THREE.InstancedMesh(geo, mat, maxPerBucket);
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     mesh.count = 0;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    mesh.userData.noShadow = true;
     return mesh;
   };
 

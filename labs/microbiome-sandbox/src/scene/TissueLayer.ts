@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { BiomeState, MicrobeNode } from '../sim/types';
 import { Epithelium3D, createLumenChamber, type EpitheliumKind } from './epithelium';
 import { LUMEN_BOUNDS, RECEPTOR_SITES, type LumenBounds } from './epithelium/tissueModels';
-import { bucketForType, colorForMicrobe, createMicrobeMeshSet } from './microbes/MicrobeMeshes';
+import { bucketForType, createMicrobeMeshSet } from './microbes/MicrobeMeshes';
 import { ScfaParticleField } from './ScfaParticleField';
 import { ImmuneHaze } from './ImmuneHaze';
 
@@ -59,6 +59,21 @@ function placeMicrobe(n: MicrobeNode, bounds: LumenBounds, receptors: number[], 
   return { x, y, z };
 }
 
+function surfaceAdhesionPosition(n: MicrobeNode, bounds: LumenBounds, receptors: number[], time: number) {
+  const receptor = receptors[Math.abs((n.id * 7) % receptors.length)];
+  const phase = time * 0.00012 + n.id * 1.37;
+  const slowCrawl = Math.sin(phase) * 0.045 + Math.sin(phase * 0.37) * 0.025;
+  const jitter = (((n.id * 7.13) % 1) - 0.5) * 0.06;
+  const yBand = n.type === 'probiotic' ? 0.54 : n.type === 'pathogen' ? 0.24 : 0.18;
+  const yWobble = Math.sin(time * 0.00035 + n.id) * 0.008;
+  const zWobble = Math.cos(time * 0.00028 + n.id * 0.8) * 0.012;
+  return {
+    x: receptor + jitter + slowCrawl,
+    y: THREE.MathUtils.lerp(bounds.epithelialY, bounds.mucusY, yBand + (n.vitality - 0.5) * 0.08) + yWobble,
+    z: bounds.zMin + (((n.id * 0.271) % 1) * (bounds.zMax - bounds.zMin) * 0.55) + 0.025 + zWobble,
+  };
+}
+
 export class TissueLayer {
   readonly group = new THREE.Group();
   private epithelium = new Epithelium3D();
@@ -66,12 +81,12 @@ export class TissueLayer {
   private lumenGroup = new THREE.Group();
   private meshes = createMicrobeMeshSet(120);
   private dummy = new THREE.Object3D();
-  private instanceColor = new THREE.Color();
   private geometry: EpitheliumKind = 'sinus';
   private burstKind: 'allergen' | 'probiotic' | 'alkaline' | 'stress' | 'default' | null = null;
   private burstTime = 0;
   private scfaParticles = new ScfaParticleField();
   private immuneHaze = new ImmuneHaze();
+  private visualPositions = new Map<number, THREE.Vector3>();
 
   constructor() {
     this.epithelium.setKind('sinus');
@@ -83,7 +98,22 @@ export class TissueLayer {
     this.group.add(this.lumenGroup);
     this.group.add(this.scfaParticles.group);
     this.group.add(this.immuneHaze.group);
+    this.configureMeshLighting();
     this.group.visible = false;
+  }
+
+  private configureMeshLighting() {
+    this.group.traverse((obj) => {
+      if (obj instanceof THREE.Mesh) {
+        if (obj.userData.noShadow) {
+          obj.castShadow = false;
+          obj.receiveShadow = false;
+          return;
+        }
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+      }
+    });
   }
 
   setGeometry(kind: EpitheliumKind) {
@@ -101,6 +131,7 @@ export class TissueLayer {
     this.chamber = createLumenChamber(kind);
     this.group.add(this.chamber);
     this.group.children.unshift(this.group.children.pop()!);
+    this.configureMeshLighting();
   }
 
   show() {
@@ -164,6 +195,7 @@ export class TissueLayer {
     });
 
     const receptors = RECEPTOR_SITES[this.geometry];
+    const liveIds = new Set<number>();
     const buckets: Record<string, number> = {
       probiotic: 0,
       commensal: 0,
@@ -179,12 +211,25 @@ export class TissueLayer {
       const idx = buckets[bucket]++;
       const mesh = this.meshes[bucket];
       if (idx >= mesh.instanceMatrix.count) continue;
+      liveIds.add(n.id);
 
-      const { x, y, z } = placeMicrobe(n, bounds, receptors, time);
-      this.dummy.position.set(x, y, z);
+      const target = (n.type === 'commensal' || n.type === 'pathogen' || n.type === 'yeast' || n.type === 'probiotic')
+        ? surfaceAdhesionPosition(n, bounds, receptors, time)
+        : placeMicrobe(n, bounds, receptors, time);
+      let visual = this.visualPositions.get(n.id);
+      if (!visual) {
+        visual = new THREE.Vector3(target.x, target.y, target.z);
+        this.visualPositions.set(n.id, visual);
+      } else {
+        visual.lerp(new THREE.Vector3(target.x, target.y, target.z), THREE.MathUtils.clamp(dt * 3.2, 0, 1));
+      }
+      this.dummy.position.copy(visual);
       const vitality = n.vitality;
-      const pulse = n.type === 'allergen' ? 1 + Math.sin(performance.now() * 0.008 + n.id) * 0.2 : 1;
-      const scale = (0.5 + vitality * 0.75) * pulse;
+      const pulse = n.type === 'allergen' ? 1 + Math.sin(performance.now() * 0.004 + n.id) * 0.08 : 1;
+      const microFlex = n.type === 'probiotic' || n.type === 'commensal'
+        ? 1 + Math.sin(time * 0.001 + n.id * 0.9) * 0.035
+        : 1;
+      const scale = (0.62 + vitality * 0.62) * pulse * microFlex;
       this.dummy.rotation.set(0, 0, 0);
 
       if (bucket === 'pathogen') {
@@ -198,32 +243,25 @@ export class TissueLayer {
         this.dummy.rotation.z = n.id * 0.4;
       } else if (bucket === 'commensal') {
         this.dummy.scale.set(scale * 0.45, scale * 0.75, scale * 0.45);
-        this.dummy.rotation.z = Math.PI / 2;
+        this.dummy.rotation.z = Math.PI / 2 + Math.sin(time * 0.00042 + n.id) * 0.22;
       } else if (bucket === 'probiotic') {
         this.dummy.scale.set(scale * 0.5, scale * 0.85, scale * 0.5);
-        this.dummy.rotation.z = Math.PI / 2;
+        this.dummy.rotation.z = Math.PI / 2 + Math.sin(time * 0.00038 + n.id * 1.4) * 0.2;
       } else {
         this.dummy.scale.setScalar(scale * 0.8);
       }
 
       this.dummy.updateMatrix();
       mesh.setMatrixAt(idx, this.dummy.matrix);
-      if (
-        n.type === 'probiotic' ||
-        n.type === 'prebiotic' ||
-        n.type === 'pathogen' ||
-        n.type === 'yeast' ||
-        n.type === 'commensal'
-      ) {
-        this.instanceColor.setHex(colorForMicrobe(n.type, n.strain));
-        mesh.setColorAt(idx, this.instanceColor);
-      }
     }
 
     for (const [key, mesh] of Object.entries(this.meshes)) {
       mesh.count = buckets[key] ?? 0;
       mesh.instanceMatrix.needsUpdate = true;
-      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    }
+
+    for (const id of this.visualPositions.keys()) {
+      if (!liveIds.has(id)) this.visualPositions.delete(id);
     }
   }
 }

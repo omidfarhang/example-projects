@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
+import { DEPTH, histologyVeil, livingSlab, mat, mucusSheet, organic, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 /**
  * ORAL — non-keratinized mucosa with papillae, saliva film, thrush-prone patches.
@@ -11,10 +11,7 @@ export function buildOralTissue(): TissueBuildResult {
   const inflamedMeshes: THREE.Mesh[] = [];
   const W = 5;
 
-  const submucosa = new THREE.Mesh(
-    new THREE.BoxGeometry(W, 0.12, DEPTH),
-    mat(P.laminaDeep),
-  );
+  const submucosa = livingSlab(W, 0.12, DEPTH, P.laminaDeep, {}, 1.1);
   submucosa.position.set(0, 0.08, 0);
   group.add(submucosa, outline(submucosa, 0xa07068, 0.32));
 
@@ -26,19 +23,20 @@ export function buildOralTissue(): TissueBuildResult {
 
   let y = 0.14;
   for (const layer of layers) {
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(W, layer.h, DEPTH * 0.88), mat(layer.color));
+    const slab = livingSlab(W, layer.h, DEPTH * 0.88, layer.color, {}, y + layer.h);
     slab.position.set(0, y + layer.h / 2, 0);
     group.add(slab, outline(slab, 0xe0a898, 0.3));
 
     const pitch = W / layer.cells;
     for (let i = 0; i < layer.cells; i++) {
-      const cx = -W / 2 + pitch * 0.5 + i * pitch;
+      const cx = -W / 2 + pitch * 0.5 + i * pitch + organic(i + layer.h * 100, 0.03);
       if (layer.name === 'superficial') {
         const papilla = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.018, 0.028, 0.05, 6),
-          mat(0xf0d0c0, { roughness: 0.35 }),
+          new THREE.CapsuleGeometry(0.018 + organic(i + 1, 0.004), 0.045 + organic(i + 2, 0.014), 6, 8),
+          mat(0xf0d0c0, { roughness: 0.48 }),
         );
         papilla.position.set(cx, y + layer.h / 2 + 0.03, DEPTH * 0.3);
+        papilla.rotation.z = organic(i + 2, 0.1);
         group.add(papilla);
         trackInflamed(papilla, 0xf0d0c0, inflamedMeshes);
       }
@@ -64,7 +62,7 @@ export function buildOralTissue(): TissueBuildResult {
 
   const thrush = new THREE.Mesh(
     new THREE.PlaneGeometry(W * 0.55, 0.08),
-    mat(0xf8f4f0, { transparent: true, opacity: 0.12, roughness: 0.2 }),
+    mat(0xf8f4f0, { transparent: true, opacity: 0.1, roughness: 0.35 }),
   );
   thrush.position.set(-0.4, surfaceY + 0.08, DEPTH * 0.46);
   thrush.userData.isThrush = true;
@@ -86,6 +84,11 @@ export function buildOralTissue(): TissueBuildResult {
   biofilm.userData.isBiofilm = true;
   group.add(biofilm);
   overlays.push(biofilm);
+
+  const veil = histologyVeil('oral', W * 0.92, 0.64, surfaceY + 0.14, DEPTH * 0.49);
+  veil.userData.histologyBaseOpacity = 0.2;
+  group.add(veil);
+  overlays.push(veil);
 
   return { group, inflamedMeshes, overlays, kind: 'oral' };
 }

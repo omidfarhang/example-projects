@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
+import { DEPTH, histologyVeil, livingSlab, mat, mucusSheet, organic, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 /**
  * EAR CANAL — narrow tubular squamous canal (not ciliated sinus):
@@ -30,7 +30,7 @@ export function buildEarCanalTissue(): TissueBuildResult {
 
   let y = 0.14;
   for (const layer of layers) {
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(W, layer.h, DEPTH * 0.9), mat(layer.color));
+    const slab = livingSlab(W, layer.h, DEPTH * 0.9, layer.color, {}, y + layer.h);
     slab.position.set(0, y + layer.h / 2, 0);
     group.add(slab, outline(slab, 0xb89080, 0.32));
 
@@ -43,7 +43,8 @@ export function buildEarCanalTissue(): TissueBuildResult {
           roughness: layer.name === 'corneum' ? 0.28 : 0.55,
         }),
       );
-      bump.position.set(cx, y + layer.h / 2 + (layer.name === 'corneum' ? 0.008 : 0), DEPTH * 0.22);
+      bump.position.set(cx + organic(i + layer.h * 100, 0.018), y + layer.h / 2 + (layer.name === 'corneum' ? 0.008 : 0), DEPTH * 0.22);
+      bump.rotation.z = organic(i + 4.2, 0.08);
       group.add(bump);
       if (layer.name === 'spinous') {
         trackInflamed(bump, P.spinous, inflamedMeshes);
@@ -77,7 +78,7 @@ export function buildEarCanalTissue(): TissueBuildResult {
 
   const cerumen = new THREE.Mesh(
     new THREE.PlaneGeometry(W * 0.88, 0.12),
-    mat(0xd4a040, { transparent: true, opacity: 0.22, roughness: 0.4 }),
+    mat(0xd4a040, { transparent: true, opacity: 0.18, roughness: 0.52 }),
   );
   cerumen.position.set(0, canalTop + 0.06, DEPTH * 0.44);
   cerumen.userData.isCerumen = true;
@@ -111,6 +112,11 @@ export function buildEarCanalTissue(): TissueBuildResult {
   biofilm.userData.isBiofilm = true;
   group.add(biofilm);
   overlays.push(biofilm);
+
+  const veil = histologyVeil('ear', W * 0.88, 0.6, canalTop + 0.17, DEPTH * 0.49);
+  veil.userData.histologyBaseOpacity = 0.18;
+  group.add(veil);
+  overlays.push(veil);
 
   return { group, inflamedMeshes, overlays, kind: 'ear' };
 }

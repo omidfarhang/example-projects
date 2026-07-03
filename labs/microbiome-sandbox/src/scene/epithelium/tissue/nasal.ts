@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
+import { DEPTH, histologyVeil, livingSlab, mat, mucusSheet, organic, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 /**
  * NOSE/SINUS — layered airway cross-section (like skin clarity):
@@ -16,17 +16,11 @@ export function buildNasalTissue(): TissueBuildResult {
   const laminaH = 0.14;
   const epiBase = baseY + laminaH + 0.02;
 
-  const lamina = new THREE.Mesh(
-    new THREE.BoxGeometry(span + 0.2, laminaH, DEPTH),
-    mat(P.laminaDeep),
-  );
+  const lamina = livingSlab(span + 0.2, laminaH, DEPTH, P.laminaDeep, {}, 1.2);
   lamina.position.set(0, baseY + laminaH / 2, 0);
   group.add(lamina, outline(lamina, 0xa07068, 0.35));
 
-  const bm = new THREE.Mesh(
-    new THREE.BoxGeometry(span + 0.2, 0.016, DEPTH + 0.02),
-    mat(P.basement),
-  );
+  const bm = livingSlab(span + 0.2, 0.016, DEPTH + 0.02, P.basement, { roughness: 0.85 }, 2.1);
   bm.position.set(0, epiBase, 0);
   group.add(bm);
 
@@ -35,35 +29,47 @@ export function buildNasalTissue(): TissueBuildResult {
   let maxApicalY = epiBase;
 
   for (let i = 0; i < cols; i++) {
-    const x = -span / 2 + i * pitch;
+    const x = -span / 2 + i * pitch + organic(i + 0.4, 0.035);
     const isGoblet = i === 1 || i === 4 || i === 7 || i === 10;
 
     if (isGoblet) {
       const stemH = 0.14;
       const stem = new THREE.Mesh(
-        new THREE.BoxGeometry(0.09, stemH, DEPTH * 0.7),
-        mat(P.cytoplasmDeep),
+        new THREE.CapsuleGeometry(0.034, stemH, 8, 10),
+        mat(P.cytoplasmDeep, { roughness: 0.78 }),
       );
-      stem.position.set(x, epiBase + stemH / 2 + 0.01, 0);
+      stem.position.set(x, epiBase + stemH / 2 + 0.01, 0.01);
+      stem.scale.set(0.92, 1, 0.55);
+      stem.rotation.z = organic(i + 1.1, 0.06);
       group.add(stem);
 
       const cup = new THREE.Mesh(
-        new THREE.SphereGeometry(0.12, 14, 12),
-        mat(P.mucusVacuole, { transparent: true, opacity: 0.9, roughness: 0.08 }),
+        new THREE.SphereGeometry(0.1, 18, 14),
+        mat(P.mucusVacuole, { transparent: true, opacity: 0.68, roughness: 0.22, depthWrite: false }),
       );
-      cup.position.set(x, epiBase + stemH + 0.1, 0);
-      cup.scale.set(0.95, 0.78, 0.82);
-      group.add(cup, outline(cup, 0xa8d0e8, 0.4));
+      cup.position.set(x, epiBase + stemH + 0.075, 0.02);
+      cup.scale.set(0.82, 1.1, 0.58);
+      cup.rotation.z = organic(i + 1.8, 0.12);
+      group.add(cup);
+      const basalNucleus = new THREE.Mesh(
+        new THREE.SphereGeometry(0.024, 10, 8),
+        mat(P.nucleusDark, { roughness: 0.86 }),
+      );
+      basalNucleus.position.set(x + organic(i + 6, 0.014), epiBase + 0.055, DEPTH * 0.25);
+      basalNucleus.scale.set(1.25, 0.75, 0.65);
+      group.add(basalNucleus);
       maxApicalY = Math.max(maxApicalY, epiBase + stemH + 0.18);
       trackInflamed(cup, P.mucusVacuole, inflamedMeshes);
     } else {
-      const colH = 0.34 + (i % 3) * 0.08;
+      const colH = 0.32 + (i % 3) * 0.075 + organic(i + 2.2, 0.04);
       const col = new THREE.Mesh(
-        new THREE.BoxGeometry(0.1, colH, DEPTH * 0.78),
-        mat(P.cytoplasm),
+        new THREE.CapsuleGeometry(0.038, colH, 8, 12),
+        mat(P.cytoplasm, { roughness: 0.7 }),
       );
       col.position.set(x, epiBase + colH / 2 + 0.02, 0);
-      group.add(col, outline(col, 0xe0b0a8, 0.35));
+      col.scale.set(0.82, 1, 0.52);
+      col.rotation.z = organic(i + 3.5, 0.05);
+      group.add(col);
       trackInflamed(col, P.cytoplasm, inflamedMeshes);
 
       const nucOffsets = [0.12, 0.24, 0.18, 0.3];
@@ -78,7 +84,8 @@ export function buildNasalTissue(): TissueBuildResult {
           new THREE.CylinderGeometry(0.0028, 0.0012, 0.09, 3),
           mat(P.cilia),
         );
-        cil.position.set(x + (c - 3.5) * 0.014, ciliaBase + 0.045, (c % 2) * 0.006);
+        cil.position.set(x + (c - 3.5) * 0.014, ciliaBase + 0.045 + organic(c + i * 2, 0.01), (c % 2) * 0.006);
+        cil.rotation.z = organic(c + i, 0.22);
         group.add(cil);
       }
       maxApicalY = Math.max(maxApicalY, ciliaBase + 0.1);
@@ -88,14 +95,20 @@ export function buildNasalTissue(): TissueBuildResult {
   const brushY = maxApicalY + 0.02;
   const ciliaBrush = new THREE.Mesh(
     new THREE.BoxGeometry(span + 0.1, 0.05, DEPTH * 0.35),
-    mat(P.cilia, { transparent: true, opacity: 0.4 }),
+    mat(P.cilia, { transparent: true, opacity: 0.28 }),
   );
   ciliaBrush.position.set(0, brushY, DEPTH * 0.18);
   group.add(ciliaBrush);
 
   const mucus = mucusSheet(span, 0.32, brushY + 0.08, 0.08);
+  mucus.rotation.z = -0.015;
   group.add(mucus);
   overlays.push(mucus);
+
+  const veil = histologyVeil('sinus', span * 0.94, 0.78, epiBase + 0.18, DEPTH * 0.49);
+  veil.userData.histologyBaseOpacity = 0.2;
+  group.add(veil);
+  overlays.push(veil);
 
   const airwayY = brushY + 0.28;
   const airway = new THREE.Mesh(

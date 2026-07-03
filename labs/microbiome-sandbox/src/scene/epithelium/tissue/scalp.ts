@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P } from '../tissuePalette';
-import { DEPTH, mat, mucusSheet, outline, trackInflamed, type TissueBuildResult } from './shared';
+import { DEPTH, histologyVeil, livingSlab, mat, mucusSheet, organic, outline, trackInflamed, type TissueBuildResult } from './shared';
 
 /**
  * SCALP — dense follicular field with sebaceous units (distinct from single-follicle skin).
@@ -22,7 +22,7 @@ export function buildScalpTissue(): TissueBuildResult {
 
   let y = 0;
   for (const layer of layers) {
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(W, layer.h, DEPTH), mat(layer.color));
+    const slab = livingSlab(W, layer.h, DEPTH, layer.color, {}, y + layer.h);
     slab.position.set(0, y + layer.h / 2, 0);
     group.add(slab, outline(slab, 0x9a6868, 0.32));
 
@@ -60,6 +60,7 @@ export function buildScalpTissue(): TissueBuildResult {
       mat(0x1a1008, { roughness: 0.92 }),
     );
     hair.position.set(fx, surfaceY + 0.34, DEPTH * 0.38);
+    hair.rotation.z = organic(fi + 2.4, 0.08);
     group.add(hair);
 
     const sebaceous = new THREE.Mesh(
@@ -91,7 +92,7 @@ export function buildScalpTissue(): TissueBuildResult {
 
   const sebumSheen = new THREE.Mesh(
     new THREE.PlaneGeometry(W, 0.03),
-    mat(0xf0d878, { transparent: true, opacity: 0.18, metalness: 0.28 }),
+    mat(0xf0d878, { transparent: true, opacity: 0.12, metalness: 0.18 }),
   );
   sebumSheen.position.set(0, surfaceY + 0.02, DEPTH * 0.48);
   sebumSheen.userData.isSebum = true;
@@ -106,6 +107,11 @@ export function buildScalpTissue(): TissueBuildResult {
   biofilm.userData.isBiofilm = true;
   group.add(biofilm);
   overlays.push(biofilm);
+
+  const veil = histologyVeil('scalp', W * 0.92, 0.68, surfaceY + 0.17, DEPTH * 0.49);
+  veil.userData.histologyBaseOpacity = 0.21;
+  group.add(veil);
+  overlays.push(veil);
 
   return { group, inflamedMeshes, overlays, kind: 'scalp' };
 }
