@@ -1,7 +1,7 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { getActiveDistRoot, PLAYGROUND_ROOT } from './paths.mjs';
-import { ensureDir } from './fs-utils.mjs';
+import fs from "node:fs";
+import path from "node:path";
+import { getActiveDistRoot, PLAYGROUND_ROOT } from "./paths.mjs";
+import { ensureDir } from "./fs-utils.mjs";
 import {
   getArticleTitle,
   getDemoPublicUrl,
@@ -9,39 +9,39 @@ import {
   getRepoUrl,
   getSourceUrl,
   SITE_URL,
-} from './manifest-utils.mjs';
-import { escapeHtml } from './theme.mjs';
+} from "./manifest-utils.mjs";
+import { escapeHtml } from "./theme.mjs";
 
-export const PLAYGROUND_TITLE = 'Omid Playground';
-export const PLAYGROUND_SITE_NAME = 'omid.dev';
-export const PLAYGROUND_AUTHOR = 'Omid Farhang';
+export const PLAYGROUND_TITLE = "Omid Playground";
+export const PLAYGROUND_SITE_NAME = "omid.dev";
+export const PLAYGROUND_AUTHOR = "Omid Farhang";
 export const PLAYGROUND_DESCRIPTION =
-  'Live companion demos for omid.dev technical articles. Try Angular, React, WebAssembly, Web Workers, micro frontends, Web Components, and CSS migration examples in the browser.';
-const PLAYGROUND_OG_IMAGE_PATH = '/assets/og-image.png';
+  "Live companion demos for omid.dev technical articles. Try Angular, React, WebAssembly, Web Workers, micro frontends, Web Components, and CSS migration examples in the browser.";
+const PLAYGROUND_OG_IMAGE_PATH = "/assets/og-image.png";
 export const PLAYGROUND_KEYWORDS = [
-  'Omid Farhang',
-  'omid.dev',
-  'Frontend',
-  'Angular',
-  'React',
-  'TypeScript',
-  'WebAssembly',
-  'Rust',
-  'Web Workers',
-  'Micro Frontends',
-  'Web Components',
-  'Frontend Architecture',
-  'Live Demos',
-  'Companion Projects',
+  "Omid Farhang",
+  "omid.dev",
+  "Frontend",
+  "Angular",
+  "React",
+  "TypeScript",
+  "WebAssembly",
+  "Rust",
+  "Web Workers",
+  "Micro Frontends",
+  "Web Components",
+  "Frontend Architecture",
+  "Live Demos",
+  "Companion Projects",
 ];
 
 export function getOgImageUrl(manifest) {
   const imagePath = manifest.generatedOgImagePath ?? PLAYGROUND_OG_IMAGE_PATH;
-  return `${getLandingUrl(manifest).replace(/\/$/, '')}${imagePath}`;
+  return `${getLandingUrl(manifest).replace(/\/$/, "")}${imagePath}`;
 }
 
 function renderKeywords(keywords = PLAYGROUND_KEYWORDS) {
-  return keywords.join(', ');
+  return keywords.join(", ");
 }
 
 export function renderMatomo() {
@@ -72,14 +72,14 @@ export function renderSeoHead({
   imageUrl,
   imageAlt = title,
   keywords = PLAYGROUND_KEYWORDS,
-  type = 'website',
+  type = "website",
   schema,
 }) {
-  const imageType = imageUrl.endsWith('.png')
-    ? 'image/png'
-    : imageUrl.endsWith('.jpg') || imageUrl.endsWith('.jpeg')
-      ? 'image/jpeg'
-      : 'image/svg+xml';
+  const imageType = imageUrl.endsWith(".png")
+    ? "image/png"
+    : imageUrl.endsWith(".jpg") || imageUrl.endsWith(".jpeg")
+      ? "image/jpeg"
+      : "image/svg+xml";
 
   return `
   <meta name="robots" content="index, follow" />
@@ -92,7 +92,7 @@ export function renderSeoHead({
   <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
   <link rel="home" href="${escapeHtml(SITE_URL)}/" />
   <link rel="me" href="https://github.com/omidfarhang" />
-  <link rel="me" href="https://x.com/omidfarhangen" />
+  <link rel="me" href="https://x.com/omidfarhang" />
   <link rel="me" href="https://bsky.app/profile/omid.dev" />
   <link rel="me" href="https://mastodon.social/@omidfarhang" />
   <meta property="og:type" content="${escapeHtml(type)}" />
@@ -108,7 +108,7 @@ export function renderSeoHead({
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="${escapeHtml(imageAlt)}" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@omidfarhangen" />
+  <meta name="twitter:site" content="@omidfarhang" />
   <meta name="twitter:title" content="${escapeHtml(title)}" />
   <meta name="twitter:description" content="${escapeHtml(description)}" />
   <meta name="twitter:image" content="${escapeHtml(imageUrl)}" />
@@ -116,7 +116,7 @@ export function renderSeoHead({
     schema
       ? `
   <script type="application/ld+json">${JSON.stringify(schema)}</script>`
-      : ''
+      : ""
   }
   ${renderMatomo()}`;
 }
@@ -124,37 +124,37 @@ export function renderSeoHead({
 export function landingSchema(manifest) {
   const url = getLandingUrl(manifest);
   return {
-    '@context': 'https://schema.org',
-    '@graph': [
+    "@context": "https://schema.org",
+    "@graph": [
       {
-        '@type': 'WebSite',
-        '@id': `${url}#website`,
+        "@type": "WebSite",
+        "@id": `${url}#website`,
         name: PLAYGROUND_TITLE,
         url,
         description: PLAYGROUND_DESCRIPTION,
         publisher: {
-          '@id': `${SITE_URL}/#person`,
+          "@id": `${SITE_URL}/#person`,
         },
       },
       {
-        '@type': 'Person',
-        '@id': `${SITE_URL}/#person`,
+        "@type": "Person",
+        "@id": `${SITE_URL}/#person`,
         name: PLAYGROUND_AUTHOR,
         url: SITE_URL,
         sameAs: [
-          'https://github.com/omidfarhang',
-          'https://linkedin.com/in/omidfarhang',
-          'https://x.com/omidfarhangen',
-          'https://bsky.app/profile/omid.dev',
-          'https://mastodon.social/@omidfarhang',
+          "https://github.com/omidfarhang",
+          "https://linkedin.com/in/omidfarhang",
+          "https://x.com/omidfarhang",
+          "https://bsky.app/profile/omid.dev",
+          "https://mastodon.social/@omidfarhang",
         ],
       },
       {
-        '@type': 'ItemList',
-        '@id': `${url}#live-demos`,
-        name: 'Live companion demos',
+        "@type": "ItemList",
+        "@id": `${url}#live-demos`,
+        name: "Live companion demos",
         itemListElement: getAllBuildTargets(manifest).map((target, index) => ({
-          '@type': 'ListItem',
+          "@type": "ListItem",
           position: index + 1,
           url: getDemoPublicUrl(manifest, target, target.category),
           name: target.title,
@@ -165,30 +165,30 @@ export function landingSchema(manifest) {
 }
 
 export function demoSchema(manifest, demo) {
-  const url = getDemoPublicUrl(manifest, demo, manifest.category ?? 'examples');
+  const url = getDemoPublicUrl(manifest, demo, manifest.category ?? "examples");
   const articleTitle = getArticleTitle(demo);
   return {
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
     name: demo.title,
     url,
     description: demo.description,
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Web browser',
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: "Web browser",
     isPartOf: {
-      '@type': 'WebSite',
+      "@type": "WebSite",
       name: PLAYGROUND_TITLE,
       url: getLandingUrl(manifest),
     },
     author: {
-      '@type': 'Person',
+      "@type": "Person",
       name: PLAYGROUND_AUTHOR,
       url: SITE_URL,
     },
     codeRepository: getSourceUrl(demo, manifest),
     discussionUrl: demo.articleUrl,
     about: {
-      '@type': 'TechArticle',
+      "@type": "TechArticle",
       headline: articleTitle,
       url: demo.articleUrl,
     },
@@ -206,30 +206,45 @@ export function demoTitle(demo) {
 export function writeSeoAssets(manifest, selectedTargets = null) {
   const baseUrl = getLandingUrl(manifest);
   const distRoot = getActiveDistRoot();
-  const assetsDir = path.join(distRoot, 'assets');
+  const assetsDir = path.join(distRoot, "assets");
   ensureDir(assetsDir);
 
-  const ogImageSourcePath = path.join(PLAYGROUND_ROOT, 'assets', 'og-image.png');
-  const ogImageDistPath = path.join(assetsDir, 'og-image.png');
+  const ogImageSourcePath = path.join(
+    PLAYGROUND_ROOT,
+    "assets",
+    "og-image.png",
+  );
+  const ogImageDistPath = path.join(assetsDir, "og-image.png");
 
   fs.copyFileSync(ogImageSourcePath, ogImageDistPath);
   manifest.generatedOgImagePath = PLAYGROUND_OG_IMAGE_PATH;
-  fs.writeFileSync(path.join(distRoot, 'robots.txt'), renderRobotsTxt(baseUrl), 'utf8');
-  fs.writeFileSync(path.join(distRoot, 'sitemap.xml'), renderSitemapXml(manifest, selectedTargets), 'utf8');
+  fs.writeFileSync(
+    path.join(distRoot, "robots.txt"),
+    renderRobotsTxt(baseUrl),
+    "utf8",
+  );
+  fs.writeFileSync(
+    path.join(distRoot, "sitemap.xml"),
+    renderSitemapXml(manifest, selectedTargets),
+    "utf8",
+  );
 }
 
 function renderRobotsTxt(baseUrl) {
   return `User-agent: *
 Allow: /
 
-Sitemap: ${baseUrl.replace(/\/$/, '')}/sitemap.xml
+Sitemap: ${baseUrl.replace(/\/$/, "")}/sitemap.xml
 `;
 }
 
 function getAllBuildTargets(manifest) {
   const categories = manifest.categories ?? {};
-  const examples = (categories.examples ?? manifest.demos ?? []).map((d) => ({ ...d, category: 'examples' }));
-  const labs = (categories.labs ?? []).map((d) => ({ ...d, category: 'labs' }));
+  const examples = (categories.examples ?? manifest.demos ?? []).map((d) => ({
+    ...d,
+    category: "examples",
+  }));
+  const labs = (categories.labs ?? []).map((d) => ({ ...d, category: "labs" }));
   return [...examples, ...labs];
 }
 
@@ -243,13 +258,13 @@ function renderSitemapXml(manifest, selectedTargets = null) {
   const urls = [
     {
       loc: getLandingUrl(manifest),
-      priority: '1.0',
-      changefreq: 'weekly',
+      priority: "1.0",
+      changefreq: "weekly",
     },
     ...targets.map((target) => ({
       loc: getDemoPublicUrl(manifest, target, target.category),
-      priority: target.category === 'labs' ? '0.85' : '0.8',
-      changefreq: 'monthly',
+      priority: target.category === "labs" ? "0.85" : "0.8",
+      changefreq: "monthly",
     })),
   ];
 
@@ -263,8 +278,7 @@ ${urls
     <priority>${item.priority}</priority>
   </url>`,
   )
-  .join('\n')}
+  .join("\n")}
 </urlset>
 `;
 }
-
