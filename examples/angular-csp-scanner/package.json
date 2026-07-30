@@ -1,0 +1,18 @@
+{
+  "name": "angular-csp-scanner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Scan Angular workspaces for common Content-Security-Policy footguns — companion for omid.dev",
+  "bin": {
+    "angular-csp-scan": "./bin/csp-scan.mjs"
+  },
+  "scripts": {
+    "start": "node bin/csp-scan.mjs",
+    "scan:fixture": "node bin/csp-scan.mjs ./fixtures/sample-app",
+    "test": "node bin/csp-scan.mjs ./fixtures/sample-app; test $? -eq 1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

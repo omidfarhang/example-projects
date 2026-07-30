@@ -1,0 +1,12 @@
+<section>
+  <h1>Dashboard</h1>
+
+  <!-- Classic CSP footgun: inline DOM handler instead of (click) -->
+  <button onclick="refresh()">Refresh</button>
+
+  <a href="javascript:void(0)">Open menu</a>
+
+  <div [innerHTML]="bannerHtml"></div>
+  <div [ngStyle]="themeStyles"></div>
+  <p [style.color]="accent">Accent</p>
+</section>

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>CSP sample (intentionally messy)</title>
+    <base href="/" />
+    <script>
+      // Inline bootstrap leftover — will violate script-src without a nonce.
+      window.__APP_BOOT__ = Date.now();
+    </script>
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>

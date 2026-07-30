@@ -240,6 +240,15 @@
       "sourcePath": "examples/angular-modern-auth",
       "reason": "local BFF",
       "articleUrl": "https://omid.dev/2026/07/31/modern-auth-patterns-for-angular-frontends/"
+    },
+    {
+      "slug": "angular-csp-scanner",
+      "title": "Angular CSP Scanner",
+      "description": "CLI scanner for Angular CSP footguns plus nginx/Apache/Cloudflare header samples.",
+      "articleTitle": "CSP and Angular: Practical Patterns",
+      "sourcePath": "examples/angular-csp-scanner",
+      "reason": "CLI tooling",
+      "articleUrl": "https://omid.dev/2026/07/15/csp-and-angular-practical-patterns/"
     }
   ]
 }
