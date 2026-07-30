@@ -231,6 +231,15 @@
       "sourcePath": "examples/latency-lens",
       "reason": "Native Linux",
       "articleUrl": "https://omid.dev/2026/06/04/building-a-tiny-linux-app-to-explain-desktop-stutter/"
+    },
+    {
+      "slug": "angular-modern-auth",
+      "title": "Modern Auth for Angular",
+      "description": "BFF session cookies, CSRF, auth interceptor, and role guards — no JWTs in localStorage.",
+      "articleTitle": "Modern Auth Patterns for Angular Frontends",
+      "sourcePath": "examples/angular-modern-auth",
+      "reason": "local BFF",
+      "articleUrl": "https://omid.dev/2026/07/31/modern-auth-patterns-for-angular-frontends/"
     }
   ]
 }

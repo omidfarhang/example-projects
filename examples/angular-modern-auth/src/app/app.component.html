@@ -1,0 +1,28 @@
+<div class="shell">
+  <header class="shell__header">
+    <div class="shell__brand">
+      <h1>Modern auth for Angular</h1>
+      <p>
+        BFF session cookies, CSRF headers, interceptors, and role guards —
+        without JWTs in <code>localStorage</code>.
+      </p>
+    </div>
+
+    <nav class="nav" aria-label="Primary">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Overview</a>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/admin" routerLinkActive="active">Admin</a>
+      @if (auth.isAuthenticated()) {
+        <button type="button" class="btn btn--ghost" (click)="logout()">Log out</button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="active">Log in</a>
+      }
+    </nav>
+  </header>
+
+  @if (!auth.ready()) {
+    <p class="note">Hydrating session from the BFF…</p>
+  } @else {
+    <router-outlet />
+  }
+</div>
