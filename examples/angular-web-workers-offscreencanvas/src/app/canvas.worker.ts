@@ -47,7 +47,7 @@ function draw(): void {
 
   ctx.shadowBlur = 16;
   ctx.shadowColor = 'rgba(139, 92, 246, 0.65)';
-  ctx.fillStyle = '#8b5cf6';
+  ctx.fillStyle = '#6eb4f0';
   ctx.fillRect(x, y, 48, 48);
   ctx.shadowBlur = 0;
 

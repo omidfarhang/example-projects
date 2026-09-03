@@ -27,8 +27,8 @@
 }
 
 .upload-button:hover {
-  background: rgb(139 92 246 / 0.08);
-  border-color: rgb(139 92 246 / 0.45);
+  background: rgb(110 180 240 / 0.08);
+  border-color: rgb(110 180 240 / 0.45);
 }
 
 .upload-button input {
@@ -82,7 +82,7 @@
 }
 
 .seek-bar:focus-visible {
-  outline: 2px solid rgb(139 92 246 / 0.55);
+  outline: 2px solid rgb(110 180 240 / 0.55);
   outline-offset: 2px;
 }
 
@@ -105,7 +105,7 @@
   background: white;
   border: 2px solid var(--accent);
   border-radius: 50%;
-  box-shadow: 0 0 0 3px rgb(139 92 246 / 0.2);
+  box-shadow: 0 0 0 3px rgb(110 180 240 / 0.2);
   height: 0.875rem;
   margin-top: -0.3125rem;
   width: 0.875rem;
@@ -128,7 +128,7 @@
   background: white;
   border: 2px solid var(--accent);
   border-radius: 50%;
-  box-shadow: 0 0 0 3px rgb(139 92 246 / 0.2);
+  box-shadow: 0 0 0 3px rgb(110 180 240 / 0.2);
   height: 0.875rem;
   width: 0.875rem;
 }
@@ -159,8 +159,8 @@
 
 .transport-button:hover:not(:disabled) {
   background: var(--accent-soft);
-  border-color: rgb(139 92 246 / 0.45);
-  box-shadow: 0 0 0 3px rgb(139 92 246 / 0.12);
+  border-color: rgb(110 180 240 / 0.45);
+  box-shadow: 0 0 0 3px rgb(110 180 240 / 0.12);
   transform: translateY(-1px);
 }
 

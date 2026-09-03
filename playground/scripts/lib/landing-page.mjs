@@ -17,7 +17,7 @@ import {
   PLAYGROUND_TITLE,
   renderSeoHead,
 } from './seo.mjs';
-import { escapeHtml, faviconHead, landingPageCss } from './theme.mjs';
+import { escapeHtml, faviconHead, landingPageCss, plexFontHead } from './theme.mjs';
 
 const TYPE_LABELS = {
   angular: 'Angular',
@@ -187,7 +187,6 @@ export function writeLandingPage(manifest) {
       ? `
     <section class="zone zone--labs" id="labs">
       <header class="zone__header">
-        <p class="zone__eyebrow">Interactive sandboxes</p>
         <h2 class="zone__title">Labs</h2>
         <p class="zone__lede">Standalone simulations you can poke at — deeper than article companions, built for exploration.</p>
       </header>
@@ -202,7 +201,6 @@ export function writeLandingPage(manifest) {
       ? `
     <section class="zone zone--companions" id="companions">
       <header class="zone__header">
-        <p class="zone__eyebrow">Runnable in the browser</p>
         <h2 class="zone__title">Article companions</h2>
         <p class="zone__lede">Static builds hosted on Cloudflare Pages — open a demo, then read the post for context.</p>
       </header>
@@ -217,7 +215,6 @@ export function writeLandingPage(manifest) {
       ? `
     <section class="zone zone--source" id="clone-only">
       <header class="zone__header">
-        <p class="zone__eyebrow">Needs local setup</p>
         <h2 class="zone__title">Clone-only companions</h2>
         <p class="zone__lede">Firebase, API servers, native Linux tooling, or notebooks — not yet runnable as static browser demos.</p>
       </header>
@@ -243,9 +240,7 @@ export function writeLandingPage(manifest) {
     schema: landingSchema(manifest),
   })}
   ${faviconHead()}
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  ${plexFontHead()}
   <style>${landingPageCss()}</style>
 </head>
 <body>
@@ -265,7 +260,6 @@ export function writeLandingPage(manifest) {
 
   <section class="intro">
     <div class="intro__inner">
-      <p class="intro__eyebrow">Companion demos &amp; interactive labs</p>
       <h1 class="intro__title">Try the ideas from <a href="https://omid.dev/">omid.dev</a> — in your browser.</h1>
       <p class="intro__lede">Open a lab or companion demo, break things, read the source. Every project links back to the article it came from.</p>
       ${stats}

@@ -19,7 +19,7 @@ import {
   getOgImageUrl,
   renderSeoHead,
 } from './seo.mjs';
-import { escapeHtml, faviconHead } from './theme.mjs';
+import { escapeHtml, faviconHead, plexFontHead } from './theme.mjs';
 
 const COMPANION_ASSET = '/assets/companion-frame.css';
 
@@ -118,6 +118,14 @@ function injectIntoHead(html, injection) {
   }
 
   return html;
+}
+
+function injectPlexFonts(html) {
+  if (html.includes('family=IBM+Plex+Sans')) {
+    return html;
+  }
+
+  return injectIntoHead(html, plexFontHead());
 }
 
 function injectStylesheetLink(html) {
@@ -240,6 +248,7 @@ export function injectCompanionFrame(demo, category, manifest) {
 
   let html = fs.readFileSync(indexPath, 'utf8');
   html = injectHtmlClass(html);
+  html = injectPlexFonts(html);
   html = injectStylesheetLink(html);
   html = injectFaviconHead(html);
   html = injectMetaTags(html, demo, category, manifest);

@@ -87,7 +87,7 @@ export function renderSeoHead({
   <meta name="author" content="${escapeHtml(PLAYGROUND_AUTHOR)}" />
   <meta name="keywords" content="${escapeHtml(renderKeywords(keywords))}" />
   <meta name="application-name" content="${escapeHtml(PLAYGROUND_TITLE)}" />
-  <meta name="theme-color" content="#2563eb" />
+  <meta name="theme-color" content="#3574b8" />
   <meta name="msapplication-TileColor" content="#0f172a" />
   <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
   <link rel="home" href="${escapeHtml(SITE_URL)}/" />

@@ -1,17 +1,17 @@
 :root {
-  --bg: #eef1f8;
+  --bg: #eef3f9;
   --surface: #ffffff;
   --surface-muted: #f8fafc;
-  --border: #e2e8f0;
+  --border: #dbe4f0;
   --border-strong: #cbd5e1;
   --text: #0f172a;
   --text-muted: #64748b;
   --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.04);
-  --shadow-md: 0 8px 30px rgb(15 23 42 / 0.07);
-  --shadow-lg: 0 24px 60px rgb(15 23 42 / 0.08);
-  --radius-sm: 12px;
-  --radius-md: 20px;
-  --radius-lg: 24px;
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.06);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --accent-qwik: #7c3aed;
   --accent-qwik-soft: #ede9fe;
   --accent-angular: #dd0031;
@@ -21,10 +21,9 @@
   --accent-rust: #b7410e;
   --accent-rust-soft: #ffedd5;
   --font-sans:
-    "Inter", ui-sans-serif, system-ui, -apple-system, blinkmacsystemfont,
-    "Segoe UI", sans-serif;
+    "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono:
-    "JetBrains Mono", ui-monospace, "Cascadia Code", "Segoe UI Mono", monospace;
+    "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
 }
 
 * {
@@ -33,9 +32,7 @@
 
 body {
   background: var(--bg);
-  background-image:
-    radial-gradient(circle at 0% 0%, rgb(124 58 237 / 0.06), transparent 40%),
-    radial-gradient(circle at 100% 0%, rgb(8 126 164 / 0.05), transparent 35%);
+  background-image: radial-gradient(ellipse 80% 42% at 50% 0%, rgba(53, 116, 184, 0.07), transparent 72%);
   color: var(--text);
   font-family: var(--font-sans);
   line-height: 1.5;
@@ -46,7 +43,7 @@ body {
 button {
   background: var(--accent-qwik);
   border: 0;
-  border-radius: 999px;
+  border-radius: 12px;
   color: white;
   cursor: pointer;
   font: inherit;
@@ -85,7 +82,7 @@ button:disabled {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
   display: grid;
   gap: 1rem;
   overflow: hidden;
@@ -95,12 +92,8 @@ button:disabled {
 
 .panel::before {
   background: var(--panel-accent, var(--accent-qwik));
-  content: "";
-  height: 4px;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
+  content: none;
+  display: none;
 }
 
 .panel--qwik {
@@ -137,10 +130,9 @@ button:disabled {
 .eyebrow {
   color: var(--panel-accent, var(--accent-qwik));
   font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   margin: 0;
-  text-transform: uppercase;
 }
 
 .shared-state {

@@ -127,14 +127,14 @@ export class VisualizerComponent implements OnDestroy, OnInit {
 
   private drawWaveformVisualization(dataArray: Uint8Array, width: number, height: number): void {
     const gradient = this.canvasContext.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop(0, '#8b5cf6');
-    gradient.addColorStop(0.5, '#c084fc');
-    gradient.addColorStop(1, '#38bdf8');
+    gradient.addColorStop(0, '#3574b8');
+    gradient.addColorStop(0.5, '#6eb4f0');
+    gradient.addColorStop(1, '#8ac4f5');
 
     this.canvasContext.lineWidth = 2.5;
     this.canvasContext.strokeStyle = gradient;
     this.canvasContext.shadowBlur = 8;
-    this.canvasContext.shadowColor = 'rgba(139, 92, 246, 0.45)';
+    this.canvasContext.shadowColor = 'rgba(110, 180, 240, 0.45)';
 
     this.canvasContext.beginPath();
     const sliceWidth = width / dataArray.length;

@@ -25,10 +25,9 @@
 .eyebrow {
   color: var(--accent);
   font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   margin: 0;
-  text-transform: uppercase;
 }
 
 .lede {
@@ -49,7 +48,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
   display: grid;
   gap: 1rem;
   overflow: hidden;
@@ -59,12 +58,8 @@
 
 .panel::before {
   background: var(--panel-accent, var(--accent));
-  content: "";
-  height: 3px;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
+  content: none;
+  display: none;
 }
 
 .panel--scenario {
