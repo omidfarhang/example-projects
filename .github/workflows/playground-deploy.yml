@@ -61,6 +61,8 @@ jobs:
             category: examples
           - slug: chaos-resilience-lab
             category: examples
+          - slug: angular-router-resources
+            category: examples
           - slug: microbiome-sandbox
             category: labs
     steps:

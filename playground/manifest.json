@@ -162,6 +162,16 @@
         "sourcePath": "examples/chaos-resilience-lab",
         "type": "static-html",
         "staticHtmlDir": "public"
+      },
+      {
+        "slug": "angular-router-resources",
+        "title": "Angular Router Resources",
+        "description": "Trip Desk demo: waterfall resolvers vs parallel blocking Router Resources vs non-blocking Resource inputs.",
+        "articleTitle": "Angular Router Resources: Route Data as a Graph",
+        "projectDir": "examples/angular-router-resources",
+        "sourcePath": "examples/angular-router-resources",
+        "type": "angular",
+        "articleUrl": "https://omid.dev/2026/09/22/angular-router-resources-route-data-as-a-graph/"
       }
     ],
     "labs": [

@@ -27,6 +27,7 @@ Browser-only companion projects and interactive labs are published at **[playgro
 | [GraphQL with Angular & Apollo](https://playground.omid.dev/examples/angular-graphql-apollo/) | [`examples/angular-graphql-apollo`](./examples/angular-graphql-apollo/) |
 | [Real-Time Frontend Patterns](https://playground.omid.dev/examples/realtime-frontend-patterns/) | [`examples/realtime-frontend-patterns`](./examples/realtime-frontend-patterns/) |
 | [Chaos Resilience Lab](https://playground.omid.dev/examples/chaos-resilience-lab/) | [`examples/chaos-resilience-lab`](./examples/chaos-resilience-lab/) |
+| [Angular Router Resources](https://playground.omid.dev/examples/angular-router-resources/) | [`examples/angular-router-resources`](./examples/angular-router-resources/) |
 
 Demos that need Firebase, a local API server, native Linux binaries, or other non-browser runtimes are **source-only** for now. See [playground/README.md](./playground/README.md) for the playground build and deploy setup.
 
@@ -47,7 +48,7 @@ Most frontend examples are Angular apps and open on `http://localhost:4200`. Som
 
 | Area | Projects |
 | --- | --- |
-| Angular application patterns | [`examples/angular-patterns-and-di`](./examples/angular-patterns-and-di/), [`examples/angular-dynamic-form-debugging`](./examples/angular-dynamic-form-debugging/), [`examples/angular-shared-library-workspace`](./examples/angular-shared-library-workspace/), [`examples/angular-modern-auth`](./examples/angular-modern-auth/), [`examples/angular-csp-scanner`](./examples/angular-csp-scanner/) |
+| Angular application patterns | [`examples/angular-patterns-and-di`](./examples/angular-patterns-and-di/), [`examples/angular-dynamic-form-debugging`](./examples/angular-dynamic-form-debugging/), [`examples/angular-shared-library-workspace`](./examples/angular-shared-library-workspace/), [`examples/angular-modern-auth`](./examples/angular-modern-auth/), [`examples/angular-csp-scanner`](./examples/angular-csp-scanner/), [`examples/angular-router-resources`](./examples/angular-router-resources/) |
 | Browser performance | [`examples/angular-web-workers-offscreencanvas`](./examples/angular-web-workers-offscreencanvas/), [`examples/angular-web-audio-visualizer`](./examples/angular-web-audio-visualizer/), [`examples/rust-wasm-performance-demo`](./examples/rust-wasm-performance-demo/) |
 | Linux desktop and kernel-adjacent tooling | [`examples/latency-lens`](./examples/latency-lens/) |
 | APIs and data fetching | [`examples/angular-graphql-apollo`](./examples/angular-graphql-apollo/), [`examples/graphql-express-angular-migration`](./examples/graphql-express-angular-migration/) |
@@ -80,6 +81,7 @@ Most frontend examples are Angular apps and open on `http://localhost:4200`. Som
 | [`examples/latency-lens`](./examples/latency-lens/) | Rust TUI that reads Linux PSI and explains desktop stutter from kernel pressure signals | Source only (native Linux) | [Building a Tiny Linux App to Explain Desktop Stutter](https://omid.dev/2026/06/04/building-a-tiny-linux-app-to-explain-desktop-stutter/) |
 | [`examples/angular-modern-auth`](./examples/angular-modern-auth/) | BFF session cookies, CSRF, auth interceptor, and role guards — no JWTs in `localStorage` | Source only (local BFF) | [Modern Auth Patterns for Angular Frontends](https://omid.dev/2026/07/31/modern-auth-patterns-for-angular-frontends/) |
 | [`examples/angular-csp-scanner`](./examples/angular-csp-scanner/) | CLI scanner for Angular CSP footguns plus nginx/Apache/Cloudflare header samples | Source only (CLI) | [CSP and Angular: Practical Patterns](https://omid.dev/2026/07/15/csp-and-angular-practical-patterns/) |
+| [`examples/angular-router-resources`](./examples/angular-router-resources/) | Trip Desk: waterfall resolvers vs parallel Router Resources vs non-blocking `Resource` inputs (Angular 22.2 Developer Preview) | [Open](https://playground.omid.dev/examples/angular-router-resources/) | [Angular Router Resources: Route Data as a Graph](https://omid.dev/2026/09/22/angular-router-resources-route-data-as-a-graph/) |
 | [`examples/jupyter-blog-starter`](./examples/jupyter-blog-starter/) | Python and Jupyter starter for notebook-driven technical analysis | Source only | [Jupyter setup guide](https://omid.dev/2025/12/23/jupyter-technical-setup-guide/), [Jupyter real-world examples](https://omid.dev/2025/12/23/jupyter-real-world-examples/) |
 | [`examples/graphql-express-angular-migration`](./examples/graphql-express-angular-migration/) | Express API showing REST and GraphQL side by side with an Angular client | Source only (API server) | [Migrating from REST to GraphQL](https://omid.dev/2024/08/07/migrating-from-rest-to-graphql-a-step-by-step-guide-for-expressjs-and-angular/) |
 

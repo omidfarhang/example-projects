@@ -87,12 +87,14 @@ Companion frame variants:
 
 1. Create project under `labs/<slug>/` (Vite recommended).
 2. Add entry to `manifest.json` → `categories.labs`.
-3. Run `npm run build:playground -- --only <slug>`.
-4. Link from blog posts with deep-link query params.
+3. Add the same `slug` + `category: labs` to the matrix in [`.github/workflows/playground-deploy.yml`](../.github/workflows/playground-deploy.yml).
+4. Run `npm run build:playground -- --only <slug>`.
+5. Link from blog posts with deep-link query params.
 
 ## Adding an example
 
 1. Create project under `examples/<slug>/`.
 2. Add an entry to `manifest.json` → `categories.examples` with a unique `slug` and `type`.
-3. Implement or extend a builder in `scripts/lib/builders.mjs` if needed.
-4. Run `npm run build:playground` locally and verify `/examples/<slug>/`.
+3. Add the same `slug` + `category: examples` to the matrix in [`.github/workflows/playground-deploy.yml`](../.github/workflows/playground-deploy.yml) (CI does not derive the matrix from the manifest).
+4. Implement or extend a builder in `scripts/lib/builders.mjs` if needed.
+5. Run `npm run build:playground -- --only <slug>` locally and verify `/examples/<slug>/`.

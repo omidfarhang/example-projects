@@ -1,0 +1,121 @@
+:root {
+  --bg: #eef3f9;
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --border: #dbe4f0;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --accent: #dd0031;
+  --accent-soft: #ffe4ea;
+  --danger: #b91c1c;
+  --danger-soft: #fef2f2;
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.05);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  background-image: radial-gradient(ellipse 80% 42% at 50% 0%, rgba(53, 116, 184, 0.07), transparent 72%);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  margin: 0;
+  min-height: 100vh;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+code {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  padding: 0.1rem 0.35rem;
+}
+
+.page__lede {
+  color: var(--text-muted);
+  max-width: 58ch;
+}
+
+.eyebrow {
+  color: var(--page-accent, var(--accent));
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.panel h2 {
+  font-size: 1.375rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.panel .page__lede {
+  margin: 0;
+}
+
+.note {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  margin: 0;
+  padding: 0.875rem 1rem;
+}
+
+.stat-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  margin: 0;
+}
+
+.stat-grid__item {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem 0.875rem;
+}
+
+.stat-grid dt {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stat-grid dd {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+}

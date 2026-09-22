@@ -1,0 +1,81 @@
+<main class="demo">
+  <header class="hero">
+    <p class="eyebrow">Developer Preview · Angular 22.2</p>
+    <h1>Trip Desk — Router Resources</h1>
+    <p class="lede">
+      Same three payloads (trip, passenger, seat map), each delayed by ~1s. Compare sequential
+      resolvers (~3s) with parallel Router Resources (~1s), then the non-blocking variant that
+      exposes <code>Resource</code> inputs in the template.
+    </p>
+  </header>
+
+  <section class="timing" aria-live="polite">
+    <p class="timing__label">Last navigation</p>
+    <p class="timing__value">
+      @if (timer.status() === 'navigating') {
+        Navigating…
+      } @else if (timer.elapsedMs() !== null) {
+        <span class="timing__ms">{{ timer.elapsedMs() }} ms</span>
+        <span class="timing__status">· {{ timer.status() }}</span>
+      } @else {
+        —
+      }
+    </p>
+    @if (timer.resolveOrder().length) {
+      <p class="timing__order">
+        Resolve order:
+        <code>{{ timer.resolveOrder().join(' → ') }}</code>
+      </p>
+    }
+    @if (timer.message(); as msg) {
+      <p class="timing__msg">{{ msg }}</p>
+    }
+  </section>
+
+  <nav class="nav" aria-label="Demo routes">
+    <a
+      class="nav__link"
+      routerLink="/waterfall/{{ tripId }}"
+      routerLinkActive="nav__link--active"
+    >
+      Waterfall
+      <span class="nav__hint">~3s nested resolves</span>
+    </a>
+    <a
+      class="nav__link"
+      routerLink="/resources/{{ tripId }}"
+      routerLinkActive="nav__link--active"
+    >
+      Resources
+      <span class="nav__hint">~1s parallel block</span>
+    </a>
+    <a
+      class="nav__link"
+      routerLink="/resources-live/{{ tripId }}"
+      routerLinkActive="nav__link--active"
+    >
+      Live
+      <span class="nav__hint">Non-blocking UI</span>
+    </a>
+    <a
+      class="nav__link nav__link--fail"
+      routerLink="/resources/{{ tripId }}"
+      [queryParams]="{ fail: 'seat' }"
+      routerLinkActive="nav__link--active"
+    >
+      Fail (block)
+      <span class="nav__hint">?fail=seat</span>
+    </a>
+    <a
+      class="nav__link nav__link--fail"
+      routerLink="/resources-live/{{ tripId }}"
+      [queryParams]="{ fail: 'seat' }"
+      routerLinkActive="nav__link--active"
+    >
+      Fail (live)
+      <span class="nav__hint">error in template</span>
+    </a>
+  </nav>
+
+  <router-outlet />
+</main>
