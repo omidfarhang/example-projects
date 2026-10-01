@@ -6,30 +6,11 @@ This repository exists for the examples that are too large for a blog post but s
 
 ## Live Demos
 
-Browser-only companion projects and interactive labs are published at **[playground.omid.dev](https://playground.omid.dev)** under `/examples/<slug>/` and `/labs/<slug>/`.
+The catalog of labs, live companions, and clone-only projects lives on **[omid.dev/playground/](https://omid.dev/playground/)**.
 
-| Lab | Description |
-| --- | --- |
-| [Bio-Dynamics: Microbiome Sandbox](https://playground.omid.dev/labs/microbiome-sandbox/) | Full-body 3D microbiome simulator with blog-backed probiotic scenarios |
+Browser builds are hosted at **[playground.omid.dev](https://playground.omid.dev)** under `/examples/<slug>/` and `/labs/<slug>/` (the playground root redirects to the catalog). Source stays in this repo — clone a project folder to run locally.
 
-| Live demo | Project |
-| --- | --- |
-| [Angular Web Audio Visualizer](https://playground.omid.dev/examples/angular-web-audio-visualizer/) | [`examples/angular-web-audio-visualizer`](./examples/angular-web-audio-visualizer/) |
-| [Web Workers & OffscreenCanvas](https://playground.omid.dev/examples/angular-web-workers-offscreencanvas/) | [`examples/angular-web-workers-offscreencanvas`](./examples/angular-web-workers-offscreencanvas/) |
-| [Rust WASM Performance](https://playground.omid.dev/examples/rust-wasm-performance-demo/) | [`examples/rust-wasm-performance-demo`](./examples/rust-wasm-performance-demo/) |
-| [Micro Frontends (Qwik + Angular + React)](https://playground.omid.dev/examples/qwik-angular-react-rust/) | [`examples/qwik-angular-react-rust`](./examples/qwik-angular-react-rust/) |
-| [Stencil Web Components in Angular](https://playground.omid.dev/examples/angular-stencil-web-components/) | [`examples/angular-stencil-web-components`](./examples/angular-stencil-web-components/) |
-| [Angular Dynamic Form Debugging](https://playground.omid.dev/examples/angular-dynamic-form-debugging/) | [`examples/angular-dynamic-form-debugging`](./examples/angular-dynamic-form-debugging/) |
-| [Angular Patterns & DI](https://playground.omid.dev/examples/angular-patterns-and-di/) | [`examples/angular-patterns-and-di`](./examples/angular-patterns-and-di/) |
-| [Angular Shared Library Workspace](https://playground.omid.dev/examples/angular-shared-library-workspace/) | [`examples/angular-shared-library-workspace`](./examples/angular-shared-library-workspace/) |
-| [React Recoil Advanced State](https://playground.omid.dev/examples/react-recoil-advanced-state/) | [`examples/react-recoil-advanced-state`](./examples/react-recoil-advanced-state/) |
-| [Bootstrap to Tailwind Migration](https://playground.omid.dev/examples/bootstrap-to-tailwind-migration/) | [`examples/bootstrap-to-tailwind-migration`](./examples/bootstrap-to-tailwind-migration/) |
-| [GraphQL with Angular & Apollo](https://playground.omid.dev/examples/angular-graphql-apollo/) | [`examples/angular-graphql-apollo`](./examples/angular-graphql-apollo/) |
-| [Real-Time Frontend Patterns](https://playground.omid.dev/examples/realtime-frontend-patterns/) | [`examples/realtime-frontend-patterns`](./examples/realtime-frontend-patterns/) |
-| [Chaos Resilience Lab](https://playground.omid.dev/examples/chaos-resilience-lab/) | [`examples/chaos-resilience-lab`](./examples/chaos-resilience-lab/) |
-| [Angular Router Resources](https://playground.omid.dev/examples/angular-router-resources/) | [`examples/angular-router-resources`](./examples/angular-router-resources/) |
-
-Demos that need Firebase, a local API server, native Linux binaries, or other non-browser runtimes are **source-only** for now. See [playground/README.md](./playground/README.md) for the playground build and deploy setup.
+See [playground/README.md](./playground/README.md) for the build and deploy setup. Demos that need Firebase, a local API server, native Linux binaries, or notebooks are **source-only** until they have a static browser build.
 
 ## Start Here
 
@@ -60,30 +41,9 @@ Most frontend examples are Angular apps and open on `http://localhost:4200`. Som
 
 ## Project Index
 
-| Project | Focus | Live demo | Related article |
-| --- | --- | --- | --- |
-| [`examples/angular-web-audio-visualizer`](./examples/angular-web-audio-visualizer/) | Angular music visualization with the Web Audio API and Canvas | [Open](https://playground.omid.dev/examples/angular-web-audio-visualizer/) | [Creating Dynamic Music Visualizations with Angular and the Web Audio API](https://omid.dev/2024/07/13/creating-dynamic-music-visualizations-with-angular-and-the-web-audio-api/) |
-| [`examples/qwik-angular-react-rust`](./examples/qwik-angular-react-rust/) | Qwik shell app that hosts Angular and React micro frontends, with optional Rust WASM | [Open](https://playground.omid.dev/examples/qwik-angular-react-rust/) | [Micro Frontends: Working Example](https://omid.dev/2024/05/11/micro-frontends-working-example/) |
-| [`examples/angular-collaborative-editor-firebase-webrtc`](./examples/angular-collaborative-editor-firebase-webrtc/) | Real-time Angular editor using Firebase, Firestore, and WebRTC signaling ideas | Source only (Firebase) | [Building a Real-Time Collaborative Editor with Angular, Firebase, and WebRTC](https://omid.dev/2024/06/24/realtime-collaborative-editor-with-angular-firebase-webrtc/) |
-| [`examples/angular-web-workers-offscreencanvas`](./examples/angular-web-workers-offscreencanvas/) | Moving canvas work off the main thread with Web Workers and OffscreenCanvas | [Open](https://playground.omid.dev/examples/angular-web-workers-offscreencanvas/) | [Optimizing Angular Applications with Web Workers and OffscreenCanvas](https://omid.dev/2024/06/23/optimizing-angular-applications-with-web-workers-and-offscreencanvas/) |
-| [`examples/angular-graphql-apollo`](./examples/angular-graphql-apollo/) | Angular app connected to a local GraphQL API with Apollo Client | [Open](https://playground.omid.dev/examples/angular-graphql-apollo/) | [Integrating GraphQL with Angular: A Practical Guide](https://omid.dev/2024/06/01/integrating-graphql-with-angular-a-practical-guide/) |
-| [`examples/angular-stencil-web-components`](./examples/angular-stencil-web-components/) | Stencil web component consumed by an Angular app | [Open](https://playground.omid.dev/examples/angular-stencil-web-components/) | [Implementing Custom Web Components in Angular with Stencil.js](https://omid.dev/2024/06/26/implementing-custom-web-components-in-angular-with-stenciljs/) |
-| [`examples/typescript-advanced-types`](./examples/typescript-advanced-types/) | Small TypeScript examples for mapped, conditional, recursive, and utility types | Source only | [Advanced TypeScript types](https://omid.dev/2024/06/14/advanced-typeScript-types/) |
-| [`examples/react-recoil-advanced-state`](./examples/react-recoil-advanced-state/) | React task dashboard demonstrating atoms, selectors, and derived state with Recoil | [Open](https://playground.omid.dev/examples/react-recoil-advanced-state/) | [Advanced state management in React with Recoil](https://omid.dev/2024/06/14/advanced-state-management-in-react-with-recoil/) |
-| [`examples/realtime-frontend-patterns`](./examples/realtime-frontend-patterns/) | Node examples for WebSocket and Server-Sent Events patterns | [Open](https://playground.omid.dev/examples/realtime-frontend-patterns/) | [Real-time data in frontend applications](https://omid.dev/2024/06/08/real-time-data-in-frontend-applications/) |
-| [`examples/chaos-resilience-lab`](./examples/chaos-resilience-lab/) | Side-by-side checkout demo comparing fragile vs resilient UI under injected payment faults | [Open](https://playground.omid.dev/examples/chaos-resilience-lab/) | [Chaos engineering](https://omid.dev/2024/06/06/chaos-engineering/) (series overview) |
-| [`examples/angular-patterns-and-di`](./examples/angular-patterns-and-di/) | Angular design patterns, dependency injection, providers, and injection tokens | [Open](https://playground.omid.dev/examples/angular-patterns-and-di/) | [Design patterns in Angular](https://omid.dev/2024/05/31/design-patterns-in-angular-enhancing-code-quality-and-maintainability/), [Advanced DI techniques](https://omid.dev/2024/06/17/advanced-dependency-injection-techniques-in-angular-tree-shakable-providers-and-injection-tokens/) |
-| [`examples/angular-dynamic-form-debugging`](./examples/angular-dynamic-form-debugging/) | Reactive form debugging scenario for Angular applications | [Open](https://playground.omid.dev/examples/angular-dynamic-form-debugging/) | [Debugging Angular](https://omid.dev/2024/05/22/debugging-angular-a-tale-of-two-developers/) |
-| [`examples/angular-shared-library-workspace`](./examples/angular-shared-library-workspace/) | Angular workspace containing a reusable UI library and demo app | [Open](https://playground.omid.dev/examples/angular-shared-library-workspace/) | [Reusable shared module in Angular](https://omid.dev/2024/05/12/reusable-shared-module-in-angular/) |
-| [`examples/angular-custom-schematics`](./examples/angular-custom-schematics/) | Angular schematics for repeatable code generation | Source only | [Building custom Angular schematics](https://omid.dev/2024/06/03/building-custom-angular-schematics-automating-code-generation/) |
-| [`examples/bootstrap-to-tailwind-migration`](./examples/bootstrap-to-tailwind-migration/) | Side-by-side migration from Bootstrap-style markup to Tailwind CSS | [Open](https://playground.omid.dev/examples/bootstrap-to-tailwind-migration/) | [Migrate CSS Bootstrap to Tailwind](https://omid.dev/2024/05/22/migrate-css-bootstrap-to-tailwind/) |
-| [`examples/rust-wasm-performance-demo`](./examples/rust-wasm-performance-demo/) | Rust and WebAssembly benchmark served from a simple web page | [Open](https://playground.omid.dev/examples/rust-wasm-performance-demo/) | [WebAssembly and Rust](https://omid.dev/2024/06/13/building-high-performance-web-applications-leveraging-webassembly-and-rust/) |
-| [`examples/latency-lens`](./examples/latency-lens/) | Rust TUI that reads Linux PSI and explains desktop stutter from kernel pressure signals | Source only (native Linux) | [Building a Tiny Linux App to Explain Desktop Stutter](https://omid.dev/2026/06/04/building-a-tiny-linux-app-to-explain-desktop-stutter/) |
-| [`examples/angular-modern-auth`](./examples/angular-modern-auth/) | BFF session cookies, CSRF, auth interceptor, and role guards — no JWTs in `localStorage` | Source only (local BFF) | [Modern Auth Patterns for Angular Frontends](https://omid.dev/2026/07/31/modern-auth-patterns-for-angular-frontends/) |
-| [`examples/angular-csp-scanner`](./examples/angular-csp-scanner/) | CLI scanner for Angular CSP footguns plus nginx/Apache/Cloudflare header samples | Source only (CLI) | [CSP and Angular: Practical Patterns](https://omid.dev/2026/07/15/csp-and-angular-practical-patterns/) |
-| [`examples/angular-router-resources`](./examples/angular-router-resources/) | Trip Desk: waterfall resolvers vs parallel Router Resources vs non-blocking `Resource` inputs (Angular 22.2 Developer Preview) | [Open](https://playground.omid.dev/examples/angular-router-resources/) | [Angular Router Resources: Route Data as a Graph](https://omid.dev/2026/09/22/angular-router-resources-route-data-as-a-graph/) |
-| [`examples/jupyter-blog-starter`](./examples/jupyter-blog-starter/) | Python and Jupyter starter for notebook-driven technical analysis | Source only | [Jupyter setup guide](https://omid.dev/2025/12/23/jupyter-technical-setup-guide/), [Jupyter real-world examples](https://omid.dev/2025/12/23/jupyter-real-world-examples/) |
-| [`examples/graphql-express-angular-migration`](./examples/graphql-express-angular-migration/) | Express API showing REST and GraphQL side by side with an Angular client | Source only (API server) | [Migrating from REST to GraphQL](https://omid.dev/2024/08/07/migrating-from-rest-to-graphql-a-step-by-step-guide-for-expressjs-and-angular/) |
+Full catalog (live demos, labs, clone-only, article links): **[omid.dev/playground/](https://omid.dev/playground/)**.
+
+Machine-readable list for builds: [`playground/manifest.json`](./playground/manifest.json). Browse folders under [`examples/`](./examples/) and [`labs/`](./labs/) for source.
 
 ## Common Requirements
 

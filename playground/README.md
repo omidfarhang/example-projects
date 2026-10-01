@@ -14,7 +14,7 @@ Static live demos and interactive labs for omid.dev, published at **[playground.
 
 | Path | Purpose |
 | --- | --- |
-| `/` | Playground home (examples + labs) |
+| `/` | Redirects to [omid.dev/playground/](https://omid.dev/playground/) (catalog) |
 | `/examples/<slug>/` | Article companion demos |
 | `/labs/<slug>/` | Standalone interactive labs |
 

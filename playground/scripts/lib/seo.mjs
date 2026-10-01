@@ -5,6 +5,7 @@ import { ensureDir } from "./fs-utils.mjs";
 import {
   getArticleTitle,
   getDemoPublicUrl,
+  getCatalogUrl,
   getLandingUrl,
   getRepoUrl,
   getSourceUrl,
@@ -178,7 +179,7 @@ export function demoSchema(manifest, demo) {
     isPartOf: {
       "@type": "WebSite",
       name: PLAYGROUND_TITLE,
-      url: getLandingUrl(manifest),
+      url: getCatalogUrl(),
     },
     author: {
       "@type": "Person",
@@ -257,7 +258,7 @@ function renderSitemapXml(manifest, selectedTargets = null) {
 
   const urls = [
     {
-      loc: getLandingUrl(manifest),
+      loc: getCatalogUrl(),
       priority: "1.0",
       changefreq: "weekly",
     },

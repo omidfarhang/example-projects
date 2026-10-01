@@ -1,6 +1,8 @@
 export const DEFAULT_REPO_URL = 'https://github.com/omidfarhang/example-projects';
 export const DEFAULT_REPO_BRANCH = 'master';
 export const SITE_URL = 'https://omid.dev';
+/** Catalog lives on the main site; demos stay on playground.omid.dev. */
+export const CATALOG_URL = 'https://omid.dev/playground/';
 
 export function getRepoUrl(manifest) {
   return manifest?.repoUrl ?? DEFAULT_REPO_URL;
@@ -65,6 +67,12 @@ export function getDemoPublicUrl(manifest, demo, category = 'examples') {
   return `${base}/${category}/${demo.slug}/`;
 }
 
+/** Demo host root (playground.omid.dev) — for OG assets, robots, demo URLs. */
 export function getLandingUrl(manifest) {
   return `${(manifest.baseUrl ?? 'https://playground.omid.dev').replace(/\/$/, '')}/`;
+}
+
+/** Human catalog on omid.dev — companion-frame "All demos" and root redirect target. */
+export function getCatalogUrl() {
+  return CATALOG_URL;
 }

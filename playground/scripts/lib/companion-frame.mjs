@@ -6,7 +6,7 @@ import {
   getArticleTitle,
   getCompanionArticles,
   getDemoPublicUrl,
-  getLandingUrl,
+  getCatalogUrl,
   getSourceUrl,
   SITE_URL,
 } from './manifest-utils.mjs';
@@ -29,12 +29,12 @@ function isLabTarget(demo, category) {
 
 function renderCompanionBar(demo, category, manifest) {
   const sourceUrl = getSourceUrl(demo, manifest);
-  const landingUrl = getLandingUrl(manifest);
+  const catalogUrl = getCatalogUrl();
   const isLab = isLabTarget(demo, category);
 
   if (isLab) {
     const techBlogUrl = demo.techBlogUrl ?? 'https://omid.dev/posts/';
-    const allLabsUrl = `${landingUrl.replace(/\/$/, '')}/#labs`;
+    const allLabsUrl = `${catalogUrl.replace(/\/$/, '')}/#labs`;
 
     return `
   <header class="pg-companion" data-playground-companion-bar aria-label="Playground lab">
@@ -80,7 +80,7 @@ function renderCompanionBar(demo, category, manifest) {
           item: 'pg-companion__menu-item',
         })}
         <a class="pg-companion__btn pg-companion__btn--secondary" href="${escapeHtml(sourceUrl)}">View source</a>
-        <a class="pg-companion__btn" href="${escapeHtml(landingUrl)}">All demos</a>
+        <a class="pg-companion__btn" href="${escapeHtml(catalogUrl)}">All demos</a>
       </nav>
     </div>
   </header>`;

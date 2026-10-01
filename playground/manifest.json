@@ -183,6 +183,7 @@
         "sourcePath": "labs/microbiome-sandbox",
         "type": "vite",
         "kind": "lab",
+        "articleTitle": "Deterministic Microbiome Simulation Without Overclaiming the Science",
         "techBlogUrl": "https://omid.dev/2026/06/10/deterministic-microbiome-simulation-without-overclaiming-science/"
       }
     ]

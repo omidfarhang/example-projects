@@ -3,7 +3,7 @@ import path from 'node:path';
 import { getActiveDistRoot } from './paths.mjs';
 import { ensureDir } from './fs-utils.mjs';
 
-/** CSS custom properties aligned with omid.dev/design.md and themes/omid-dev/assets/css/core/theme-vars.css */
+/** CSS custom properties aligned with DESIGN.md (mono editorial) and omid.dev theme-vars.css */
 export function themeVarsCss() {
   return `
     :root {
@@ -15,31 +15,33 @@ export function themeVarsCss() {
       --theme: #ffffff;
       --theme-rgb: 255, 255, 255;
       --entry: #ffffff;
-      --primary: #0f172a;
-      --primary-rgb: 15, 23, 42;
-      --secondary: #64748b;
-      --tertiary: #cbd5e1;
-      --quaternary: #f1f5f9;
-      --content: #334155;
-      --code-bg: #f1f5f9;
-      --border: #dbe4f0;
-      --accent: #3574b8;
-      --accent-rgb: 53, 116, 184;
-      --accent-hover: #2a6299;
-      --accent-light: color-mix(in srgb, var(--accent) 12%, var(--quaternary) 88%);
-      --accent-ring: rgba(var(--accent-rgb), 0.22);
-      --accent-border-soft: color-mix(in srgb, var(--border) 72%, var(--accent) 28%);
-      --surface-tint: rgba(var(--accent-rgb), 0.06);
-      --surface-tint-strong: rgba(var(--accent-rgb), 0.1);
-      --page-bg: #eef3f9;
-      --hero-glow: rgba(var(--accent-rgb), 0.1);
-      --hero-glow-soft: rgba(var(--accent-rgb), 0.07);
-      --surface-gradient-hero: radial-gradient(ellipse 80% 42% at 50% 0%, var(--hero-glow-soft), transparent 72%);
+      --primary: #0c0c0c;
+      --primary-rgb: 12, 12, 12;
+      --secondary: #6a6a6a;
+      --tertiary: #d4d4d4;
+      --quaternary: #f5f5f4;
+      --content: #3a3a3a;
+      --code-bg: #f5f5f4;
+      --border: #e2e1de;
+      --accent: #0c0c0c;
+      --accent-rgb: 12, 12, 12;
+      --accent-hover: #3a3a3a;
+      --accent-light: color-mix(in srgb, var(--accent) 8%, var(--quaternary) 92%);
+      --accent-ring: rgba(var(--accent-rgb), 0.18);
+      --accent-border-soft: color-mix(in srgb, var(--border) 78%, var(--accent) 22%);
+      --surface-tint: rgba(var(--accent-rgb), 0.04);
+      --surface-tint-strong: rgba(var(--accent-rgb), 0.08);
+      --page-bg: #f4f4f2;
+      --highlight: #ffe36e;
+      --highlight-strong: #ffc400;
+      --hero-glow: transparent;
+      --hero-glow-soft: transparent;
+      --surface-gradient-hero: var(--theme);
       --focus-ring: 0 0 0 3px var(--accent-ring);
-      --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.06);
-      --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.05);
-      --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.06);
-      --shadow-accent: 0 8px 24px -6px rgba(var(--accent-rgb), 0.28);
+      --shadow-sm: 0 1px 2px 0 rgba(12, 12, 12, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(12, 12, 12, 0.08), 0 2px 4px -1px rgba(12, 12, 12, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(12, 12, 12, 0.1), 0 4px 6px -2px rgba(12, 12, 12, 0.06);
+      --shadow-accent: 0 8px 24px -6px rgba(var(--accent-rgb), 0.18);
       --main-width: 1200px;
       --pg-companion-height: 52px;
       --transition-interactive: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
@@ -47,33 +49,35 @@ export function themeVarsCss() {
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --theme: #0f172a;
-        --theme-rgb: 15, 23, 42;
-        --entry: #1e293b;
-        --primary: #f1f5f9;
-        --primary-rgb: 241, 245, 249;
-        --secondary: #94a3b8;
-        --tertiary: #475569;
-        --quaternary: #1a2332;
-        --content: #cbd5e1;
-        --code-bg: #334155;
-        --border: #334155;
-        --accent: #6eb4f0;
-        --accent-rgb: 110, 180, 240;
-        --accent-hover: #8ac4f5;
-        --accent-light: color-mix(in srgb, var(--accent) 14%, var(--entry) 86%);
-        --accent-ring: rgba(var(--accent-rgb), 0.32);
-        --accent-border-soft: color-mix(in srgb, var(--border) 68%, var(--accent) 32%);
-        --surface-tint: rgba(var(--accent-rgb), 0.08);
-        --surface-tint-strong: rgba(var(--accent-rgb), 0.14);
-        --page-bg: #020617;
-        --hero-glow: rgba(var(--accent-rgb), 0.14);
-        --hero-glow-soft: rgba(var(--accent-rgb), 0.09);
-        --surface-gradient-hero: radial-gradient(ellipse 80% 42% at 50% 0%, var(--hero-glow-soft), transparent 72%);
+        --theme: #121212;
+        --theme-rgb: 18, 18, 18;
+        --entry: #171717;
+        --primary: #f5f5f4;
+        --primary-rgb: 245, 245, 244;
+        --secondary: #a3a3a3;
+        --tertiary: #3a3a3a;
+        --quaternary: #1c1c1c;
+        --content: #d4d4d4;
+        --code-bg: #1c1c1c;
+        --border: #2a2a2a;
+        --accent: #fafafa;
+        --accent-rgb: 250, 250, 250;
+        --accent-hover: #d4d4d4;
+        --accent-light: color-mix(in srgb, var(--accent) 10%, var(--entry) 90%);
+        --accent-ring: rgba(var(--accent-rgb), 0.28);
+        --accent-border-soft: color-mix(in srgb, var(--border) 70%, var(--accent) 30%);
+        --surface-tint: rgba(var(--accent-rgb), 0.06);
+        --surface-tint-strong: rgba(var(--accent-rgb), 0.1);
+        --page-bg: #0a0a0a;
+        --highlight: rgba(255, 214, 10, 0.32);
+        --highlight-strong: #ffd60a;
+        --hero-glow: transparent;
+        --hero-glow-soft: transparent;
+        --surface-gradient-hero: var(--theme);
         --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
         --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -1px rgba(0, 0, 0, 0.25);
         --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-        --shadow-accent: 0 8px 24px -6px rgba(var(--accent-rgb), 0.35);
+        --shadow-accent: 0 8px 24px -6px rgba(var(--accent-rgb), 0.22);
       }
     }
 
@@ -98,7 +102,7 @@ export function companionFrameCss() {
       background: rgba(var(--theme-rgb), 0.92);
       backdrop-filter: blur(12px);
       font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
-      font-size: 0.86rem;
+      font-size: 0.875rem;
       line-height: 1.35;
     }
 
@@ -126,21 +130,33 @@ export function companionFrameCss() {
       font-weight: 800;
       text-decoration: none;
       letter-spacing: -0.02em;
+      transition: var(--transition-interactive);
     }
 
     .pg-companion__brand a:hover {
-      color: var(--accent);
+      transform: scale(1.03);
     }
 
     .pg-companion__sep {
-      color: var(--border);
+      color: var(--tertiary);
     }
 
     .pg-companion__eyebrow {
-      color: var(--accent);
-      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--primary);
+      font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.01em;
+    }
+
+    .pg-companion__eyebrow::before {
+      content: "";
+      width: 12px;
+      height: 2px;
+      border-radius: 1px;
+      background: var(--highlight-strong);
     }
 
     .pg-companion__content {
@@ -154,8 +170,8 @@ export function companionFrameCss() {
     .pg-companion__title {
       overflow: hidden;
       color: var(--primary);
-      font-size: 0.88rem;
-      font-weight: 750;
+      font-size: 0.875rem;
+      font-weight: 700;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -163,7 +179,7 @@ export function companionFrameCss() {
     .pg-companion__context {
       overflow: hidden;
       color: var(--secondary);
-      font-size: 0.76rem;
+      font-size: 0.75rem;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -185,7 +201,7 @@ export function companionFrameCss() {
       border-radius: var(--radius-lg);
       color: var(--primary);
       background: var(--theme);
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 700;
       text-decoration: none;
       white-space: nowrap;
@@ -193,7 +209,7 @@ export function companionFrameCss() {
     }
 
     .pg-companion__btn:hover {
-      color: var(--accent);
+      color: var(--primary);
       background: var(--accent-light);
       border-color: var(--accent-border-soft);
     }
@@ -205,14 +221,14 @@ export function companionFrameCss() {
 
     .pg-companion__btn--primary {
       color: var(--theme);
-      background: var(--primary);
-      border-color: var(--primary);
+      background: var(--accent);
+      border-color: var(--accent);
     }
 
     .pg-companion__btn--primary:hover {
-      color: #fff;
-      background: var(--accent);
-      border-color: var(--accent);
+      color: var(--theme);
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
     }
 
     .pg-companion__menu {
@@ -230,7 +246,7 @@ export function companionFrameCss() {
 
     .pg-companion__menu > summary::after {
       content: "▾";
-      margin-left: 0.35rem;
+      margin-inline-start: 0.35rem;
       font-size: 0.65rem;
       opacity: 0.85;
     }
@@ -242,7 +258,7 @@ export function companionFrameCss() {
     .pg-companion__menu-panel {
       position: absolute;
       top: calc(100% + 6px);
-      right: 0;
+      inset-inline-end: 0;
       z-index: 20;
       display: flex;
       flex-direction: column;
@@ -267,8 +283,8 @@ export function companionFrameCss() {
     }
 
     .pg-companion__menu-item:hover {
-      color: var(--accent-hover);
-      background: var(--surface-tint);
+      color: var(--primary);
+      background: var(--accent-light);
     }
 
     html.pg-has-companion-bar,
@@ -955,7 +971,7 @@ export function plexFontHead() {
   return `
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />`;
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />`;
 }
 
 export function faviconHead() {
